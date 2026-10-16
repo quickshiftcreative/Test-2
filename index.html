@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agency Backend CMS | Admin Control Room</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #09090b; color: #f4f4f5; }
+    .charcoal-box { background-color: #121215; border: 1px solid #27272a; }
+    .liquid-box { background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(18,18,21,0.85) 100%); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.12); }
+    input, textarea, select { background-color: #09090b !important; border: 1px solid #27272a !important; color: #ffffff !important; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- LOGIN GATE -->
+  <div id="auth-gate" class="fixed inset-0 z-50 bg-[#09090b] flex items-center justify-center p-4">
+    <div class="liquid-box rounded-3xl max-w-md w-full p-8 space-y-6">
+      <h1 class="text-2xl font-bold text-white text-center">Admin Login</h1>
+      <form onsubmit="handleLogin(event)" class="space-y-4">
+        <input type="email" id="login-email" required placeholder="admin@agency.com" class="w-full px-4 py-3 rounded-xl text-sm" />
+        <input type="password" id="login-pass" required placeholder="Admin@123" class="w-full px-4 py-3 rounded-xl text-sm" />
+        <button type="submit" class="w-full py-3.5 rounded-xl bg-indigo-600 text-white font-bold text-sm">Sign In</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- CMS APP -->
+  <div id="cms-app" class="hidden max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <div class="charcoal-box rounded-2xl p-4 flex justify-between items-center">
+      <h1 class="text-xl font-bold text-white">⚡ Admin Control Panel (Globally Synced)</h1>
+      <a href="index.html" target="_blank" class="px-4 py-2 rounded-xl bg-white text-zinc-950 text-xs font-bold">Open Website ↗</a>
+    </div>
+
+    <div class="flex gap-2">
+      <button onclick="openTab('tab-services')" class="adm-tab px-4 py-2 rounded-xl text-xs font-bold bg-white text-zinc-950">1. Services</button>
+      <button onclick="openTab('tab-tracker')" class="adm-tab px-4 py-2 rounded-xl text-xs font-bold charcoal-box text-zinc-300">2. Tracker</button>
+      <button onclick="openTab('tab-brand')" class="adm-tab px-4 py-2 rounded-xl text-xs font-bold charcoal-box text-zinc-300">3. Brand Settings</button>
+    </div>
+
+    <!-- TAB 1: SERVICES -->
+    <div id="tab-services" class="tab-panel charcoal-box rounded-3xl p-6 space-y-6">
+      <h2 class="text-lg font-bold text-white">Add Service Category</h2>
+      <form onsubmit="addCat(event)" class="grid grid-cols-2 gap-3">
+        <input type="text" id="cat-title" required placeholder="Title" class="px-3 py-2 rounded-xl text-xs" />
+        <input type="text" id="cat-desc" required placeholder="Description" class="px-3 py-2 rounded-xl text-xs" />
+        <button type="submit" class="col-span-2 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs">Save Category</button>
+      </form>
+      <h3 class="text-sm font-bold text-white mt-4">Add Sub-Service</h3>
+      <form onsubmit="addSub(event)" class="grid grid-cols-3 gap-3">
+        <select id="sub-parent" required class="px-3 py-2 rounded-xl text-xs"></select>
+        <input type="text" id="sub-name" required placeholder="Sub-service Name" class="px-3 py-2 rounded-xl text-xs" />
+        <input type="number" id="sub-price" required placeholder="Price in ₹" class="px-3 py-2 rounded-xl text-xs" />
+        <button type="submit" class="col-span-3 py-2.5 rounded-xl bg-emerald-500 text-zinc-950 font-bold text-xs">Add Sub-Service</button>
+      </form>
+      <div id="admin-services-list" class="space-y-2 pt-4"></div>
+    </div>
+
+    <!-- TAB 2: TRACKER -->
+    <div id="tab-tracker" class="tab-panel hidden charcoal-box rounded-3xl p-6 space-y-4">
+      <h2 class="text-lg font-bold text-white">Live Client Tracker</h2>
+      <form onsubmit="addProj(event)" class="grid grid-cols-2 gap-3">
+        <input type="text" id="tr-client" required placeholder="Client Name" class="px-3 py-2 rounded-xl text-xs" />
+        <input type="text" id="tr-project" required placeholder="Project Name" class="px-3 py-2 rounded-xl text-xs" />
+        <input type="range" id="tr-prog" min="0" max="100" value="50" class="col-span-2" />
+        <button type="submit" class="col-span-2 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs">Add Project</button>
+      </form>
+      <div id="admin-tracker-list" class="space-y-2 pt-4"></div>
+    </div>
+
+    <!-- TAB 3: BRAND -->
+    <div id="tab-brand" class="tab-panel hidden charcoal-box rounded-3xl p-6 space-y-4">
+      <h2 class="text-lg font-bold text-white">Brand Name & USD Rate</h2>
+      <form onsubmit="saveBrand(event)" class="space-y-3">
+        <input type="text" id="br-name" required placeholder="Agency Name" class="w-full px-3 py-2 rounded-xl text-xs" />
+        <input type="number" id="br-usd" required placeholder="USD Rate" class="w-full px-3 py-2 rounded-xl text-xs" />
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs">Save Brand</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const CLOUD_URL = 'https://backend-f4e0c-default-rtdb.firebaseio.com/';
+
+    async function getDB() {
+      try {
+        const res = await fetch(CLOUD_URL + 'agency_cms.json');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.brand) return data;
+        }
+      } catch (e) {}
+      const local = localStorage.getItem('GLOBAL_AGENCY_CMS_V4');
+      return local ? JSON.parse(local) : { services: [], projects: [], portfolio: [], team: [], reviews: [], brand: {name:'OG Dask', usdRate:84} };
+    }
+
+    async function saveDB(db) {
+      localStorage.setItem('GLOBAL_AGENCY_CMS_V4', JSON.stringify(db));
+      try {
+        await fetch(CLOUD_URL + 'agency_cms.json', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(db)
+        });
+      } catch (e) {}
+      renderAdmin();
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      if(document.getElementById('login-email').value === 'admin@agency.com' && document.getElementById('login-pass').value === 'Admin@123') {
+        document.getElementById('auth-gate').classList.add('hidden');
+        document.getElementById('cms-app').classList.remove('hidden');
+        renderAdmin();
+      } else { alert('Invalid login!'); }
+    }
+
+    function openTab(id) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    async function addCat(e) {
+      e.preventDefault();
+      const db = await getDB();
+      db.services = db.services || [];
+      db.services.push({ id: 'CAT-'+Date.now(), title: document.getElementById('cat-title').value, description: document.getElementById('cat-desc').value, subServices: [] });
+      await saveDB(db); e.target.reset();
+    }
+
+    async function addSub(e) {
+      e.preventDefault();
+      const db = await getDB();
+      const catId = document.getElementById('sub-parent').value;
+      const cat = db.services.find(c => c.id === catId);
+      if(cat) {
+        cat.subServices = cat.subServices || [];
+        cat.subServices.push({ id: 'SUB-'+Date.now(), name: document.getElementById('sub-name').value, priceINR: Number(document.getElementById('sub-price').value), billing: 'Monthly' });
+        await saveDB(db); e.target.reset();
+      }
+    }
+
+    async function addProj(e) {
+      e.preventDefault();
+      const db = await getDB();
+      db.projects = db.projects || [];
+      db.projects.unshift({ id: 'PRJ-'+Date.now(), clientName: document.getElementById('tr-client').value, projectName: document.getElementById('tr-project').value, progress: Number(document.getElementById('tr-prog').value), stage: 'Execution' });
+      await saveDB(db); e.target.reset();
+    }
+
+    async function saveBrand(e) {
+      e.preventDefault();
+      const db = await getDB();
+      db.brand.name = document.getElementById('br-name').value;
+      db.brand.usdRate = Number(document.getElementById('br-usd').value);
+      await saveDB(db); alert('Saved globally!');
+    }
+
+    async function renderAdmin() {
+      const db = await getDB();
+      document.getElementById('sub-parent').innerHTML = (db.services || []).map(c => `<option value="${c.id}">${c.title}</option>`).join('');
+      document.getElementById('br-name').value = db.brand.name || '';
+      document.getElementById('br-usd').value = db.brand.usdRate || 84;
+      
+      document.getElementById('admin-services-list').innerHTML = (db.services || []).map(c => `
+        <div class="p-3 rounded-xl bg-[#09090b] text-xs">
+          <strong>${c.title}</strong>
+          <div class="pl-3">${(c.subServices||[]).map(s=>`<div>${s.name} - ₹${s.priceINR}</div>`).join('')}</div>
+        </div>
+      `).join('');
+      
+      document.getElementById('admin-tracker-list').innerHTML = (db.projects || []).map(p => `
+        <div class="p-3 rounded-xl bg-[#09090b] text-xs flex justify-between">
+          <span>${p.clientName} - ${p.projectName} (${p.progress}%)</span>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>
