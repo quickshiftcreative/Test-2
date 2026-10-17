@@ -1,182 +1,1721 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="dark scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Agency Backend CMS | Admin Control Room</title>
+  <title>OG Desk | Global Backend CMS & Control Room</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #09090b; color: #f4f4f5; }
-    .charcoal-box { background-color: #121215; border: 1px solid #27272a; }
-    .liquid-box { background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(18,18,21,0.85) 100%); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.12); }
-    input, textarea, select { background-color: #09090b !important; border: 1px solid #27272a !important; color: #ffffff !important; }
+    :root {
+      --bg-matte: #09090b;
+      --card-charcoal: #111114;
+      --border-subtle: #242429;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-matte);
+      color: #f4f4f5;
+      overflow-x: hidden;
+    }
+    h1, h2, h3, h4, .editorial-font {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .charcoal-box {
+      background-color: var(--card-charcoal);
+      border: 1px solid var(--border-subtle);
+    }
+    .liquid-glass {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(17, 17, 20, 0.82) 100%);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);
+    }
+    input:not([type="color"]):not([type="checkbox"]):not([type="range"]), textarea, select {
+      background-color: #09090b !important;
+      border: 1px solid #27272a !important;
+      color: #ffffff !important;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: #6366f1 !important;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
   </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen flex flex-col selection:bg-indigo-600 selection:text-white">
 
-  <!-- LOGIN GATE -->
+  <!-- ================= PERSISTENT EMAIL & PASSWORD LOGIN GATE ================= -->
   <div id="auth-gate" class="fixed inset-0 z-50 bg-[#09090b] flex items-center justify-center p-4">
-    <div class="liquid-box rounded-3xl max-w-md w-full p-8 space-y-6">
-      <h1 class="text-2xl font-bold text-white text-center">Admin Login</h1>
-      <form onsubmit="handleLogin(event)" class="space-y-4">
-        <input type="email" id="login-email" required placeholder="admin@agency.com" class="w-full px-4 py-3 rounded-xl text-sm" />
-        <input type="password" id="login-pass" required placeholder="Admin@123" class="w-full px-4 py-3 rounded-xl text-sm" />
-        <button type="submit" class="w-full py-3.5 rounded-xl bg-indigo-600 text-white font-bold text-sm">Sign In</button>
+    <div class="liquid-glass rounded-3xl max-w-md w-full p-7 sm:p-9 space-y-6">
+      <div class="text-center space-y-2">
+        <div class="w-12 h-12 rounded-2xl bg-white text-zinc-950 mx-auto flex items-center justify-center font-black text-lg shadow-lg">OG</div>
+        <h1 class="text-2xl font-bold text-white">Global Backend CMS</h1>
+        <p class="text-xs text-zinc-400">Sign in with your Owner or Staff Email & Password</p>
+      </div>
+
+      <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+        <div>
+          <label class="text-xs font-bold text-zinc-400 block mb-1.5">Email Address</label>
+          <input type="email" id="login-email" required placeholder="admin@agency.com" class="w-full px-4 py-3 rounded-xl text-sm" />
+        </div>
+        <div>
+          <label class="text-xs font-bold text-zinc-400 block mb-1.5">Password</label>
+          <input type="password" id="login-pass" required placeholder="••••••••" class="w-full px-4 py-3 rounded-xl text-sm" />
+        </div>
+        <button type="submit" class="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-sm shadow-lg transition">
+          Unlock Control Room →
+        </button>
       </form>
+
+      <div class="p-4 rounded-2xl bg-[#09090b] border border-[#242429] text-[11px] text-zinc-400 space-y-1">
+        <div class="font-bold text-zinc-200">Default Owner Credentials (Changeable in Tab 10):</div>
+        <div>Email: <code class="text-emerald-400 font-bold">admin@agency.com</code></div>
+        <div>Password: <code class="text-emerald-400 font-bold">Admin@123</code></div>
+      </div>
     </div>
   </div>
 
-  <!-- CMS APP -->
-  <div id="cms-app" class="hidden max-w-7xl mx-auto px-4 py-6 space-y-6">
-    <div class="charcoal-box rounded-2xl p-4 flex justify-between items-center">
-      <h1 class="text-xl font-bold text-white">⚡ Admin Control Panel (Globally Synced)</h1>
-      <a href="index.html" target="_blank" class="px-4 py-2 rounded-xl bg-white text-zinc-950 text-xs font-bold">Open Website ↗</a>
-    </div>
+  <!-- ================= MAIN CMS APPLICATION ================= -->
+  <div id="cms-wrapper" class="hidden flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-5 space-y-6">
 
-    <div class="flex gap-2">
-      <button onclick="openTab('tab-services')" class="adm-tab px-4 py-2 rounded-xl text-xs font-bold bg-white text-zinc-950">1. Services</button>
-      <button onclick="openTab('tab-tracker')" class="adm-tab px-4 py-2 rounded-xl text-xs font-bold charcoal-box text-zinc-300">2. Tracker</button>
-      <button onclick="openTab('tab-brand')" class="adm-tab px-4 py-2 rounded-xl text-xs font-bold charcoal-box text-zinc-300">3. Brand Settings</button>
-    </div>
+    <!-- STICKY LIQUID-GLASS TOP CONTROL BAR -->
+    <header class="sticky top-3 z-40 liquid-glass rounded-2xl p-3.5 sm:px-5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-black text-sm">CMS</div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span id="sync-status-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span id="sync-status-text" class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400">Live Firebase Cloud Synced</span>
+            <span id="active-user-badge" class="px-2 py-0.5 rounded bg-white/10 text-[10px] font-bold text-zinc-300">Owner</span>
+          </div>
+          <h1 class="text-base sm:text-lg font-bold text-white leading-tight">OG Desk — Master Control Center</h1>
+        </div>
+      </div>
 
-    <!-- TAB 1: SERVICES -->
-    <div id="tab-services" class="tab-panel charcoal-box rounded-3xl p-6 space-y-6">
-      <h2 class="text-lg font-bold text-white">Add Service Category</h2>
-      <form onsubmit="addCat(event)" class="grid grid-cols-2 gap-3">
-        <input type="text" id="cat-title" required placeholder="Title" class="px-3 py-2 rounded-xl text-xs" />
-        <input type="text" id="cat-desc" required placeholder="Description" class="px-3 py-2 rounded-xl text-xs" />
-        <button type="submit" class="col-span-2 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs">Save Category</button>
-      </form>
-      <h3 class="text-sm font-bold text-white mt-4">Add Sub-Service</h3>
-      <form onsubmit="addSub(event)" class="grid grid-cols-3 gap-3">
-        <select id="sub-parent" required class="px-3 py-2 rounded-xl text-xs"></select>
-        <input type="text" id="sub-name" required placeholder="Sub-service Name" class="px-3 py-2 rounded-xl text-xs" />
-        <input type="number" id="sub-price" required placeholder="Price in ₹" class="px-3 py-2 rounded-xl text-xs" />
-        <button type="submit" class="col-span-3 py-2.5 rounded-xl bg-emerald-500 text-zinc-950 font-bold text-xs">Add Sub-Service</button>
-      </form>
-      <div id="admin-services-list" class="space-y-2 pt-4"></div>
-    </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="pushToCloudNow()" class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-extrabold text-xs transition">
+          ⚡ Push Live Now
+        </button>
+        <a href="index.html" target="_blank" class="px-3.5 py-2 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 font-extrabold text-xs transition">
+          🌐 Open Frontend ↗
+        </a>
+        <button onclick="logoutSession()" class="px-3 py-2 rounded-xl charcoal-box text-xs font-bold text-rose-400 hover:border-rose-500/40">
+          Logout
+        </button>
+      </div>
+    </header>
 
-    <!-- TAB 2: TRACKER -->
-    <div id="tab-tracker" class="tab-panel hidden charcoal-box rounded-3xl p-6 space-y-4">
-      <h2 class="text-lg font-bold text-white">Live Client Tracker</h2>
-      <form onsubmit="addProj(event)" class="grid grid-cols-2 gap-3">
-        <input type="text" id="tr-client" required placeholder="Client Name" class="px-3 py-2 rounded-xl text-xs" />
-        <input type="text" id="tr-project" required placeholder="Project Name" class="px-3 py-2 rounded-xl text-xs" />
-        <input type="range" id="tr-prog" min="0" max="100" value="50" class="col-span-2" />
-        <button type="submit" class="col-span-2 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs">Add Project</button>
-      </form>
-      <div id="admin-tracker-list" class="space-y-2 pt-4"></div>
-    </div>
+    <!-- NAVIGATION TABS (WITH FIXED ACTIVE INDICATOR & REFRESH PERSISTENCE) -->
+    <nav class="flex overflow-x-auto gap-2 pb-2 no-scrollbar">
+      <button onclick="switchTab('tab-brand')" id="btn-tab-brand" class="cms-tab-btn px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition">1. Brand & Micro-Copy</button>
+      <button onclick="switchTab('tab-theme')" id="btn-tab-theme" class="cms-tab-btn px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition">2. Colors, Pricing & Visibility</button>
+      <button onclick="switchTab('tab-3d')" id="btn-tab-3d" class="cms-tab-btn px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition">3. 3D Hero Stage</button>
+      <button onclick="switchTab('tab-services')" id="btn-tab-services" class="cms-tab-btn px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition">4. Services & Pop-up Items</button>
+      <button onclick="switchTab('tab-tracker')" id="btn-tab-tracker" class="cms-tab-btn px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition">5. Live Tracker (0-100%)</button>
+      <button onclick="switchTab('tab-portfolio')" id="btn-tab-portfolio" class="cms-tab-btn px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition">6. Portfolio & Case Studies</button>
+      <button onclick="switchTab('tab-about')" id="btn-tab-about" class="cms-tab-btn px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition">7. About, Partners & Staff</button>
+      <button onclick="switchTab('tab-editorial')" id="btn-tab-editorial" class="cms-tab-btn px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition">8. Studios, Process, Awards & FAQ</button>
+      <button onclick="switchTab('tab-seo')" id="btn-tab-seo" class="cms-tab-btn px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition">9. SEO & Legal Policies</button>
+      <button onclick="switchTab('tab-security')" id="btn-tab-security" class="cms-tab-btn px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition">10. Leads, Reviews & Accounts</button>
+    </nav>
 
-    <!-- TAB 3: BRAND -->
-    <div id="tab-brand" class="tab-panel hidden charcoal-box rounded-3xl p-6 space-y-4">
-      <h2 class="text-lg font-bold text-white">Brand Name & USD Rate</h2>
-      <form onsubmit="saveBrand(event)" class="space-y-3">
-        <input type="text" id="br-name" required placeholder="Agency Name" class="w-full px-3 py-2 rounded-xl text-xs" />
-        <input type="number" id="br-usd" required placeholder="USD Rate" class="w-full px-3 py-2 rounded-xl text-xs" />
-        <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs">Save Brand</button>
+    <!-- ======================================================================= -->
+    <!-- TAB 1: BRAND IDENTITY, LOGO UPLOAD, HERO TEXT, STATS & HEADINGS         -->
+    <!-- ======================================================================= -->
+    <section id="tab-brand" class="cms-tab-pane space-y-6">
+      <form onsubmit="saveBrandAndCopy(event)" class="space-y-6">
+        
+        <!-- Core Brand & Logo Upload -->
+        <div class="charcoal-box rounded-3xl p-6 space-y-4">
+          <h2 class="text-lg font-bold text-white border-b border-[#242429] pb-3">A. Brand Identity, Logo Upload & Contact Desk</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Agency Brand Name</label>
+              <input type="text" id="br-name" required class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Brand Tagline</label>
+              <input type="text" id="br-tagline" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Website Domain</label>
+              <input type="text" id="br-domain" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center pt-2">
+            <div class="p-3.5 rounded-2xl bg-[#09090b] border border-[#242429] flex items-center gap-3">
+              <div id="br-logo-preview" class="w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-xs overflow-hidden shrink-0">Logo</div>
+              <div class="flex-1 min-w-0">
+                <label class="text-[11px] text-zinc-400 block mb-1">Upload Brand Logo (Gallery)</label>
+                <input type="file" accept="image/*" onchange="uploadImageToInput(this, 'br-logo-data', 'br-logo-preview')" class="w-full text-[11px]" />
+                <input type="hidden" id="br-logo-data" />
+              </div>
+              <button type="button" onclick="clearLogo()" class="text-[10px] text-rose-400 font-bold">Clear</button>
+            </div>
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Display Phone Number</label>
+              <input type="text" id="br-phone" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">WhatsApp Number (Digits Only, e.g. 919876543210)</label>
+              <input type="text" id="br-whatsapp" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Official Email</label>
+              <input type="email" id="br-email" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+            <div class="md:col-span-2">
+              <label class="text-xs text-zinc-400 block mb-1">Top Announcement Bar Text</label>
+              <input type="text" id="br-announcement" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Section Copy, Pills & Marquee -->
+        <div class="charcoal-box rounded-3xl p-6 space-y-4">
+          <h2 class="text-lg font-bold text-white border-b border-[#242429] pb-3">B. Hero Section Texts, Pills & Marquee Banners</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Hero Top Badge Text</label>
+              <input type="text" id="br-hero-badge" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Hero Main Headline</label>
+              <input type="text" id="br-hero-title" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+          </div>
+          <div>
+            <label class="text-xs text-zinc-400 block mb-1">Hero Subtitle Paragraph</label>
+            <textarea id="br-hero-sub" rows="2" class="w-full px-3.5 py-2.5 rounded-xl text-sm"></textarea>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Primary Hero Button Text</label>
+              <input type="text" id="br-btn1" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Secondary Hero Button Text</label>
+              <input type="text" id="br-btn2" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Hero Discipline Pills (Comma separated)</label>
+              <input type="text" id="br-pills" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Scrolling Marquee Items (Comma separated)</label>
+              <input type="text" id="br-marquee" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Kinetic Footer Giant Scrolling Text</label>
+              <input type="text" id="br-kinetic" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Footer Copyright Line</label>
+              <input type="text" id="br-copyright" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Agency Metrics & All Page Headings -->
+        <div class="charcoal-box rounded-3xl p-6 space-y-4">
+          <h2 class="text-lg font-bold text-white border-b border-[#242429] pb-3">C. Home Metrics (Stats) & Every Page Heading</h2>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div><label class="text-[11px] text-zinc-400">Stat 1 Number</label><input type="text" id="st-1v" class="w-full px-3 py-2 rounded-xl text-xs mt-1" /></div>
+            <div><label class="text-[11px] text-zinc-400">Stat 1 Label</label><input type="text" id="st-1l" class="w-full px-3 py-2 rounded-xl text-xs mt-1" /></div>
+            <div><label class="text-[11px] text-zinc-400">Stat 2 Number</label><input type="text" id="st-2v" class="w-full px-3 py-2 rounded-xl text-xs mt-1" /></div>
+            <div><label class="text-[11px] text-zinc-400">Stat 2 Label</label><input type="text" id="st-2l" class="w-full px-3 py-2 rounded-xl text-xs mt-1" /></div>
+            <div><label class="text-[11px] text-zinc-400">Stat 3 Label (Rating)</label><input type="text" id="st-3l" class="w-full px-3 py-2 rounded-xl text-xs mt-1" /></div>
+            <div><label class="text-[11px] text-zinc-400">Stat 4 Number</label><input type="text" id="st-4v" class="w-full px-3 py-2 rounded-xl text-xs mt-1" /></div>
+            <div class="col-span-2"><label class="text-[11px] text-zinc-400">Stat 4 Label</label><input type="text" id="st-4l" class="w-full px-3 py-2 rounded-xl text-xs mt-1" /></div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3 border-t border-[#242429]">
+            <div><label class="text-[11px] text-zinc-400">Home Services Heading</label><input type="text" id="hd-hsrv" class="w-full px-3 py-2 rounded-xl text-xs mt-1" /></div>
+            <div><label class="text-[11px] text-zinc-400">Home Work Heading</label><input type="text" id="hd-hwrk" class="w-full px-3 py-2 rounded-xl text-xs mt-1" /></div>
+            <div><label class="text-[11px] text-zinc-400">Process Section Heading</label><input type="text" id="hd-proc" class="w-full px-3 py-2 rounded-xl text-xs mt-1" /></div>
+            <div><label class="text-[11px] text-zinc-400">Awards Section Heading</label><input type="text" id="hd-awd" class="w-full px-3 py-2 rounded-xl text-xs mt-1" /></div>
+            <div><label class="text-[11px] text-zinc-400">Services Page Heading</label><input type="text" id="hd-srvp" class="w-full px-3 py-2 rounded-xl text-xs mt-1" /></div>
+            <div><label class="text-[11px] text-zinc-400">Quotation Page Heading</label><input type="text" id="hd-qtp" class="w-full px-3 py-2 rounded-xl text-xs mt-1" /></div>
+            <div><label class="text-[11px] text-zinc-400">Portfolio Page Heading</label><input type="text" id="hd-pfp" class="w-full px-3 py-2 rounded-xl text-xs mt-1" /></div>
+            <div><label class="text-[11px] text-zinc-400">Tracker Page Heading</label><input type="text" id="hd-trp" class="w-full px-3 py-2 rounded-xl text-xs mt-1" /></div>
+            <div><label class="text-[11px] text-zinc-400">Contact Page Heading</label><input type="text" id="hd-cntp" class="w-full px-3 py-2 rounded-xl text-xs mt-1" /></div>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-sm shadow-xl transition">
+          💾 Save All Brand, Hero & Micro-Copy Changes Globally
+        </button>
       </form>
-    </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 2: THEME COLORS, PRICING VISIBILITY MODE, CURRENCY & TOGGLES        -->
+    <!-- ======================================================================= -->
+    <section id="tab-theme" class="cms-tab-pane hidden space-y-6">
+      <form onsubmit="saveThemeAndPricing(event)" class="space-y-6">
+        
+        <!-- Pricing Visibility Mode Switcher -->
+        <div class="charcoal-box rounded-3xl p-6 space-y-4">
+          <h2 class="text-lg font-bold text-white border-b border-[#242429] pb-3">A. Service Pricing Visibility Mode & Currency Rates</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="md:col-span-3">
+              <label class="text-xs font-extrabold text-emerald-400 block mb-2">Choose How Service Prices Appear to Clients:</label>
+              <select id="vis-pricing-mode" class="w-full px-4 py-3 rounded-xl text-sm font-bold">
+                <option value="show">1. Show Exact Prices Everywhere (Website Cards + Pop-ups + PDF Quote)</option>
+                <option value="unlock_in_pdf">2. Hide on Website ("Unlock in PDF Quote") — Reveal Exact Prices Only in Downloaded PDF</option>
+                <option value="custom_quote">3. 100% Custom Quote Mode — Hide Prices Everywhere ("Custom Quote" on Cards & PDF)</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">USD Exchange Rate ($1 = ₹ INR)</label>
+              <input type="number" id="curr-usd" required class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">AED Exchange Rate (1 AED = ₹ INR)</label>
+              <input type="number" id="curr-aed" required class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Quotation Tax / GST (%)</label>
+              <input type="number" id="curr-gst" required class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+          </div>
+          <div>
+            <label class="text-xs text-zinc-400 block mb-1">Official PDF Quotation Terms & Conditions</label>
+            <textarea id="curr-terms" rows="3" class="w-full px-3.5 py-2.5 rounded-xl text-sm"></textarea>
+          </div>
+        </div>
+
+        <!-- Live Color Customizer -->
+        <div class="charcoal-box rounded-3xl p-6 space-y-4">
+          <div class="flex items-center justify-between border-b border-[#242429] pb-3">
+            <h2 class="text-lg font-bold text-white">B. Website Theme & Accent Color Customizer</h2>
+            <button type="button" onclick="resetDefaultColors()" class="px-3 py-1.5 rounded-xl bg-white/10 text-xs font-bold text-zinc-300 hover:text-white">Reset Default Matte Dark</button>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
+            <div class="p-3 rounded-2xl bg-[#09090b] border border-[#242429] text-center">
+              <label class="text-[11px] text-zinc-400 block mb-2">Solid Background</label>
+              <input type="color" id="col-bg" class="w-12 h-10 rounded cursor-pointer mx-auto block bg-transparent" />
+            </div>
+            <div class="p-3 rounded-2xl bg-[#09090b] border border-[#242429] text-center">
+              <label class="text-[11px] text-zinc-400 block mb-2">Charcoal Cards</label>
+              <input type="color" id="col-card" class="w-12 h-10 rounded cursor-pointer mx-auto block bg-transparent" />
+            </div>
+            <div class="p-3 rounded-2xl bg-[#09090b] border border-[#242429] text-center">
+              <label class="text-[11px] text-zinc-400 block mb-2">Primary Accent</label>
+              <input type="color" id="col-pri" class="w-12 h-10 rounded cursor-pointer mx-auto block bg-transparent" />
+            </div>
+            <div class="p-3 rounded-2xl bg-[#09090b] border border-[#242429] text-center">
+              <label class="text-[11px] text-zinc-400 block mb-2">Secondary Accent</label>
+              <input type="color" id="col-sec" class="w-12 h-10 rounded cursor-pointer mx-auto block bg-transparent" />
+            </div>
+            <div class="p-3 rounded-2xl bg-[#09090b] border border-[#242429] text-center">
+              <label class="text-[11px] text-zinc-400 block mb-2">Primary Text</label>
+              <input type="color" id="col-txt" class="w-12 h-10 rounded cursor-pointer mx-auto block bg-transparent" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Show / Hide Switches -->
+        <div class="charcoal-box rounded-3xl p-6 space-y-4">
+          <h2 class="text-lg font-bold text-white border-b border-[#242429] pb-3">C. Homepage Section Show / Hide Switches</h2>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-bold">
+            <label class="p-3.5 rounded-2xl bg-[#09090b] border border-[#242429] flex items-center gap-2.5 cursor-pointer">
+              <input type="checkbox" id="tog-ann" class="w-4 h-4" /> <span>Top Announcement</span>
+            </label>
+            <label class="p-3.5 rounded-2xl bg-[#09090b] border border-[#242429] flex items-center gap-2.5 cursor-pointer">
+              <input type="checkbox" id="tog-3d" class="w-4 h-4" /> <span>3D Hero Stage</span>
+            </label>
+            <label class="p-3.5 rounded-2xl bg-[#09090b] border border-[#242429] flex items-center gap-2.5 cursor-pointer">
+              <input type="checkbox" id="tog-mq" class="w-4 h-4" /> <span>Marquee Strip</span>
+            </label>
+            <label class="p-3.5 rounded-2xl bg-[#09090b] border border-[#242429] flex items-center gap-2.5 cursor-pointer">
+              <input type="checkbox" id="tog-st" class="w-4 h-4" /> <span>Metrics Bento</span>
+            </label>
+            <label class="p-3.5 rounded-2xl bg-[#09090b] border border-[#242429] flex items-center gap-2.5 cursor-pointer">
+              <input type="checkbox" id="tog-pr" class="w-4 h-4" /> <span>4-Step Process</span>
+            </label>
+            <label class="p-3.5 rounded-2xl bg-[#09090b] border border-[#242429] flex items-center gap-2.5 cursor-pointer">
+              <input type="checkbox" id="tog-aw" class="w-4 h-4" /> <span>Awards Table</span>
+            </label>
+            <label class="p-3.5 rounded-2xl bg-[#09090b] border border-[#242429] flex items-center gap-2.5 cursor-pointer">
+              <input type="checkbox" id="tog-fq" class="w-4 h-4" /> <span>FAQ Section</span>
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-extrabold text-sm shadow-xl transition">
+          💾 Save Pricing Mode, Theme Colors & Visibility Settings
+        </button>
+      </form>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 3: INTERACTIVE 3D HERO CHARACTER / 3D MODEL STAGE MANAGER           -->
+    <!-- ======================================================================= -->
+    <section id="tab-3d" class="cms-tab-pane hidden space-y-6">
+      <form onsubmit="save3DStageConfig(event)" class="charcoal-box rounded-3xl p-6 space-y-5">
+        <h2 class="text-lg font-bold text-white border-b border-[#242429] pb-3">Interactive 3D Hero Stage Manager (Character Image, .GLB 3D Model, or Spline Scene)</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-extrabold text-indigo-400 block mb-1">Select 3D Display Mode</label>
+            <select id="h3d-mode" class="w-full px-4 py-3 rounded-xl text-sm font-bold">
+              <option value="character_image">Mode 1: 3D Character / Mascot Image (Floating + Interactive 3D Tilt)</option>
+              <option value="glb_model">Mode 2: Real 360° Interactive .GLB 3D Model (Google Model-Viewer)</option>
+              <option value="spline_embed">Mode 3: Spline / Sketchfab Interactive 3D Embed URL</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-zinc-400 block mb-1">Top Stage Badge Label</label>
+            <input type="text" id="h3d-badge" placeholder="3D INTERACTIVE STAGE" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs text-zinc-400 block mb-1">3D Stage Title / Character Name</label>
+            <input type="text" id="h3d-title" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+          </div>
+          <div>
+            <label class="text-xs text-zinc-400 block mb-1">3D Stage Subtitle / Instruction</label>
+            <input type="text" id="h3d-sub" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+          </div>
+        </div>
+
+        <!-- Mode 1: Upload 3D Character Image or URL -->
+        <div class="p-4 rounded-2xl bg-[#09090b] border border-[#242429] space-y-3">
+          <div class="text-xs font-extrabold text-emerald-400">Option 1: Upload 3D Character Image (From Phone Gallery) or Paste Image URL</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+            <input type="file" accept="image/*" onchange="uploadImageToInput(this, 'h3d-img-url')" class="text-xs" />
+            <input type="text" id="h3d-img-url" placeholder="https://... (or auto-filled by upload)" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+          </div>
+        </div>
+
+        <!-- Mode 2: .GLB 3D Model URL -->
+        <div class="p-4 rounded-2xl bg-[#09090b] border border-[#242429] space-y-2">
+          <div class="text-xs font-extrabold text-indigo-400">Option 2: 360° .GLB 3D Model URL (For Mode 2)</div>
+          <input type="text" id="h3d-glb-url" placeholder="https://modelviewer.dev/shared-assets/models/Astronaut.glb" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+        </div>
+
+        <!-- Mode 3: Spline Embed URL -->
+        <div class="p-4 rounded-2xl bg-[#09090b] border border-[#242429] space-y-2">
+          <div class="text-xs font-extrabold text-purple-400">Option 3: Spline 3D Scene Embed URL (For Mode 3)</div>
+          <input type="text" id="h3d-spline-url" placeholder="https://my.spline.design/..." class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+        </div>
+
+        <button type="submit" class="w-full py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-sm shadow-xl transition">
+          💾 Save & Update 3D Hero Stage Live
+        </button>
+      </form>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 4: SERVICES & LIQUID-GLASS POP-UP SUB-SERVICES (ADD + EDIT + DEL)   -->
+    <!-- ======================================================================= -->
+    <section id="tab-services" class="cms-tab-pane hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Add / Edit Main Service Category Card -->
+        <div class="charcoal-box rounded-3xl p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 id="cat-form-heading" class="text-lg font-bold text-white">Add / Edit Main Service Category</h2>
+            <button type="button" onclick="resetCategoryForm()" class="text-xs text-zinc-400 hover:text-white">Reset Form</button>
+          </div>
+          <form onsubmit="saveServiceCategory(event)" class="space-y-3">
+            <input type="hidden" id="cat-edit-id" />
+            <div class="grid grid-cols-3 gap-3">
+              <input type="text" id="cat-index" placeholder="No. e.g. (01)" class="px-3.5 py-2.5 rounded-xl text-sm" />
+              <input type="text" id="cat-badge" required placeholder="Badge (e.g. Marketplaces)" class="col-span-2 px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+            <input type="text" id="cat-title" required placeholder="Service Category Title (e.g. E-Commerce Management)" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            <textarea id="cat-desc" required rows="2" placeholder="Description shown on the card and pop-up header..." class="w-full px-3.5 py-2.5 rounded-xl text-sm"></textarea>
+            <button type="submit" id="cat-submit-btn" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs">
+              + Save Main Service Category
+            </button>
+          </form>
+        </div>
+
+        <!-- Add / Edit Sub-Service Inside Category Pop-up -->
+        <div class="charcoal-box rounded-3xl p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 id="sub-form-heading" class="text-lg font-bold text-white">Add / Edit Pop-up Sub-Service</h2>
+            <button type="button" onclick="resetSubServiceForm()" class="text-xs text-zinc-400 hover:text-white">Reset Form</button>
+          </div>
+          <form onsubmit="saveSubService(event)" class="space-y-3">
+            <input type="hidden" id="sub-edit-id" />
+            <select id="sub-parent-cat" required class="w-full px-3.5 py-2.5 rounded-xl text-sm"></select>
+            <input type="text" id="sub-name" required placeholder="Sub-Service Deliverable Name" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            <div class="grid grid-cols-2 gap-3">
+              <input type="number" id="sub-price" required placeholder="Price in ₹ INR" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+              <select id="sub-billing" class="w-full px-3.5 py-2.5 rounded-xl text-sm">
+                <option value="One-Time">One-Time</option>
+                <option value="Monthly">Monthly</option>
+                <option value="Quarterly">Quarterly</option>
+                <option value="Custom">Custom</option>
+              </select>
+            </div>
+            <button type="submit" id="sub-submit-btn" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-extrabold text-xs">
+              + Save Sub-Service Item
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Full Interactive List with Edit & Delete -->
+      <div class="charcoal-box rounded-3xl p-6 space-y-4">
+        <h3 class="text-base font-bold text-white">All Live Service Categories & Pop-up Sub-Services (Click ✏️ Edit to Modify)</h3>
+        <div id="cms-services-list" class="space-y-4"></div>
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 5: LIVE CLIENT WORK TRACKER (0% - 100% SLIDER + EDIT + DELETE)      -->
+    <!-- ======================================================================= -->
+    <section id="tab-tracker" class="cms-tab-pane hidden space-y-6">
+      <div class="charcoal-box rounded-3xl p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-[#242429] pb-3">
+          <h2 id="tr-form-heading" class="text-lg font-bold text-white">Add / Edit Client Live Tracker Project</h2>
+          <button type="button" onclick="resetTrackerForm()" class="text-xs text-zinc-400 hover:text-white">Reset Form</button>
+        </div>
+        <form onsubmit="saveTrackerProject(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <input type="hidden" id="tr-edit-id" />
+          <input type="text" id="tr-client" required placeholder="Client / Brand Name *" class="px-3.5 py-2.5 rounded-xl text-sm" />
+          <input type="text" id="tr-project" required placeholder="Project Title *" class="px-3.5 py-2.5 rounded-xl text-sm" />
+          <input type="text" id="tr-code" placeholder="Project Code (e.g. PRJ-204)" class="px-3.5 py-2.5 rounded-xl text-sm" />
+          <select id="tr-stage" class="px-3.5 py-2.5 rounded-xl text-sm">
+            <option value="Onboarding & Audit">Onboarding & Audit</option>
+            <option value="Strategy & Design">Strategy & Design</option>
+            <option value="Execution & Scaling">Execution & Scaling</option>
+            <option value="Final Review">Final Review</option>
+            <option value="Completed">Completed</option>
+          </select>
+          <div class="flex items-center gap-3 px-3.5 py-2 rounded-xl bg-[#09090b] border border-[#242429]">
+            <span class="text-xs text-zinc-400">Progress:</span>
+            <input type="range" id="tr-prog" min="0" max="100" value="50" oninput="document.getElementById('tr-prog-val').innerText=this.value+'%'" class="flex-1" />
+            <span id="tr-prog-val" class="text-xs font-extrabold text-emerald-400">50%</span>
+          </div>
+          <input type="text" id="tr-link" placeholder="Shared Drive / Report URL (Optional)" class="px-3.5 py-2.5 rounded-xl text-sm" />
+          <input type="text" id="tr-note" placeholder="Current status note for client..." class="md:col-span-2 px-3.5 py-2.5 rounded-xl text-sm" />
+          <input type="text" id="tr-deliv" placeholder="Deliverables Checklist (Comma separated, e.g. Audit ✔, A+ Live ✔)" class="px-3.5 py-2.5 rounded-xl text-sm" />
+          <button type="submit" id="tr-submit-btn" class="md:col-span-3 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs">
+            + Save Client Project to Live Tracker
+          </button>
+        </form>
+      </div>
+
+      <div class="charcoal-box rounded-3xl p-6 space-y-3">
+        <h3 class="text-base font-bold text-white">Active Client Projects (Drag Slider for Instant 0-100% Update or Click ✏️ Edit)</h3>
+        <div id="cms-tracker-list" class="space-y-3"></div>
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 6: PORTFOLIO, CASE STUDIES & REELS (WITH GALLERY UPLOAD & EDIT)     -->
+    <!-- ======================================================================= -->
+    <section id="tab-portfolio" class="cms-tab-pane hidden space-y-6">
+      <div class="charcoal-box rounded-3xl p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-[#242429] pb-3">
+          <h2 id="pf-form-heading" class="text-lg font-bold text-white">Add / Edit Portfolio Case Study & Reel</h2>
+          <button type="button" onclick="resetPortfolioForm()" class="text-xs text-zinc-400 hover:text-white">Reset Form</button>
+        </div>
+        <form onsubmit="savePortfolioStudy(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <input type="hidden" id="pf-edit-id" />
+          <input type="text" id="pf-index" placeholder="Index e.g. (01)" class="px-3.5 py-2.5 rounded-xl text-sm" />
+          <input type="text" id="pf-title" required placeholder="Case Study Headline *" class="md:col-span-2 px-3.5 py-2.5 rounded-xl text-sm" />
+          <input type="text" id="pf-client" required placeholder="Client Brand Name *" class="px-3.5 py-2.5 rounded-xl text-sm" />
+          <input type="text" id="pf-cat" required placeholder="Category (e.g. E-Commerce & 3D)" class="px-3.5 py-2.5 rounded-xl text-sm" />
+          <input type="text" id="pf-metric" placeholder="Growth Result (e.g. +240% GMV Growth)" class="px-3.5 py-2.5 rounded-xl text-sm" />
+          
+          <div class="p-3 rounded-xl bg-[#09090b] border border-[#242429]">
+            <label class="text-[11px] text-zinc-400 block mb-1">Upload Cover Image from Gallery</label>
+            <input type="file" accept="image/*" onchange="uploadImageToInput(this, 'pf-media')" class="text-xs w-full" />
+          </div>
+          <input type="text" id="pf-media" placeholder="OR Paste Image URL" class="px-3.5 py-2.5 rounded-xl text-sm" />
+          <input type="text" id="pf-live" placeholder="Reel / Live Project Link (Optional)" class="px-3.5 py-2.5 rounded-xl text-sm" />
+
+          <textarea id="pf-summary" required rows="2" placeholder="Card Summary..." class="md:col-span-3 px-3.5 py-2.5 rounded-xl text-sm"></textarea>
+          <textarea id="pf-challenge" rows="2" placeholder="Pop-up: The Client Challenge..." class="md:col-span-1 px-3.5 py-2.5 rounded-xl text-sm"></textarea>
+          <textarea id="pf-solution" rows="2" placeholder="Pop-up: Our Execution & Solution..." class="md:col-span-2 px-3.5 py-2.5 rounded-xl text-sm"></textarea>
+
+          <button type="submit" id="pf-submit-btn" class="md:col-span-3 py-3.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-xs">
+            📤 Save & Publish Portfolio Case Study
+          </button>
+        </form>
+      </div>
+
+      <div class="charcoal-box rounded-3xl p-6 space-y-3">
+        <h3 class="text-base font-bold text-white">Published Portfolio Works</h3>
+        <div id="cms-portfolio-list" class="space-y-3"></div>
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 7: ABOUT STORY, FOUNDERS/PARTNERS & CORE STAFF (WITH PHOTO UPLOAD)  -->
+    <!-- ======================================================================= -->
+    <section id="tab-about" class="cms-tab-pane hidden space-y-6">
+      <form onsubmit="saveAboutStory(event)" class="charcoal-box rounded-3xl p-6 space-y-4">
+        <h2 class="text-lg font-bold text-white border-b border-[#242429] pb-3">A. About Us Story, Mission & Vision</h2>
+        <input type="text" id="ab-heading" required placeholder="About Section Headline" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+        <textarea id="ab-story" required rows="4" placeholder="Full Agency Story..." class="w-full px-3.5 py-2.5 rounded-xl text-sm"></textarea>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input type="text" id="ab-mission" placeholder="Our Mission" class="px-3.5 py-2.5 rounded-xl text-sm" />
+          <input type="text" id="ab-vision" placeholder="Our Vision" class="px-3.5 py-2.5 rounded-xl text-sm" />
+        </div>
+        <button type="submit" class="px-6 py-3 rounded-xl bg-indigo-600 text-white font-extrabold text-xs">Save About Story</button>
+      </form>
+
+      <div class="charcoal-box rounded-3xl p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-[#242429] pb-3">
+          <h2 id="tm-form-heading" class="text-lg font-bold text-white">B. Add / Edit Founder, Partner or Employee Card</h2>
+          <button type="button" onclick="resetTeamForm()" class="text-xs text-zinc-400 hover:text-white">Reset Form</button>
+        </div>
+        <form onsubmit="saveTeamMember(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <input type="hidden" id="tm-edit-id" />
+          <input type="text" id="tm-name" required placeholder="Full Name *" class="px-3.5 py-2.5 rounded-xl text-sm" />
+          <input type="text" id="tm-role" required placeholder="Designation / Role *" class="px-3.5 py-2.5 rounded-xl text-sm" />
+          <select id="tm-type" class="px-3.5 py-2.5 rounded-xl text-sm">
+            <option value="Partner">Founder / Managing Partner</option>
+            <option value="Staff">Core Team / Specialist</option>
+          </select>
+          <div class="p-2.5 rounded-xl bg-[#09090b] border border-[#242429]">
+            <label class="text-[10px] text-zinc-400 block">Upload Photo from Phone</label>
+            <input type="file" accept="image/*" onchange="uploadImageToInput(this, 'tm-photo')" class="text-[11px] w-full" />
+            <input type="hidden" id="tm-photo" />
+          </div>
+          <input type="text" id="tm-bio" placeholder="Short specialization bio..." class="md:col-span-3 px-3.5 py-2.5 rounded-xl text-sm" />
+          <button type="submit" id="tm-submit-btn" class="py-3 rounded-xl bg-emerald-500 text-zinc-950 font-extrabold text-xs">+ Save Member</button>
+        </form>
+
+        <div id="cms-team-list" class="space-y-2.5 pt-4"></div>
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 8: STUDIOS (INDIA/UAE), 4-STEP PROCESS, AWARDS & FAQS               -->
+    <!-- ======================================================================= -->
+    <section id="tab-editorial" class="cms-tab-pane hidden space-y-6">
+      
+      <!-- Global Regional Studios -->
+      <div class="charcoal-box rounded-3xl p-6 space-y-4">
+        <h2 class="text-lg font-bold text-white border-b border-[#242429] pb-3">A. Regional Studio Hubs (India / UAE / Global Cards)</h2>
+        <form onsubmit="saveStudioHub(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3">
+          <input type="hidden" id="st-edit-id" />
+          <input type="text" id="st-country" required placeholder="Region (e.g. INDIA STUDIO)" class="px-3 py-2.5 rounded-xl text-xs" />
+          <input type="text" id="st-city" required placeholder="Hub Title (e.g. Gujarat & Odisha)" class="px-3 py-2.5 rounded-xl text-xs" />
+          <input type="text" id="st-phone" required placeholder="Phone" class="px-3 py-2.5 rounded-xl text-xs" />
+          <input type="text" id="st-email" required placeholder="Email" class="px-3 py-2.5 rounded-xl text-xs" />
+          <input type="text" id="st-addr" required placeholder="Address / Note" class="px-3 py-2.5 rounded-xl text-xs" />
+          <button type="submit" class="md:col-span-5 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs">+ Save Studio Hub</button>
+        </form>
+        <div id="cms-studios-list" class="space-y-2"></div>
+      </div>
+
+      <!-- Awards & Recognition Rows -->
+      <div class="charcoal-box rounded-3xl p-6 space-y-4">
+        <h2 class="text-lg font-bold text-white border-b border-[#242429] pb-3">B. Awards & Recognition Rows ((001) - (004))</h2>
+        <form onsubmit="saveAwardRow(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <input type="text" id="aw-code" required placeholder="Code e.g. (001)" class="px-3 py-2.5 rounded-xl text-xs" />
+          <input type="text" id="aw-title" required placeholder="Award / Milestone Title" class="px-3 py-2.5 rounded-xl text-xs" />
+          <input type="text" id="aw-org" required placeholder="Organization / Benchmark" class="px-3 py-2.5 rounded-xl text-xs" />
+          <input type="text" id="aw-year" required placeholder="Year (e.g. 2026)" class="px-3 py-2.5 rounded-xl text-xs" />
+          <button type="submit" class="md:col-span-4 py-2.5 rounded-xl bg-amber-500 text-zinc-950 font-extrabold text-xs">+ Add Award Row</button>
+        </form>
+        <div id="cms-awards-list" class="space-y-2"></div>
+      </div>
+
+      <!-- FAQs -->
+      <div class="charcoal-box rounded-3xl p-6 space-y-4">
+        <h2 class="text-lg font-bold text-white border-b border-[#242429] pb-3">C. Frequently Asked Questions (FAQ)</h2>
+        <form onsubmit="saveFaqItem(event)" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <input type="hidden" id="fq-edit-id" />
+          <input type="text" id="fq-q" required placeholder="Question *" class="px-3.5 py-2.5 rounded-xl text-xs" />
+          <input type="text" id="fq-a" required placeholder="Detailed Answer *" class="px-3.5 py-2.5 rounded-xl text-xs" />
+          <button type="submit" class="md:col-span-2 py-2.5 rounded-xl bg-emerald-500 text-zinc-950 font-extrabold text-xs">+ Save FAQ</button>
+        </form>
+        <div id="cms-faq-list" class="space-y-2"></div>
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 9: COMPLETE GOOGLE SEO SUITE & LEGAL POLICIES                       -->
+    <!-- ======================================================================= -->
+    <section id="tab-seo" class="cms-tab-pane hidden space-y-6">
+      <form onsubmit="saveSeoAndPolicies(event)" class="space-y-6">
+        <div class="charcoal-box rounded-3xl p-6 space-y-4">
+          <h2 class="text-lg font-bold text-white border-b border-[#242429] pb-3">A. Google Search SEO, OpenGraph & Favicon Suite</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Meta Title (Shown on Google & Browser Tab)</label>
+              <input type="text" id="seo-t" required class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Focus Keywords (Comma separated)</label>
+              <input type="text" id="seo-k" class="w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+          </div>
+          <div>
+            <label class="text-xs text-zinc-400 block mb-1">Meta Description (150-160 characters recommended)</label>
+            <textarea id="seo-d" rows="2" class="w-full px-3.5 py-2.5 rounded-xl text-sm"></textarea>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-3 rounded-xl bg-[#09090b] border border-[#242429]">
+              <label class="text-xs text-zinc-400 block mb-1">Upload Custom Favicon Icon</label>
+              <input type="file" accept="image/*" onchange="uploadImageToInput(this, 'seo-fav')" class="text-xs w-full" />
+              <input type="text" id="seo-fav" placeholder="Or Favicon URL" class="w-full px-3 py-1.5 rounded-lg text-xs mt-2" />
+            </div>
+            <div class="p-3 rounded-xl bg-[#09090b] border border-[#242429]">
+              <label class="text-xs text-zinc-400 block mb-1">Upload WhatsApp / Social Share Banner (OG Image)</label>
+              <input type="file" accept="image/*" onchange="uploadImageToInput(this, 'seo-og')" class="text-xs w-full" />
+              <input type="text" id="seo-og" placeholder="Or OG Image URL" class="w-full px-3 py-1.5 rounded-lg text-xs mt-2" />
+            </div>
+          </div>
+        </div>
+
+        <div class="charcoal-box rounded-3xl p-6 space-y-4">
+          <h2 class="text-lg font-bold text-white border-b border-[#242429] pb-3">B. Legal Policies (Privacy, Terms & Refund Policy)</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Privacy Policy</label>
+              <textarea id="pol-priv" rows="5" class="w-full px-3.5 py-2.5 rounded-xl text-xs"></textarea>
+            </div>
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Terms & Conditions</label>
+              <textarea id="pol-term" rows="5" class="w-full px-3.5 py-2.5 rounded-xl text-xs"></textarea>
+            </div>
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Refund & Cancellation Policy</label>
+              <textarea id="pol-ref" rows="5" class="w-full px-3.5 py-2.5 rounded-xl text-xs"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-sm shadow-xl transition">
+          💾 Save SEO Suite & Legal Policies
+        </button>
+      </form>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 10: LEADS CRM, REVIEWS, MULTI-ADMIN ACCOUNTS & BACKUP               -->
+    <!-- ======================================================================= -->
+    <section id="tab-security" class="cms-tab-pane hidden space-y-6">
+      
+      <!-- Create / Edit Owner & Staff Login Accounts -->
+      <div class="charcoal-box rounded-3xl p-6 space-y-4">
+        <h2 class="text-lg font-bold text-white border-b border-[#242429] pb-3">A. Create & Manage Admin / Staff Login Accounts (Email & Password)</h2>
+        <form onsubmit="addOrUpdateAdminAccount(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <input type="text" id="acc-name" required placeholder="User Name (e.g. Jenish / Staff)" class="px-3.5 py-2.5 rounded-xl text-xs" />
+          <input type="email" id="acc-email" required placeholder="Login Email *" class="px-3.5 py-2.5 rounded-xl text-xs" />
+          <input type="text" id="acc-pass" required placeholder="Login Password *" class="px-3.5 py-2.5 rounded-xl text-xs" />
+          <select id="acc-role" class="px-3.5 py-2.5 rounded-xl text-xs">
+            <option value="Owner">Owner (Full Access)</option>
+            <option value="Staff">Staff / Employee</option>
+          </select>
+          <button type="submit" class="md:col-span-4 py-3 rounded-xl bg-emerald-500 text-zinc-950 font-extrabold text-xs">
+            + Create / Update Login Account (Synced to Cloud)
+          </button>
+        </form>
+        <div id="cms-accounts-list" class="space-y-2 pt-2"></div>
+      </div>
+
+      <!-- Downloaded Quotation Leads & Contact Inquiries -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="charcoal-box rounded-3xl p-6 space-y-4">
+          <h2 class="text-lg font-bold text-white border-b border-[#242429] pb-3">B. Downloaded PDF Quotation Leads</h2>
+          <div id="cms-leads-list" class="space-y-3 max-h-96 overflow-y-auto"></div>
+        </div>
+        <div class="charcoal-box rounded-3xl p-6 space-y-4">
+          <h2 class="text-lg font-bold text-white border-b border-[#242429] pb-3">C. Direct Contact Brief Inquiries</h2>
+          <div id="cms-inquiries-list" class="space-y-3 max-h-96 overflow-y-auto"></div>
+        </div>
+      </div>
+
+      <!-- Client 5-Star Reviews Moderation -->
+      <div class="charcoal-box rounded-3xl p-6 space-y-4">
+        <h2 class="text-lg font-bold text-white border-b border-[#242429] pb-3">D. Client 5-Star Reviews Manager</h2>
+        <div id="cms-reviews-list" class="space-y-2.5"></div>
+      </div>
+
+      <!-- Database Backup & Restore -->
+      <div class="charcoal-box rounded-3xl p-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h3 class="text-sm font-bold text-white">Database Backup & Restore</h3>
+          <p class="text-xs text-zinc-400">Download a full JSON backup of your website or restore defaults anytime.</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <button onclick="downloadBackupJSON()" class="px-4 py-2.5 rounded-xl bg-white text-zinc-950 font-extrabold text-xs">📥 Export Backup JSON</button>
+          <button onclick="resetToFactoryDefaults()" class="px-4 py-2.5 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/30 font-bold text-xs">Reset to Default Demo Data</button>
+        </div>
+      </div>
+
+    </section>
+
   </div>
 
+  <!-- ========================================================================= -->
+  <!-- MASTER BACKEND CMS ENGINE (CLOUD SYNC + PERSISTENT SESSION & TAB FIX)     -->
+  <!-- ========================================================================= -->
   <script>
-    const CLOUD_URL = 'https://backend-f4e0c-default-rtdb.firebaseio.com/';
+    const FIREBASE_DB_URL = 'https://backend-f4e0c-default-rtdb.firebaseio.com/agency_os_v5.json';
+    const FIREBASE_AUTH_URL = 'https://backend-f4e0c-default-rtdb.firebaseio.com/agency_auth_v5.json';
+    const LOCAL_CACHE_KEY = 'OG_DESK_GLOBAL_V5_CACHE';
+    const LOCAL_AUTH_KEY = 'OG_DESK_ACCOUNTS_V5';
+    const SESSION_TOKEN_KEY = 'OG_DESK_ACTIVE_SESSION_V5';
+    const ACTIVE_TAB_KEY = 'OG_DESK_ACTIVE_TAB_V5';
 
-    async function getDB() {
-      try {
-        const res = await fetch(CLOUD_URL + 'agency_cms.json');
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.brand) return data;
-        }
-      } catch (e) {}
-      const local = localStorage.getItem('GLOBAL_AGENCY_CMS_V4');
-      return local ? JSON.parse(local) : { services: [], projects: [], portfolio: [], team: [], reviews: [], brand: {name:'OG Dask', usdRate:84} };
+    const defaultAccounts = [
+      { id: 'ACC-1', name: 'Master Owner', email: 'admin@agency.com', pass: 'Admin@123', role: 'Owner' },
+      { id: 'ACC-2', name: 'Agency Staff', email: 'staff@agency.com', pass: 'Staff@123', role: 'Staff' }
+    ];
+
+    function getAccounts() {
+      const raw = localStorage.getItem(LOCAL_AUTH_KEY);
+      if (!raw) {
+        localStorage.setItem(LOCAL_AUTH_KEY, JSON.stringify(defaultAccounts));
+        return defaultAccounts;
+      }
+      try { return JSON.parse(raw); } catch (e) { return defaultAccounts; }
     }
 
-    async function saveDB(db) {
-      localStorage.setItem('GLOBAL_AGENCY_CMS_V4', JSON.stringify(db));
+    async function syncAccountsFromCloud() {
       try {
-        await fetch(CLOUD_URL + 'agency_cms.json', {
+        const res = await fetch(FIREBASE_AUTH_URL + '?t=' + Date.now());
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            localStorage.setItem(LOCAL_AUTH_KEY, JSON.stringify(data));
+          } else {
+            await fetch(FIREBASE_AUTH_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(getAccounts()) });
+          }
+        }
+      } catch (e) {}
+    }
+
+    function getDB() {
+      const raw = localStorage.getItem(LOCAL_CACHE_KEY);
+      if (!raw) return { theme: {}, visibility: {}, brand: { name: 'OG DESK', usdRate: 84, aedRate: 23, gstPercent: 0 }, hero3D: {}, seo: {}, headings: {}, about: {}, studios: [], process: [], awards: [], faqs: [], policies: {}, services: [], projects: [], portfolio: [], team: [], reviews: [], leads: [], inquiries: [] };
+      try { return JSON.parse(raw); } catch (e) { return {}; }
+    }
+
+    async function pullFromCloud() {
+      try {
+        const res = await fetch(FIREBASE_DB_URL + '?t=' + Date.now(), { cache: 'no-store' });
+        if (res.ok) {
+          const cloud = await res.json();
+          if (cloud && cloud.brand) {
+            localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(cloud));
+            populateAllForms();
+            renderAllLists();
+          }
+        }
+      } catch (e) {}
+    }
+
+    async function saveAndPushDB(db, showToast = false) {
+      localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(db));
+      const dot = document.getElementById('sync-status-dot');
+      const txt = document.getElementById('sync-status-text');
+      if (txt) txt.innerText = 'Syncing to Global Cloud...';
+      try {
+        await fetch(FIREBASE_DB_URL, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(db)
         });
-      } catch (e) {}
-      renderAdmin();
+        if (txt) txt.innerText = 'Live Firebase Cloud Synced ✓';
+        if (dot) dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+      } catch (e) {
+        if (txt) txt.innerText = 'Saved Locally (Offline)';
+      }
+      renderAllLists();
+      if (showToast) alert('✅ Changes Saved & Pushed Live Globally!');
     }
 
-    async function handleLogin(e) {
+    async function pushToCloudNow() {
+      await saveAndPushDB(getDB(), true);
+    }
+
+    // Persistent Login Session (Does NOT Logout on Refresh!)
+    async function handleAdminLogin(e) {
       e.preventDefault();
-      if(document.getElementById('login-email').value === 'admin@agency.com' && document.getElementById('login-pass').value === 'Admin@123') {
-        document.getElementById('auth-gate').classList.add('hidden');
-        document.getElementById('cms-app').classList.remove('hidden');
-        renderAdmin();
-      } else { alert('Invalid login!'); }
-    }
+      await syncAccountsFromCloud();
+      const email = document.getElementById('login-email').value.trim().toLowerCase();
+      const pass = document.getElementById('login-pass').value;
+      const accounts = getAccounts();
+      const matched = accounts.find(a => a.email.toLowerCase() === email && a.pass === pass);
 
-    function openTab(id) {
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
-    }
-
-    async function addCat(e) {
-      e.preventDefault();
-      const db = await getDB();
-      db.services = db.services || [];
-      db.services.push({ id: 'CAT-'+Date.now(), title: document.getElementById('cat-title').value, description: document.getElementById('cat-desc').value, subServices: [] });
-      await saveDB(db); e.target.reset();
-    }
-
-    async function addSub(e) {
-      e.preventDefault();
-      const db = await getDB();
-      const catId = document.getElementById('sub-parent').value;
-      const cat = db.services.find(c => c.id === catId);
-      if(cat) {
-        cat.subServices = cat.subServices || [];
-        cat.subServices.push({ id: 'SUB-'+Date.now(), name: document.getElementById('sub-name').value, priceINR: Number(document.getElementById('sub-price').value), billing: 'Monthly' });
-        await saveDB(db); e.target.reset();
+      if (matched) {
+        localStorage.setItem(SESSION_TOKEN_KEY, JSON.stringify({ email: matched.email, role: matched.role, name: matched.name, time: Date.now() }));
+        unlockDashboard(matched);
+      } else {
+        alert('❌ Invalid Email or Password!');
       }
     }
 
-    async function addProj(e) {
+    function unlockDashboard(userObj) {
+      document.getElementById('auth-gate').classList.add('hidden');
+      document.getElementById('cms-wrapper').classList.remove('hidden');
+      document.getElementById('active-user-badge').innerText = `${userObj.name || 'Admin'} (${userObj.role || 'Owner'})`;
+      const savedTab = localStorage.getItem(ACTIVE_TAB_KEY) || 'tab-brand';
+      switchTab(savedTab);
+      populateAllForms();
+      renderAllLists();
+      pullFromCloud();
+    }
+
+    function logoutSession() {
+      localStorage.removeItem(SESSION_TOKEN_KEY);
+      document.getElementById('cms-wrapper').classList.add('hidden');
+      document.getElementById('auth-gate').classList.remove('hidden');
+    }
+
+    // Fixed Active Tab Indicator + Tab Persistence Across Refreshes
+    function switchTab(tabId) {
+      document.querySelectorAll('.cms-tab-pane').forEach(p => p.classList.add('hidden'));
+      const target = document.getElementById(tabId);
+      if (target) target.classList.remove('hidden');
+
+      document.querySelectorAll('.cms-tab-btn').forEach(b => {
+        b.classList.remove('bg-white', 'text-zinc-950', 'shadow-lg');
+        b.classList.add('charcoal-box', 'text-zinc-300');
+      });
+      const activeBtn = document.getElementById('btn-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.remove('charcoal-box', 'text-zinc-300');
+        activeBtn.classList.add('bg-white', 'text-zinc-950', 'shadow-lg');
+      }
+      localStorage.setItem(ACTIVE_TAB_KEY, tabId);
+    }
+
+    // Phone Gallery Image -> Compressed Base64 Uploader
+    function uploadImageToInput(fileInput, targetInputId, previewBoxId = null) {
+      const file = fileInput.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 720;
+          const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+          document.getElementById(targetInputId).value = dataUrl;
+          if (previewBoxId) {
+            document.getElementById(previewBoxId).innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover" />`;
+          }
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearLogo() {
+      document.getElementById('br-logo-data').value = '';
+      document.getElementById('br-logo-preview').innerHTML = 'Logo';
+    }
+
+    function populateAllForms() {
+      const db = getDB();
+      const b = db.brand || {};
+      const h = db.headings || {};
+      const t = db.theme || {};
+      const v = db.visibility || {};
+      const h3 = db.hero3D || {};
+      const s = db.seo || {};
+      const ab = db.about || {};
+      const pol = db.policies || {};
+
+      document.getElementById('br-name').value = b.name || 'OG DESK';
+      document.getElementById('br-tagline').value = b.tagline || '';
+      document.getElementById('br-domain').value = b.domain || '';
+      document.getElementById('br-logo-data').value = b.logo || '';
+      if (b.logo) document.getElementById('br-logo-preview').innerHTML = `<img src="${b.logo}" class="w-full h-full object-cover" />`;
+      document.getElementById('br-phone').value = b.phone || '';
+      document.getElementById('br-whatsapp').value = b.whatsapp || '';
+      document.getElementById('br-email').value = b.email || '';
+      document.getElementById('br-announcement').value = b.announcement || '';
+      document.getElementById('br-hero-badge').value = b.heroBadge || '';
+      document.getElementById('br-hero-title').value = b.heroTitle || '';
+      document.getElementById('br-hero-sub').value = b.heroSub || '';
+      document.getElementById('br-btn1').value = b.heroBtn1 || '';
+      document.getElementById('br-btn2').value = b.heroBtn2 || '';
+      document.getElementById('br-pills').value = (b.pills || []).join(', ');
+      document.getElementById('br-marquee').value = (b.marqueeItems || []).join(', ');
+      document.getElementById('br-kinetic').value = b.kineticFooterText || '';
+      document.getElementById('br-copyright').value = b.copyright || '';
+
+      document.getElementById('st-1v').value = b.stat1Val || '50+';
+      document.getElementById('st-1l').value = b.stat1Lbl || '';
+      document.getElementById('st-2v').value = b.stat2Val || '250+';
+      document.getElementById('st-2l').value = b.stat2Lbl || '';
+      document.getElementById('st-3l').value = b.stat3Lbl || '';
+      document.getElementById('st-4v').value = b.stat4Val || '24/7';
+      document.getElementById('st-4l').value = b.stat4Lbl || '';
+
+      document.getElementById('hd-hsrv').value = h.homeSrvHeading || '';
+      document.getElementById('hd-hwrk').value = h.homeWorkHeading || '';
+      document.getElementById('hd-proc').value = h.processHeading || '';
+      document.getElementById('hd-awd').value = h.awardsHeading || '';
+      document.getElementById('hd-srvp').value = h.srvPageHeading || '';
+      document.getElementById('hd-qtp').value = h.quotePageHeading || '';
+      document.getElementById('hd-pfp').value = h.pfPageHeading || '';
+      document.getElementById('hd-trp').value = h.trPageHeading || '';
+      document.getElementById('hd-cntp').value = h.contactHeading || '';
+
+      // Tab 2: Theme & Pricing
+      document.getElementById('vis-pricing-mode').value = v.pricingMode || 'show';
+      document.getElementById('curr-usd').value = b.usdRate || 84;
+      document.getElementById('curr-aed').value = b.aedRate || 23;
+      document.getElementById('curr-gst').value = b.gstPercent || 0;
+      document.getElementById('curr-terms').value = b.quoteTerms || '';
+
+      document.getElementById('col-bg').value = t.bgSolid || '#09090b';
+      document.getElementById('col-card').value = t.cardCharcoal || '#111114';
+      document.getElementById('col-pri').value = t.accentPrimary || '#6366f1';
+      document.getElementById('col-sec').value = t.accentSecondary || '#10b981';
+      document.getElementById('col-txt').value = t.textMain || '#f4f4f5';
+
+      document.getElementById('tog-ann').checked = v.showAnnouncement !== false;
+      document.getElementById('tog-3d').checked = v.show3DStage !== false;
+      document.getElementById('tog-mq').checked = v.showMarquee !== false;
+      document.getElementById('tog-st').checked = v.showStats !== false;
+      document.getElementById('tog-pr').checked = v.showProcess !== false;
+      document.getElementById('tog-aw').checked = v.showAwards !== false;
+      document.getElementById('tog-fq').checked = v.showFAQ !== false;
+
+      // Tab 3: 3D Stage
+      document.getElementById('h3d-mode').value = h3.mode || 'character_image';
+      document.getElementById('h3d-badge').value = h3.badgeText || '';
+      document.getElementById('h3d-title').value = h3.title || '';
+      document.getElementById('h3d-sub').value = h3.subtitle || '';
+      document.getElementById('h3d-img-url').value = h3.imageUrl || '';
+      document.getElementById('h3d-glb-url').value = h3.glbUrl || '';
+      document.getElementById('h3d-spline-url').value = h3.splineUrl || '';
+
+      // Tab 7: About
+      document.getElementById('ab-heading').value = ab.heading || '';
+      document.getElementById('ab-story').value = ab.story || '';
+      document.getElementById('ab-mission').value = ab.mission || '';
+      document.getElementById('ab-vision').value = ab.vision || '';
+
+      // Tab 9: SEO & Policies
+      document.getElementById('seo-t').value = s.title || '';
+      document.getElementById('seo-k').value = s.keywords || '';
+      document.getElementById('seo-d').value = s.desc || '';
+      document.getElementById('seo-fav').value = s.favicon || '';
+      document.getElementById('seo-og').value = s.ogImage || '';
+
+      document.getElementById('pol-priv').value = pol.privacy || '';
+      document.getElementById('pol-term').value = pol.terms || '';
+      document.getElementById('pol-ref').value = pol.refund || '';
+    }
+
+    // Save Handlers
+    async function saveBrandAndCopy(e) {
       e.preventDefault();
-      const db = await getDB();
+      const db = getDB();
+      db.brand = {
+        ...db.brand,
+        name: document.getElementById('br-name').value.trim(),
+        tagline: document.getElementById('br-tagline').value.trim(),
+        domain: document.getElementById('br-domain').value.trim(),
+        logo: document.getElementById('br-logo-data').value,
+        phone: document.getElementById('br-phone').value.trim(),
+        whatsapp: document.getElementById('br-whatsapp').value.trim(),
+        email: document.getElementById('br-email').value.trim(),
+        announcement: document.getElementById('br-announcement').value.trim(),
+        heroBadge: document.getElementById('br-hero-badge').value.trim(),
+        heroTitle: document.getElementById('br-hero-title').value.trim(),
+        heroSub: document.getElementById('br-hero-sub').value.trim(),
+        heroBtn1: document.getElementById('br-btn1').value.trim(),
+        heroBtn2: document.getElementById('br-btn2').value.trim(),
+        pills: document.getElementById('br-pills').value.split(',').map(x => x.trim()).filter(Boolean),
+        marqueeItems: document.getElementById('br-marquee').value.split(',').map(x => x.trim()).filter(Boolean),
+        kineticFooterText: document.getElementById('br-kinetic').value,
+        copyright: document.getElementById('br-copyright').value.trim(),
+        stat1Val: document.getElementById('st-1v').value.trim(),
+        stat1Lbl: document.getElementById('st-1l').value.trim(),
+        stat2Val: document.getElementById('st-2v').value.trim(),
+        stat2Lbl: document.getElementById('st-2l').value.trim(),
+        stat3Lbl: document.getElementById('st-3l').value.trim(),
+        stat4Val: document.getElementById('st-4v').value.trim(),
+        stat4Lbl: document.getElementById('st-4l').value.trim()
+      };
+      db.headings = {
+        ...db.headings,
+        homeSrvHeading: document.getElementById('hd-hsrv').value.trim(),
+        homeWorkHeading: document.getElementById('hd-hwrk').value.trim(),
+        processHeading: document.getElementById('hd-proc').value.trim(),
+        awardsHeading: document.getElementById('hd-awd').value.trim(),
+        srvPageHeading: document.getElementById('hd-srvp').value.trim(),
+        quotePageHeading: document.getElementById('hd-qtp').value.trim(),
+        pfPageHeading: document.getElementById('hd-pfp').value.trim(),
+        trPageHeading: document.getElementById('hd-trp').value.trim(),
+        contactHeading: document.getElementById('hd-cntp').value.trim()
+      };
+      await saveAndPushDB(db, true);
+    }
+
+    async function saveThemeAndPricing(e) {
+      e.preventDefault();
+      const db = getDB();
+      db.theme = {
+        bgSolid: document.getElementById('col-bg').value,
+        cardCharcoal: document.getElementById('col-card').value,
+        accentPrimary: document.getElementById('col-pri').value,
+        accentSecondary: document.getElementById('col-sec').value,
+        textMain: document.getElementById('col-txt').value
+      };
+      db.visibility = {
+        pricingMode: document.getElementById('vis-pricing-mode').value,
+        showAnnouncement: document.getElementById('tog-ann').checked,
+        show3DStage: document.getElementById('tog-3d').checked,
+        showMarquee: document.getElementById('tog-mq').checked,
+        showStats: document.getElementById('tog-st').checked,
+        showProcess: document.getElementById('tog-pr').checked,
+        showAwards: document.getElementById('tog-aw').checked,
+        showFAQ: document.getElementById('tog-fq').checked
+      };
+      db.brand = {
+        ...db.brand,
+        usdRate: Number(document.getElementById('curr-usd').value || 84),
+        aedRate: Number(document.getElementById('curr-aed').value || 23),
+        gstPercent: Number(document.getElementById('curr-gst').value || 0),
+        quoteTerms: document.getElementById('curr-terms').value
+      };
+      await saveAndPushDB(db, true);
+    }
+
+    function resetDefaultColors() {
+      document.getElementById('col-bg').value = '#09090b';
+      document.getElementById('col-card').value = '#111114';
+      document.getElementById('col-pri').value = '#6366f1';
+      document.getElementById('col-sec').value = '#10b981';
+      document.getElementById('col-txt').value = '#f4f4f5';
+    }
+
+    async function save3DStageConfig(e) {
+      e.preventDefault();
+      const db = getDB();
+      db.hero3D = {
+        mode: document.getElementById('h3d-mode').value,
+        badgeText: document.getElementById('h3d-badge').value.trim(),
+        title: document.getElementById('h3d-title').value.trim(),
+        subtitle: document.getElementById('h3d-sub').value.trim(),
+        imageUrl: document.getElementById('h3d-img-url').value.trim(),
+        glbUrl: document.getElementById('h3d-glb-url').value.trim(),
+        splineUrl: document.getElementById('h3d-spline-url').value.trim()
+      };
+      await saveAndPushDB(db, true);
+    }
+
+    // Services & Sub-Services (Add + Edit + Delete)
+    async function saveServiceCategory(e) {
+      e.preventDefault();
+      const db = getDB();
+      db.services = db.services || [];
+      const editId = document.getElementById('cat-edit-id').value;
+      const payload = {
+        index: document.getElementById('cat-index').value.trim() || `(0${db.services.length + 1})`,
+        badge: document.getElementById('cat-badge').value.trim(),
+        title: document.getElementById('cat-title').value.trim(),
+        description: document.getElementById('cat-desc').value.trim()
+      };
+
+      if (editId) {
+        const item = db.services.find(c => c.id === editId);
+        if (item) Object.assign(item, payload);
+      } else {
+        db.services.push({ id: 'CAT-' + Date.now(), ...payload, subServices: [] });
+      }
+      resetCategoryForm();
+      await saveAndPushDB(db);
+    }
+
+    function editServiceCategory(catId) {
+      const db = getDB();
+      const cat = (db.services || []).find(c => c.id === catId);
+      if (!cat) return;
+      document.getElementById('cat-edit-id').value = cat.id;
+      document.getElementById('cat-index').value = cat.index || '';
+      document.getElementById('cat-badge').value = cat.badge || '';
+      document.getElementById('cat-title').value = cat.title || '';
+      document.getElementById('cat-desc').value = cat.description || '';
+      document.getElementById('cat-form-heading').innerText = '✏️ Editing Category: ' + cat.title;
+      document.getElementById('cat-submit-btn').innerText = '💾 Update Service Category';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetCategoryForm() {
+      document.getElementById('cat-edit-id').value = '';
+      document.getElementById('cat-index').value = '';
+      document.getElementById('cat-badge').value = '';
+      document.getElementById('cat-title').value = '';
+      document.getElementById('cat-desc').value = '';
+      document.getElementById('cat-form-heading').innerText = 'Add / Edit Main Service Category';
+      document.getElementById('cat-submit-btn').innerText = '+ Save Main Service Category';
+    }
+
+    async function saveSubService(e) {
+      e.preventDefault();
+      const db = getDB();
+      const catId = document.getElementById('sub-parent-cat').value;
+      const cat = (db.services || []).find(c => c.id === catId);
+      if (!cat) return;
+      cat.subServices = cat.subServices || [];
+
+      const editSubId = document.getElementById('sub-edit-id').value;
+      const subData = {
+        name: document.getElementById('sub-name').value.trim(),
+        priceINR: Number(document.getElementById('sub-price').value),
+        billing: document.getElementById('sub-billing').value
+      };
+
+      if (editSubId) {
+        db.services.forEach(c => {
+          const existing = (c.subServices || []).find(s => s.id === editSubId);
+          if (existing) Object.assign(existing, subData);
+        });
+      } else {
+        cat.subServices.push({ id: 'SUB-' + Date.now(), ...subData });
+      }
+      resetSubServiceForm();
+      await saveAndPushDB(db);
+    }
+
+    function editSubService(catId, subId) {
+      const db = getDB();
+      const cat = (db.services || []).find(c => c.id === catId);
+      if (!cat) return;
+      const sub = (cat.subServices || []).find(s => s.id === subId);
+      if (!sub) return;
+      document.getElementById('sub-edit-id').value = sub.id;
+      document.getElementById('sub-parent-cat').value = cat.id;
+      document.getElementById('sub-name').value = sub.name;
+      document.getElementById('sub-price').value = sub.priceINR;
+      document.getElementById('sub-billing').value = sub.billing;
+      document.getElementById('sub-form-heading').innerText = '✏️ Editing Sub-Service';
+      document.getElementById('sub-submit-btn').innerText = '💾 Update Sub-Service';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetSubServiceForm() {
+      document.getElementById('sub-edit-id').value = '';
+      document.getElementById('sub-name').value = '';
+      document.getElementById('sub-price').value = '';
+      document.getElementById('sub-form-heading').innerText = 'Add / Edit Pop-up Sub-Service';
+      document.getElementById('sub-submit-btn').innerText = '+ Save Sub-Service Item';
+    }
+
+    async function deleteSubServiceItem(catId, subId) {
+      const db = getDB();
+      const cat = (db.services || []).find(c => c.id === catId);
+      if (!cat) return;
+      cat.subServices = (cat.subServices || []).filter(s => s.id !== subId);
+      await saveAndPushDB(db);
+    }
+
+    // Tracker (Add + Edit + Instant Slider + Delete)
+    async function saveTrackerProject(e) {
+      e.preventDefault();
+      const db = getDB();
       db.projects = db.projects || [];
-      db.projects.unshift({ id: 'PRJ-'+Date.now(), clientName: document.getElementById('tr-client').value, projectName: document.getElementById('tr-project').value, progress: Number(document.getElementById('tr-prog').value), stage: 'Execution' });
-      await saveDB(db); e.target.reset();
+      const editId = document.getElementById('tr-edit-id').value;
+      const payload = {
+        clientName: document.getElementById('tr-client').value.trim(),
+        projectName: document.getElementById('tr-project').value.trim(),
+        code: document.getElementById('tr-code').value.trim() || 'PRJ-' + Math.floor(100 + Math.random() * 900),
+        stage: document.getElementById('tr-stage').value,
+        progress: Number(document.getElementById('tr-prog').value),
+        liveLink: document.getElementById('tr-link').value.trim(),
+        note: document.getElementById('tr-note').value.trim(),
+        deliverables: document.getElementById('tr-deliv').value.split(',').map(x => x.trim()).filter(Boolean)
+      };
+
+      if (editId) {
+        const p = db.projects.find(x => x.id === editId);
+        if (p) Object.assign(p, payload);
+      } else {
+        db.projects.unshift({ id: 'PRJ-' + Date.now(), ...payload });
+      }
+      resetTrackerForm();
+      await saveAndPushDB(db);
     }
 
-    async function saveBrand(e) {
+    function editTrackerProject(id) {
+      const db = getDB();
+      const p = (db.projects || []).find(x => x.id === id);
+      if (!p) return;
+      document.getElementById('tr-edit-id').value = p.id;
+      document.getElementById('tr-client').value = p.clientName;
+      document.getElementById('tr-project').value = p.projectName;
+      document.getElementById('tr-code').value = p.code || '';
+      document.getElementById('tr-stage').value = p.stage || 'Execution & Scaling';
+      document.getElementById('tr-prog').value = p.progress || 50;
+      document.getElementById('tr-prog-val').innerText = (p.progress || 50) + '%';
+      document.getElementById('tr-link').value = p.liveLink || '';
+      document.getElementById('tr-note').value = p.note || '';
+      document.getElementById('tr-deliv').value = (p.deliverables || []).join(', ');
+      document.getElementById('tr-form-heading').innerText = '✏️ Editing Project: ' + p.clientName;
+      document.getElementById('tr-submit-btn').innerText = '💾 Update Client Project';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetTrackerForm() {
+      document.getElementById('tr-edit-id').value = '';
+      document.getElementById('tr-client').value = '';
+      document.getElementById('tr-project').value = '';
+      document.getElementById('tr-code').value = '';
+      document.getElementById('tr-link').value = '';
+      document.getElementById('tr-note').value = '';
+      document.getElementById('tr-deliv').value = '';
+      document.getElementById('tr-form-heading').innerText = 'Add / Edit Client Live Tracker Project';
+      document.getElementById('tr-submit-btn').innerText = '+ Save Client Project to Live Tracker';
+    }
+
+    async function quickSlideProgress(id, val) {
+      const db = getDB();
+      const p = (db.projects || []).find(x => x.id === id);
+      if (p) {
+        p.progress = Number(val);
+        if (p.progress === 100) p.stage = 'Completed';
+        await saveAndPushDB(db);
+      }
+    }
+
+    // Portfolio (Add + Edit + Delete)
+    async function savePortfolioStudy(e) {
       e.preventDefault();
-      const db = await getDB();
-      db.brand.name = document.getElementById('br-name').value;
-      db.brand.usdRate = Number(document.getElementById('br-usd').value);
-      await saveDB(db); alert('Saved globally!');
+      const db = getDB();
+      db.portfolio = db.portfolio || [];
+      const editId = document.getElementById('pf-edit-id').value;
+      const payload = {
+        index: document.getElementById('pf-index').value.trim() || `(0${db.portfolio.length + 1})`,
+        title: document.getElementById('pf-title').value.trim(),
+        client: document.getElementById('pf-client').value.trim(),
+        category: document.getElementById('pf-cat').value.trim(),
+        metric: document.getElementById('pf-metric').value.trim(),
+        media: document.getElementById('pf-media').value.trim(),
+        liveUrl: document.getElementById('pf-live').value.trim(),
+        summary: document.getElementById('pf-summary').value.trim(),
+        challenge: document.getElementById('pf-challenge').value.trim(),
+        solution: document.getElementById('pf-solution').value.trim()
+      };
+
+      if (editId) {
+        const item = db.portfolio.find(x => x.id === editId);
+        if (item) Object.assign(item, payload);
+      } else {
+        db.portfolio.unshift({ id: 'PF-' + Date.now(), ...payload });
+      }
+      resetPortfolioForm();
+      await saveAndPushDB(db);
     }
 
-    async function renderAdmin() {
-      const db = await getDB();
-      document.getElementById('sub-parent').innerHTML = (db.services || []).map(c => `<option value="${c.id}">${c.title}</option>`).join('');
-      document.getElementById('br-name').value = db.brand.name || '';
-      document.getElementById('br-usd').value = db.brand.usdRate || 84;
-      
-      document.getElementById('admin-services-list').innerHTML = (db.services || []).map(c => `
-        <div class="p-3 rounded-xl bg-[#09090b] text-xs">
-          <strong>${c.title}</strong>
-          <div class="pl-3">${(c.subServices||[]).map(s=>`<div>${s.name} - ₹${s.priceINR}</div>`).join('')}</div>
+    function editPortfolioStudy(id) {
+      const db = getDB();
+      const pf = (db.portfolio || []).find(x => x.id === id);
+      if (!pf) return;
+      document.getElementById('pf-edit-id').value = pf.id;
+      document.getElementById('pf-index').value = pf.index || '';
+      document.getElementById('pf-title').value = pf.title || '';
+      document.getElementById('pf-client').value = pf.client || '';
+      document.getElementById('pf-cat').value = pf.category || '';
+      document.getElementById('pf-metric').value = pf.metric || '';
+      document.getElementById('pf-media').value = pf.media || '';
+      document.getElementById('pf-live').value = pf.liveUrl || '';
+      document.getElementById('pf-summary').value = pf.summary || '';
+      document.getElementById('pf-challenge').value = pf.challenge || '';
+      document.getElementById('pf-solution').value = pf.solution || '';
+      document.getElementById('pf-form-heading').innerText = '✏️ Editing Work: ' + pf.title;
+      document.getElementById('pf-submit-btn').innerText = '💾 Update Portfolio Study';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetPortfolioForm() {
+      document.getElementById('pf-edit-id').value = '';
+      document.getElementById('pf-index').value = '';
+      document.getElementById('pf-title').value = '';
+      document.getElementById('pf-client').value = '';
+      document.getElementById('pf-cat').value = '';
+      document.getElementById('pf-metric').value = '';
+      document.getElementById('pf-media').value = '';
+      document.getElementById('pf-live').value = '';
+      document.getElementById('pf-summary').value = '';
+      document.getElementById('pf-challenge').value = '';
+      document.getElementById('pf-solution').value = '';
+      document.getElementById('pf-form-heading').innerText = 'Add / Edit Portfolio Case Study & Reel';
+      document.getElementById('pf-submit-btn').innerText = '📤 Save & Publish Portfolio Case Study';
+    }
+
+    // About & Team (Add + Edit + Delete)
+    async function saveAboutStory(e) {
+      e.preventDefault();
+      const db = getDB();
+      db.about = {
+        heading: document.getElementById('ab-heading').value.trim(),
+        story: document.getElementById('ab-story').value.trim(),
+        mission: document.getElementById('ab-mission').value.trim(),
+        vision: document.getElementById('ab-vision').value.trim()
+      };
+      await saveAndPushDB(db, true);
+    }
+
+    async function saveTeamMember(e) {
+      e.preventDefault();
+      const db = getDB();
+      db.team = db.team || [];
+      const editId = document.getElementById('tm-edit-id').value;
+      const payload = {
+        name: document.getElementById('tm-name').value.trim(),
+        role: document.getElementById('tm-role').value.trim(),
+        type: document.getElementById('tm-type').value,
+        photo: document.getElementById('tm-photo').value,
+        bio: document.getElementById('tm-bio').value.trim()
+      };
+
+      if (editId) {
+        const m = db.team.find(x => x.id === editId);
+        if (m) Object.assign(m, payload);
+      } else {
+        db.team.push({ id: 'TM-' + Date.now(), ...payload });
+      }
+      resetTeamForm();
+      await saveAndPushDB(db);
+    }
+
+    function editTeamMember(id) {
+      const db = getDB();
+      const m = (db.team || []).find(x => x.id === id);
+      if (!m) return;
+      document.getElementById('tm-edit-id').value = m.id;
+      document.getElementById('tm-name').value = m.name;
+      document.getElementById('tm-role').value = m.role;
+      document.getElementById('tm-type').value = m.type;
+      document.getElementById('tm-photo').value = m.photo || '';
+      document.getElementById('tm-bio').value = m.bio || '';
+      document.getElementById('tm-form-heading').innerText = '✏️ Editing Member: ' + m.name;
+      document.getElementById('tm-submit-btn').innerText = '💾 Update Member';
+    }
+
+    function resetTeamForm() {
+      document.getElementById('tm-edit-id').value = '';
+      document.getElementById('tm-name').value = '';
+      document.getElementById('tm-role').value = '';
+      document.getElementById('tm-photo').value = '';
+      document.getElementById('tm-bio').value = '';
+      document.getElementById('tm-form-heading').innerText = 'B. Add / Edit Founder, Partner or Employee Card';
+      document.getElementById('tm-submit-btn').innerText = '+ Save Member';
+    }
+
+    // Tab 8: Studios, Awards & FAQs
+    async function saveStudioHub(e) {
+      e.preventDefault();
+      const db = getDB();
+      db.studios = db.studios || [];
+      db.studios.push({
+        id: 'ST-' + Date.now(),
+        country: document.getElementById('st-country').value.trim(),
+        city: document.getElementById('st-city').value.trim(),
+        phone: document.getElementById('st-phone').value.trim(),
+        email: document.getElementById('st-email').value.trim(),
+        address: document.getElementById('st-addr').value.trim()
+      });
+      e.target.reset();
+      await saveAndPushDB(db);
+    }
+
+    async function saveAwardRow(e) {
+      e.preventDefault();
+      const db = getDB();
+      db.awards = db.awards || [];
+      db.awards.push({
+        code: document.getElementById('aw-code').value.trim(),
+        title: document.getElementById('aw-title').value.trim(),
+        org: document.getElementById('aw-org').value.trim(),
+        year: document.getElementById('aw-year').value.trim()
+      });
+      e.target.reset();
+      await saveAndPushDB(db);
+    }
+
+    async function deleteAwardIdx(idx) {
+      const db = getDB();
+      db.awards.splice(idx, 1);
+      await saveAndPushDB(db);
+    }
+
+    async function saveFaqItem(e) {
+      e.preventDefault();
+      const db = getDB();
+      db.faqs = db.faqs || [];
+      db.faqs.push({
+        id: 'FQ-' + Date.now(),
+        q: document.getElementById('fq-q').value.trim(),
+        a: document.getElementById('fq-a').value.trim()
+      });
+      e.target.reset();
+      await saveAndPushDB(db);
+    }
+
+    // Tab 9: SEO & Policies
+    async function saveSeoAndPolicies(e) {
+      e.preventDefault();
+      const db = getDB();
+      db.seo = {
+        title: document.getElementById('seo-t').value.trim(),
+        keywords: document.getElementById('seo-k').value.trim(),
+        desc: document.getElementById('seo-d').value.trim(),
+        favicon: document.getElementById('seo-fav').value.trim(),
+        ogImage: document.getElementById('seo-og').value.trim()
+      };
+      db.policies = {
+        privacy: document.getElementById('pol-priv').value.trim(),
+        terms: document.getElementById('pol-term').value.trim(),
+        refund: document.getElementById('pol-ref').value.trim()
+      };
+      await saveAndPushDB(db, true);
+    }
+
+    // Tab 10: Admin & Staff Accounts Manager
+    async function addOrUpdateAdminAccount(e) {
+      e.preventDefault();
+      const accounts = getAccounts();
+      const name = document.getElementById('acc-name').value.trim();
+      const email = document.getElementById('acc-email').value.trim();
+      const pass = document.getElementById('acc-pass').value;
+      const role = document.getElementById('acc-role').value;
+
+      const existing = accounts.find(a => a.email.toLowerCase() === email.toLowerCase());
+      if (existing) {
+        existing.name = name;
+        existing.pass = pass;
+        existing.role = role;
+      } else {
+        accounts.push({ id: 'ACC-' + Date.now(), name, email, pass, role });
+      }
+      localStorage.setItem(LOCAL_AUTH_KEY, JSON.stringify(accounts));
+      try {
+        await fetch(FIREBASE_AUTH_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(accounts) });
+      } catch (err) {}
+      e.target.reset();
+      renderAllLists();
+      alert('✅ Account Saved & Synced!');
+    }
+
+    async function deleteAdminAccount(id) {
+      let accounts = getAccounts();
+      if (accounts.length <= 1) { alert('Cannot delete the last admin account!'); return; }
+      accounts = accounts.filter(a => a.id !== id);
+      localStorage.setItem(LOCAL_AUTH_KEY, JSON.stringify(accounts));
+      try {
+        await fetch(FIREBASE_AUTH_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(accounts) });
+      } catch (err) {}
+      renderAllLists();
+    }
+
+    async function deleteById(col, id) {
+      const db = getDB();
+      db[col] = (db[col] || []).filter(x => x.id !== id);
+      await saveAndPushDB(db);
+    }
+
+    function downloadBackupJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(getDB(), null, 2));
+      const a = document.createElement('a');
+      a.setAttribute("href", dataStr);
+      a.setAttribute("download", "og_desk_backup_" + Date.now() + ".json");
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    async function resetToFactoryDefaults() {
+      if (!confirm('Reset website to default factory demo data?')) return;
+      localStorage.removeItem(LOCAL_CACHE_KEY);
+      await fetch(FIREBASE_DB_URL, { method: 'DELETE' });
+      location.reload();
+    }
+
+    function renderAllLists() {
+      const db = getDB();
+
+      // Category Select Dropdown
+      const parentSelect = document.getElementById('sub-parent-cat');
+      if (parentSelect) {
+        parentSelect.innerHTML = (db.services || []).map(c => `<option value="${c.id}">${c.index || ''} ${c.title}</option>`).join('');
+      }
+
+      // 1. Services Tree
+      document.getElementById('cms-services-list').innerHTML = (db.services || []).map(cat => `
+        <div class="p-4 rounded-2xl bg-[#09090b] border border-[#242429] space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <span class="text-xs font-extrabold text-indigo-400">${cat.index || ''} • ${cat.badge || ''}</span>
+              <h4 class="text-base font-bold text-white">${cat.title}</h4>
+              <p class="text-xs text-zinc-400">${cat.description}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="editServiceCategory('${cat.id}')" class="px-3 py-1.5 rounded-lg bg-indigo-500/20 text-indigo-300 text-xs font-bold">✏️ Edit Card</button>
+              <button onclick="deleteById('services', '${cat.id}')" class="px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 text-xs font-bold">🗑️ Delete</button>
+            </div>
+          </div>
+          <div class="pl-3 border-l-2 border-[#242429] space-y-1.5">
+            ${(cat.subServices || []).map(sub => `
+              <div class="p-2.5 rounded-xl bg-[#111114] flex flex-wrap items-center justify-between gap-2 text-xs">
+                <span><strong>${sub.name}</strong> — <span class="text-emerald-400 font-bold">₹${sub.priceINR}</span> (${sub.billing})</span>
+                <div class="flex items-center gap-2">
+                  <button onclick="editSubService('${cat.id}', '${sub.id}')" class="text-indigo-400 font-bold">✏️ Edit</button>
+                  <button onclick="deleteSubServiceItem('${cat.id}', '${sub.id}')" class="text-rose-400 font-bold">✕</button>
+                </div>
+              </div>
+            `).join('') || '<div class="text-xs text-zinc-500">No sub-services inside this pop-up yet.</div>'}
+          </div>
+        </div>
+      `).join('') || '<div class="text-xs text-zinc-500">No service categories created yet.</div>';
+
+      // 2. Tracker List
+      document.getElementById('cms-tracker-list').innerHTML = (db.projects || []).map(p => `
+        <div class="p-4 rounded-2xl bg-[#09090b] border border-[#242429] flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <span class="text-xs font-bold text-indigo-400">${p.code} • ${p.stage}</span>
+            <h4 class="font-bold text-white text-sm">${p.clientName} — ${p.projectName}</h4>
+            <p class="text-xs text-zinc-400">${p.note || ''}</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <input type="range" min="0" max="100" value="${p.progress}" onchange="quickSlideProgress('${p.id}', this.value)" class="w-32" />
+            <span class="text-sm font-extrabold text-emerald-400 w-10">${p.progress}%</span>
+            <button onclick="editTrackerProject('${p.id}')" class="px-3 py-1.5 rounded-lg bg-indigo-500/20 text-indigo-300 text-xs font-bold">✏️ Edit</button>
+            <button onclick="deleteById('projects', '${p.id}')" class="px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 text-xs font-bold">🗑️</button>
+          </div>
+        </div>
+      `).join('') || '<div class="text-xs text-zinc-500">No active client projects.</div>';
+
+      // 3. Portfolio List
+      document.getElementById('cms-portfolio-list').innerHTML = (db.portfolio || []).map(pf => `
+        <div class="p-4 rounded-2xl bg-[#09090b] border border-[#242429] flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            ${pf.media ? `<img src="${pf.media}" class="w-12 h-12 rounded-xl object-cover" />` : ''}
+            <div>
+              <div class="text-xs text-emerald-400 font-bold">${pf.index || ''} ${pf.category} • ${pf.metric || ''}</div>
+              <div class="text-sm font-bold text-white">${pf.title} (${pf.client})</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="editPortfolioStudy('${pf.id}')" class="px-3 py-1.5 rounded-lg bg-indigo-500/20 text-indigo-300 text-xs font-bold">✏️ Edit</button>
+            <button onclick="deleteById('portfolio', '${pf.id}')" class="px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 text-xs font-bold">🗑️</button>
+          </div>
         </div>
       `).join('');
-      
-      document.getElementById('admin-tracker-list').innerHTML = (db.projects || []).map(p => `
-        <div class="p-3 rounded-xl bg-[#09090b] text-xs flex justify-between">
-          <span>${p.clientName} - ${p.projectName} (${p.progress}%)</span>
+
+      // 4. Team List
+      document.getElementById('cms-team-list').innerHTML = (db.team || []).map(m => `
+        <div class="p-3.5 rounded-2xl bg-[#09090b] border border-[#242429] flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <img src="${m.photo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(m.name)}" class="w-10 h-10 rounded-full object-cover" />
+            <div>
+              <span class="text-[10px] font-extrabold uppercase text-amber-400">${m.type}</span>
+              <div class="text-sm font-bold text-white">${m.name} — <span class="text-xs text-zinc-400">${m.role}</span></div>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="editTeamMember('${m.id}')" class="px-3 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 text-xs font-bold">✏️ Edit</button>
+            <button onclick="deleteById('team', '${m.id}')" class="px-3 py-1 rounded-lg bg-rose-500/20 text-rose-300 text-xs font-bold">🗑️</button>
+          </div>
+        </div>
+      `).join('');
+
+      // 5. Studios, Awards & FAQs
+      document.getElementById('cms-studios-list').innerHTML = (db.studios || []).map(st => `
+        <div class="p-3 rounded-xl bg-[#09090b] border border-[#242429] flex justify-between items-center text-xs">
+          <span><strong>${st.country}</strong> — ${st.city} (${st.phone} | ${st.email})</span>
+          <button onclick="deleteById('studios', '${st.id}')" class="text-rose-400 font-bold">Delete</button>
+        </div>
+      `).join('');
+
+      document.getElementById('cms-awards-list').innerHTML = (db.awards || []).map((aw, idx) => `
+        <div class="p-3 rounded-xl bg-[#09090b] border border-[#242429] flex justify-between items-center text-xs">
+          <span><strong>${aw.code} ${aw.title}</strong> — ${aw.org} (${aw.year})</span>
+          <button onclick="deleteAwardIdx(${idx})" class="text-rose-400 font-bold">Delete</button>
+        </div>
+      `).join('');
+
+      document.getElementById('cms-faq-list').innerHTML = (db.faqs || []).map(f => `
+        <div class="p-3 rounded-xl bg-[#09090b] border border-[#242429] flex justify-between items-center text-xs">
+          <span><strong>Q: ${f.q}</strong> — ${f.a}</span>
+          <button onclick="deleteById('faqs', '${f.id}')" class="text-rose-400 font-bold">Delete</button>
+        </div>
+      `).join('');
+
+      // 6. Accounts, Leads, Inquiries & Reviews
+      document.getElementById('cms-accounts-list').innerHTML = getAccounts().map(a => `
+        <div class="p-3 rounded-xl bg-[#09090b] border border-[#242429] flex items-center justify-between text-xs">
+          <div><strong>${a.name}</strong> [${a.role}] — Email: <code class="text-emerald-400">${a.email}</code> | Pass: <code class="text-indigo-300">${a.pass}</code></div>
+          <button onclick="deleteAdminAccount('${a.id}')" class="text-rose-400 font-bold">Remove</button>
+        </div>
+      `).join('');
+
+      document.getElementById('cms-leads-list').innerHTML = (db.leads || []).map(l => `
+        <div class="p-3.5 rounded-2xl bg-[#09090b] border border-[#242429] flex justify-between items-start gap-2 text-xs">
+          <div>
+            <span class="text-emerald-400 font-bold">${l.id} • ${l.date}</span>
+            <div class="font-bold text-white mt-0.5">${l.client} (${l.brand}) — ${l.phone}</div>
+            <div class="text-zinc-400">${l.email} | ${l.country || ''}</div>
+            <div class="text-zinc-300 mt-1">Items: ${l.items}</div>
+          </div>
+          <div class="text-right">
+            <strong class="text-emerald-400 text-sm block">${l.totalFormatted}</strong>
+            <button onclick="deleteById('leads', '${l.id}')" class="text-rose-400 text-[10px] mt-2">Delete</button>
+          </div>
+        </div>
+      `).join('') || '<div class="text-xs text-zinc-500">No PDF quotations downloaded yet.</div>';
+
+      document.getElementById('cms-inquiries-list').innerHTML = (db.inquiries || []).map(inq => `
+        <div class="p-3.5 rounded-2xl bg-[#09090b] border border-[#242429] flex justify-between items-start text-xs">
+          <div>
+            <div class="font-bold text-white">${inq.name} (${inq.brand}) — ${inq.phone}</div>
+            <div class="text-zinc-400">${inq.email} • ${inq.date || ''}</div>
+            <p class="text-zinc-300 mt-1">${inq.message}</p>
+          </div>
+          <button onclick="deleteById('inquiries', '${inq.id}')" class="text-rose-400 font-bold">✕</button>
+        </div>
+      `).join('') || '<div class="text-xs text-zinc-500">No direct contact inquiries yet.</div>';
+
+      document.getElementById('cms-reviews-list').innerHTML = (db.reviews || []).map(r => `
+        <div class="p-3.5 rounded-2xl bg-[#09090b] border border-[#242429] flex items-center justify-between text-xs">
+          <div>
+            <span class="text-amber-400 font-bold">${'★'.repeat(r.stars)}</span> — <strong>${r.name}</strong> (${r.brand})
+            <p class="text-zinc-300 mt-1">"${r.text}"</p>
+          </div>
+          <button onclick="deleteById('reviews', '${r.id}')" class="text-rose-400 font-bold">Delete</button>
         </div>
       `).join('');
     }
+
+    // Auto-Restore Login Session & Active Tab on Browser Refresh
+    window.addEventListener('DOMContentLoaded', async () => {
+      await syncAccountsFromCloud();
+      const savedSession = localStorage.getItem(SESSION_TOKEN_KEY);
+      if (savedSession) {
+        try {
+          const userObj = JSON.parse(savedSession);
+          unlockDashboard(userObj);
+        } catch (e) {}
+      }
+    });
   </script>
 </body>
 </html>
