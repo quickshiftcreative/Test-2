@@ -2775,3 +2775,102 @@
   })();
 </script>
 <!-- ==================== ADMIN.HTML : REAL LOGIN VAULT PATCH COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : LUXURY GLASS & WIDGETS CUSTOMIZER PATCH (PASTE AT VERY BOTTOM) ==================== -->
+<script>
+  (function () {
+    const panelGlobal = document.getElementById('panel-global');
+    if (panelGlobal && !document.getElementById('luxury-ui-studio-card')) {
+      const luxCard = document.createElement('div');
+      luxCard.id = 'luxury-ui-studio-card';
+      luxCard.className = 'admin-card rounded-3xl p-6 space-y-5 border-amber-500/40';
+      luxCard.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#242429] pb-3">
+          <div>
+            <span class="text-[10px] font-extrabold uppercase text-amber-400">Apple / Liquid-Glass Visual Studio</span>
+            <h3 class="text-base font-bold text-white">✨ Liquid-Glass Blur, Card Roundness, Gold Shimmer & Conversion Widgets</h3>
+            <p class="text-xs text-zinc-400">Customize the exact glassmorphism depth, corner radius, cursor aura, and interactive tools.</p>
+          </div>
+          <button type="button" onclick="saveAndPushAll('Updated Luxury UI Studio')" class="px-4 py-2 rounded-xl bg-amber-400 text-zinc-950 font-extrabold text-xs shadow-lg">
+            ✓ Save Visual Style
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="text-xs font-bold text-zinc-300 block mb-1">Liquid-Glass Blur (<span id="lux-blur-lbl">24</span>px)</label>
+            <input type="range" id="lux-blur-inp" min="4" max="44" value="24" oninput="document.getElementById('lux-blur-lbl').innerText=this.value" class="w-full accent-amber-400 mt-2" />
+          </div>
+          <div>
+            <label class="text-xs font-bold text-zinc-300 block mb-1">Card Corner Roundness (<span id="lux-rad-lbl">24</span>px)</label>
+            <input type="range" id="lux-rad-inp" min="8" max="40" value="24" oninput="document.getElementById('lux-rad-lbl').innerText=this.value" class="w-full accent-indigo-500 mt-2" />
+          </div>
+          <div>
+            <label class="text-xs font-bold text-amber-400 block mb-1">Interactive Mouse Spotlight Aura</label>
+            <select id="lux-spot-inp" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs font-bold">
+              <option value="gold">👑 Metallic Gold Aura</option>
+              <option value="indigo">🌌 Indigo Cyber Glow</option>
+              <option value="emerald">💎 Emerald Matrix Glow</option>
+              <option value="none">Disable Cursor Aura</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-bold pt-1">
+          <label class="flex items-center gap-2 p-3 rounded-xl bg-black border border-amber-500/30 text-amber-300 cursor-pointer">
+            <input type="checkbox" id="lux-gold-shimmer" class="w-4 h-4 accent-amber-400" checked />
+            <span>✨ Metallic Gold Card Border Glow</span>
+          </label>
+          <label class="flex items-center gap-2 p-3 rounded-xl bg-black border border-white/10 text-zinc-200 cursor-pointer">
+            <input type="checkbox" id="lux-show-grader" class="w-4 h-4 accent-emerald-500" checked />
+            <span>📦 Show Listing SEO Grader Tool</span>
+          </label>
+          <label class="flex items-center gap-2 p-3 rounded-xl bg-black border border-white/10 text-zinc-200 cursor-pointer">
+            <input type="checkbox" id="lux-show-callbtn" class="w-4 h-4 accent-indigo-500" checked />
+            <span>📅 Show "Book 15m Call" Floating Button</span>
+          </label>
+        </div>
+      `;
+      panelGlobal.insertBefore(luxCard, panelGlobal.children[2]);
+    }
+
+    /* Hook into Populate & Save */
+    const prevPop = window.populateAllInputsFromDB;
+    window.populateAllInputsFromDB = function () {
+      if (typeof prevPop === 'function') prevPop();
+      if (!window.db) return;
+      const lux = db.luxuryUI || { blurPx: 24, radiusPx: 24, spotlight: 'gold', goldShimmer: true, showGrader: true, showCallBtn: true };
+
+      const blurEl = document.getElementById('lux-blur-inp');
+      const radEl = document.getElementById('lux-rad-inp');
+      const spotEl = document.getElementById('lux-spot-inp');
+      if (blurEl) { blurEl.value = lux.blurPx ?? 24; document.getElementById('lux-blur-lbl').innerText = lux.blurPx ?? 24; }
+      if (radEl) { radEl.value = lux.radiusPx ?? 24; document.getElementById('lux-rad-lbl').innerText = lux.radiusPx ?? 24; }
+      if (spotEl) spotEl.value = lux.spotlight || 'gold';
+
+      const gShim = document.getElementById('lux-gold-shimmer');
+      const sGrad = document.getElementById('lux-show-grader');
+      const sCall = document.getElementById('lux-show-callbtn');
+      if (gShim) gShim.checked = lux.goldShimmer !== false;
+      if (sGrad) sGrad.checked = lux.showGrader !== false;
+      if (sCall) sCall.checked = lux.showCallBtn !== false;
+    };
+
+    const prevSave = window.saveAndPushAll;
+    window.saveAndPushAll = async function (label) {
+      if (window.db && document.getElementById('lux-blur-inp')) {
+        db.luxuryUI = {
+          blurPx: Number(document.getElementById('lux-blur-inp').value || 24),
+          radiusPx: Number(document.getElementById('lux-rad-inp').value || 24),
+          spotlight: document.getElementById('lux-spot-inp').value || 'gold',
+          goldShimmer: document.getElementById('lux-gold-shimmer').checked,
+          showGrader: document.getElementById('lux-show-grader').checked,
+          showCallBtn: document.getElementById('lux-show-callbtn').checked
+        };
+      }
+      if (typeof prevSave === 'function') await prevSave(label);
+    };
+
+    setTimeout(() => { if (typeof window.populateAllInputsFromDB === 'function') window.populateAllInputsFromDB(); }, 800);
+  })();
+</script>
+<!-- ==================== ADMIN.HTML : LUXURY GLASS & WIDGETS PATCH COMPLETE ==================== -->
