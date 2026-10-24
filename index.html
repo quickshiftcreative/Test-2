@@ -2493,43 +2493,285 @@
   })();
 </script>
 <!-- ==================== ADMIN.HTML : MASTER RECOVERY PATCH COMPLETE ==================== -->
-<!-- ==================== ADMIN.HTML : NOTIFICATION TOAST & FINAL POLISH PATCH (PASTE AT VERY BOTTOM) ==================== -->
-<div id="admin-toast-box" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
-  <div class="px-5 py-3 rounded-2xl bg-emerald-500 text-zinc-950 font-extrabold text-xs shadow-2xl flex items-center gap-2 border border-emerald-300">
-    <span id="toast-icon">✓</span>
-    <span id="toast-msg">Changes saved successfully!</span>
+<!-- ==================== ADMIN.HTML : REAL LOGIN VAULT & UNTHINKABLE FEATURES PATCH (PASTE AT VERY BOTTOM) ==================== -->
+<!-- Security & Real Login Modal -->
+<div id="security-vault-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
+  <div class="liquid-bar rounded-3xl max-w-2xl w-full p-6 sm:p-8 max-h-[90vh] overflow-y-auto space-y-6 border border-indigo-500/40 shadow-2xl">
+    <div class="flex items-center justify-between border-b border-white/10 pb-4">
+      <div>
+        <span class="text-[10px] font-extrabold uppercase tracking-widest text-emerald-400">Production Security Vault</span>
+        <h3 class="text-xl font-bold text-white mt-0.5">🔐 My Real Login, Recovery PIN & Conversion Boosters</h3>
+      </div>
+      <button type="button" onclick="closeSecurityVaultModal()" class="w-9 h-9 rounded-xl bg-white/10 text-white font-bold">✕</button>
+    </div>
+
+    <!-- 1. Primary Owner Real Email, Password & Recovery PIN -->
+    <div class="p-5 rounded-2xl bg-[#09090b] border border-emerald-500/30 space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h4 class="text-sm font-extrabold text-emerald-400">1. Set Your Permanent Owner Login (Replaces admin123)</h4>
+        <label class="flex items-center gap-2 text-xs font-extrabold text-amber-300 cursor-pointer">
+          <input type="checkbox" id="sec-lock-autologin" class="w-4 h-4 accent-amber-400" />
+          🔒 Hide "1-Click Auto-Login" Button on Login Screen
+        </label>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        <div>
+          <label class="text-[11px] font-bold text-zinc-400 block mb-1">Your Owner Name</label>
+          <input type="text" id="sec-owner-name" placeholder="Jenish Kamli" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs font-bold" />
+        </div>
+        <div>
+          <label class="text-[11px] font-bold text-emerald-400 block mb-1">Your Real Login Email ID *</label>
+          <input type="email" id="sec-owner-email" placeholder="yourname@gmail.com" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs font-bold" />
+        </div>
+        <div>
+          <label class="text-[11px] font-bold text-indigo-400 block mb-1">Your New Strong Password *</label>
+          <input type="text" id="sec-owner-pass" placeholder="Enter new password" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs font-mono font-bold" />
+        </div>
+        <div>
+          <label class="text-[11px] font-bold text-amber-400 block mb-1">Secret Recovery PIN (For Forgot Password) *</label>
+          <input type="text" id="sec-master-pin" placeholder="e.g. 7788" maxlength="8" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs font-mono font-bold text-amber-300" />
+        </div>
+      </div>
+
+      <button type="button" onclick="saveRealOwnerCredentials()" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-extrabold text-xs shadow-lg transition">
+        ✓ Permanently Update My Real Login & Lock Security
+      </button>
+    </div>
+
+    <!-- 2. Unthinkable Conversion Boosters Control -->
+    <div class="p-5 rounded-2xl bg-[#09090b] border border-[#242429] space-y-4">
+      <h4 class="text-sm font-extrabold text-indigo-400">2. Next-Gen Website Conversion Boosters</h4>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-bold">
+        <label class="flex items-center gap-2 p-3 rounded-xl bg-black border border-white/10 cursor-pointer">
+          <input type="checkbox" id="bst-fomo-pulse" class="w-4 h-4 accent-emerald-500" />
+          <span>🟢 Live Social Proof Pulse</span>
+        </label>
+        <label class="flex items-center gap-2 p-3 rounded-xl bg-black border border-white/10 cursor-pointer">
+          <input type="checkbox" id="bst-exit-intent" class="w-4 h-4 accent-indigo-500" />
+          <span>🕵️‍♂️ Exit-Intent VIP Popup</span>
+        </label>
+        <label class="flex items-center gap-2 p-3 rounded-xl bg-black border border-white/10 cursor-pointer">
+          <input type="checkbox" id="bst-profit-calc" class="w-4 h-4 accent-amber-400" />
+          <span>🧮 Profit Margin Calculator</span>
+        </label>
+      </div>
+      <div>
+        <label class="text-[11px] text-zinc-400 block mb-1">Exit-Intent Popup Special Offer Headline</label>
+        <input type="text" id="bst-exit-title" placeholder="Wait! Claim Your Free Marketplace & 3D Brand Audit Before You Leave" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs font-bold" />
+      </div>
+      <button type="button" onclick="saveConversionBoosters()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs">
+        ✓ Save Booster Settings
+      </button>
+    </div>
+
+    <!-- 3. Quick Jump to Full Staff & User Manager -->
+    <div class="flex items-center justify-between pt-2 text-xs">
+      <span class="text-zinc-400">Want to create or manage additional Staff/User accounts?</span>
+      <button type="button" onclick="closeSecurityVaultModal(); switchAdminTab('global');" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold">
+        👥 Open Staff Accounts Matrix →
+      </button>
+    </div>
   </div>
 </div>
 
 <script>
   (function () {
-    window.showAdminToast = function (msg = 'Changes saved successfully!', isError = false) {
-      const box = document.getElementById('admin-toast-box');
-      const txt = document.getElementById('toast-msg');
-      const icon = document.getElementById('toast-icon');
-      if (!box || !txt) return;
+    /* 1. Add "🔐 Real Login & Security" Button in Top Header */
+    const topBtnRow = document.querySelector('header .flex.flex-wrap.items-center.gap-2');
+    if (topBtnRow) {
+      const secBtn = document.createElement('button');
+      secBtn.type = 'button';
+      secBtn.onclick = () => window.openSecurityVaultModal();
+      secBtn.className = 'px-3.5 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-extrabold hover:bg-emerald-500/30 transition';
+      secBtn.innerHTML = '🔐 Real Login & Boosters';
+      topBtnRow.prepend(secBtn);
+    }
 
-      txt.innerText = msg;
-      if (isError) {
-        box.firstElementChild.className = 'px-5 py-3 rounded-2xl bg-rose-600 text-white font-extrabold text-xs shadow-2xl flex items-center gap-2 border border-rose-400';
-        icon.innerText = '✕';
+    /* 2. Check & Enforce Production Security Lock on Login Screen */
+    window.enforceLoginScreenSecurity = function () {
+      if (!window.db) return;
+      const owner = (db.staffAccounts || [])[0] || {};
+      const autoBtn = document.querySelector('button[onclick="fillDefaultOwnerLogin()"]');
+      const isCustomCreds = (owner.email && owner.email !== 'admin@theblankpage.agency') || (owner.password && owner.password !== 'admin123');
+      const shouldLock = Boolean(db.securityConfig?.hideAutoLogin) || isCustomCreds;
+
+      if (autoBtn) {
+        if (shouldLock) {
+          autoBtn.classList.add('hidden');
+        } else {
+          autoBtn.classList.remove('hidden');
+        }
+      }
+    };
+
+    /* 3. Upgrade "Login Help?" to Use Secret Master Recovery PIN */
+    window.triggerForgotPassHint = function () {
+      const owner = (db?.staffAccounts || [])[0] || {};
+      const savedPin = db?.securityConfig?.masterPin || '';
+
+      if (savedPin) {
+        const enteredPin = prompt('🔐 Enter your Secret Recovery PIN to view/reset your Owner Login:');
+        if (enteredPin === null) return;
+        if (enteredPin.trim() === savedPin.trim()) {
+          const newPass = prompt(`✅ PIN Verified!\nYour Login Email is: ${owner.email}\n\nType a new password below (or leave blank to keep "${owner.password}"):`);
+          if (newPass && newPass.trim().length >= 4) {
+            db.staffAccounts[0].password = newPass.trim();
+            pushToFirebase('Reset Owner Password via Secret PIN');
+            alert('✅ Your new password has been saved!');
+          } else {
+            alert(`Your current login details:\nEmail: ${owner.email}\nPassword: ${owner.password}`);
+          }
+        } else {
+          alert('❌ Incorrect Secret Recovery PIN!');
+        }
       } else {
-        box.firstElementChild.className = 'px-5 py-3 rounded-2xl bg-emerald-500 text-zinc-950 font-extrabold text-xs shadow-2xl flex items-center gap-2 border border-emerald-300';
-        icon.innerText = '✓';
+        alert(`Owner Login Hint:\nEmail: ${owner.email}\n(Tip: Set a Secret Recovery PIN inside "🔐 Real Login & Boosters" to lock this hint!)`);
+      }
+    };
+
+    /* 4. Open / Save Real Owner Credentials & Boosters */
+    window.openSecurityVaultModal = function () {
+      const owner = (db.staffAccounts || [])[0] || {};
+      const sec = db.securityConfig || {};
+      const bst = db.boosters || { fomoPulse: true, exitIntent: true, profitCalc: true, exitTitle: 'Wait! Claim Your Free Marketplace & 3D Brand Audit Before You Leave' };
+
+      document.getElementById('sec-owner-name').value = owner.name || 'Jenish Kamli';
+      document.getElementById('sec-owner-email').value = owner.email || '';
+      document.getElementById('sec-owner-pass').value = owner.password || '';
+      document.getElementById('sec-master-pin').value = sec.masterPin || '';
+
+      const isCustom = (owner.email !== 'admin@theblankpage.agency') || (owner.password !== 'admin123');
+      document.getElementById('sec-lock-autologin').checked = sec.hideAutoLogin ?? isCustom;
+
+      document.getElementById('bst-fomo-pulse').checked = bst.fomoPulse !== false;
+      document.getElementById('bst-exit-intent').checked = bst.exitIntent !== false;
+      document.getElementById('bst-profit-calc').checked = bst.profitCalc !== false;
+      document.getElementById('bst-exit-title').value = bst.exitTitle || 'Wait! Claim Your Free Marketplace & 3D Brand Audit Before You Leave';
+
+      document.getElementById('security-vault-modal').classList.remove('hidden');
+      document.getElementById('security-vault-modal').classList.add('flex');
+    };
+
+    window.closeSecurityVaultModal = function () {
+      document.getElementById('security-vault-modal').classList.add('hidden');
+      document.getElementById('security-vault-modal').classList.remove('flex');
+    };
+
+    window.saveRealOwnerCredentials = async function () {
+      const name = document.getElementById('sec-owner-name').value.trim() || 'Owner';
+      const email = document.getElementById('sec-owner-email').value.trim().toLowerCase();
+      const pass = document.getElementById('sec-owner-pass').value.trim();
+      const pin = document.getElementById('sec-master-pin').value.trim();
+      const hideAuto = document.getElementById('sec-lock-autologin').checked;
+
+      if (!email || !pass) {
+        alert('Please enter both a valid Email ID and Password!');
+        return;
       }
 
-      box.classList.remove('translate-y-20', 'opacity-0');
-      setTimeout(() => {
-        box.classList.add('translate-y-20', 'opacity-0');
-      }, 3000);
+      db.staffAccounts = db.staffAccounts || [];
+      db.staffAccounts[0] = {
+        ...(db.staffAccounts[0] || {}),
+        id: 'USR-OWNER',
+        name,
+        email,
+        password: pass,
+        rolePreset: 'Super Admin / Owner',
+        canDelete: true,
+        perms: { home: true, services: true, quotation: true, portfolio: true, tracker: true, about: true, reviews: true, customPages: true, crm: true, global: true }
+      };
+
+      db.securityConfig = {
+        masterPin: pin,
+        hideAutoLogin: hideAuto
+      };
+
+      currentUser = db.staffAccounts[0];
+      localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ id: currentUser.id, email: currentUser.email }));
+      document.getElementById('active-user-badge').innerText = currentUser.name;
+
+      renderAdminStaffRBAC();
+      window.enforceLoginScreenSecurity();
+      await pushToFirebase('Updated Primary Owner Real Credentials');
+      if (typeof window.showAdminToast === 'function') window.showAdminToast('🔐 Real Login & Security PIN Saved!');
+      window.closeSecurityVaultModal();
     };
 
-    /* Hook toast into saveAndPushAll */
-    const baseSave = window.saveAndPushAll;
-    window.saveAndPushAll = async function (label) {
-      if (typeof baseSave === 'function') await baseSave(label);
-      window.showAdminToast(label || 'Changes saved & synced live!');
+    window.saveConversionBoosters = async function () {
+      db.boosters = {
+        fomoPulse: document.getElementById('bst-fomo-pulse').checked,
+        exitIntent: document.getElementById('bst-exit-intent').checked,
+        profitCalc: document.getElementById('bst-profit-calc').checked,
+        exitTitle: document.getElementById('bst-exit-title').value.trim()
+      };
+      await pushToFirebase('Updated Website Conversion Boosters');
+      if (typeof window.showAdminToast === 'function') window.showAdminToast('🚀 Conversion Boosters Synced Live!');
+      window.closeSecurityVaultModal();
     };
+
+    /* 5. Add "📲 Share Login on WhatsApp" Button to Client Projects & Staff Accounts */
+    window.sendClientTrackerOnWhatsApp = function (pIdx) {
+      const p = db.projects[pIdx];
+      if (!p) return;
+      const siteUrl = window.location.origin + window.location.pathname.replace('admin.html', 'index.html') + '#tracker';
+      const msg = encodeURIComponent(
+        `Hello *${p.clientName}*,\n\nYour live project tracker for *${p.projectName}* is now active on *${db.brand?.name || 'our portal'}*!\n\n🔗 *Portal Link:* ${siteUrl}\n📧 *Login Email:* ${p.clientEmail}\n🔑 *Project ID:* ${p.code}\n📊 *Current Progress:* ${p.progress}%\n\nYou can log in anytime to inspect live milestones and approve stages.`
+      );
+      window.open(`https://wa.me/?text=${msg}`, '_blank');
+    };
+
+    window.sendStaffLoginOnWhatsApp = function (sIdx) {
+      const acc = db.staffAccounts[sIdx];
+      if (!acc) return;
+      const adminUrl = window.location.href.split('#')[0];
+      const msg = encodeURIComponent(
+        `Hello *${acc.name}*,\n\nYour staff workspace account for *${db.brand?.name || 'Agency OS'}* is ready:\n\n🔗 *Admin Link:* ${adminUrl}\n📧 *Login Email:* ${acc.email}\n🔑 *Password:* ${acc.password}\n\nPlease keep these credentials confidential.`
+      );
+      window.open(`https://wa.me/?text=${msg}`, '_blank');
+    };
+
+    /* Inject WhatsApp Share Buttons into Projects & Staff Cards */
+    const origRenderProjects = window.renderAdminProjects;
+    window.renderAdminProjects = function () {
+      if (typeof origRenderProjects === 'function') origRenderProjects();
+      const cards = document.querySelectorAll('#adm-projects-list > div');
+      cards.forEach((card, idx) => {
+        const headerRow = card.querySelector('.border-b');
+        if (headerRow && !headerRow.querySelector('.wa-share-prj')) {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.onclick = () => window.sendClientTrackerOnWhatsApp(idx);
+          btn.className = 'wa-share-prj px-3 py-1 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-extrabold hover:bg-emerald-500/30 ml-auto mr-2';
+          btn.innerHTML = '📲 WhatsApp Login to Client';
+          headerRow.insertBefore(btn, headerRow.lastElementChild);
+        }
+      });
+    };
+
+    const origRenderStaff = window.renderAdminStaffRBAC;
+    window.renderAdminStaffRBAC = function () {
+      if (typeof origRenderStaff === 'function') origRenderStaff();
+      const cards = document.querySelectorAll('#adm-staff-accounts-list > div');
+      cards.forEach((card, idx) => {
+        const topRow = card.firstElementChild;
+        if (topRow && !topRow.querySelector('.wa-share-stf')) {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.onclick = () => window.sendStaffLoginOnWhatsApp(idx);
+          btn.className = 'wa-share-stf px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-[11px] font-extrabold ml-auto mr-2';
+          btn.innerHTML = '📲 WhatsApp Credentials';
+          topRow.insertBefore(btn, topRow.lastElementChild);
+        }
+      });
+    };
+
+    /* Ensure Security Lock & Buttons Render on Load */
+    setTimeout(() => {
+      window.enforceLoginScreenSecurity();
+      window.renderAdminProjects();
+      window.renderAdminStaffRBAC();
+    }, 700);
   })();
 </script>
-<!-- ==================== ADMIN.HTML : NOTIFICATION TOAST PATCH COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : REAL LOGIN VAULT PATCH COMPLETE ==================== -->
