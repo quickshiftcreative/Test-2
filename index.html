@@ -2279,3 +2279,217 @@
 </body>
 </html>
 <!-- ==================== ADMIN.HTML : PART 2 OF 2 (COMPLETE) ==================== -->
+<!-- ==================== ADMIN.HTML : MASTER RECOVERY PATCH (PASTE AT VERY BOTTOM) ==================== -->
+<script>
+  (function () {
+    /* 1. Inject "Quick Brand, Logo & Agency Contact Bar" right at the TOP of Tab 1 (Home) */
+    const panelHome = document.getElementById('panel-home');
+    if (panelHome) {
+      const quickBrandCard = document.createElement('div');
+      quickBrandCard.className = 'admin-card rounded-3xl p-6 space-y-4 border-emerald-500/40';
+      quickBrandCard.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#242429] pb-3">
+          <div>
+            <span class="text-[10px] font-extrabold uppercase text-emerald-400">Instant Identity & Contact Studio</span>
+            <h3 class="text-base font-bold text-white">0. Agency Name, Logo (Image or Text) & Phone/WhatsApp Number</h3>
+            <p class="text-xs text-zinc-400">Yahan se apna Logo, Brand Name aur Mobile/WhatsApp Number badlein — yeh turant Navbar, Contact Page aur Footer mein update ho jayega.</p>
+          </div>
+          <button type="button" onclick="saveAndPushAll('Updated Brand Logo & Contact')" class="px-4 py-2 rounded-xl bg-emerald-500 text-zinc-950 font-extrabold text-xs shadow-lg">
+            ✓ Save Logo & Number
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <!-- Left: Live Logo Preview & Upload -->
+          <div class="lg:col-span-4 flex flex-col items-center justify-center p-4 rounded-2xl preview-thumb border border-[#242429] space-y-2.5">
+            <span class="text-[10px] font-extrabold uppercase text-zinc-400">Live Navbar Logo Preview</span>
+            <div id="quick-logo-preview" class="w-16 h-16 rounded-2xl bg-indigo-600 flex items-center justify-center overflow-hidden border border-white/20 font-black text-white text-lg shadow-lg">BP</div>
+            <div class="w-full grid grid-cols-2 gap-2">
+              <input type="text" id="qk-logo-text" oninput="syncQuickBrandToGlobal()" placeholder="Text Logo (e.g. OG)" maxlength="4" class="px-2.5 py-1.5 rounded-lg adm-input text-xs font-bold text-center uppercase" />
+              <input type="number" id="qk-logo-size" min="32" max="64" value="40" oninput="syncQuickBrandToGlobal()" placeholder="Size (px)" class="px-2.5 py-1.5 rounded-lg adm-input text-xs font-bold text-center" />
+            </div>
+            <div class="flex flex-wrap justify-center gap-2 w-full">
+              <label class="flex-1 text-center py-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs cursor-pointer">
+                📁 Upload Logo Photo
+                <input type="file" accept="image/*" onchange="handleSmartImageUpload(this, 'gl-logo', syncGlobalLogoToQuick)" class="hidden" />
+              </label>
+              <button type="button" onclick="document.getElementById('gl-logo').value=''; syncGlobalLogoToQuick(); saveAndPushAll('Removed Logo Image');" class="px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 text-xs font-bold">
+                Delete Photo
+              </button>
+            </div>
+          </div>
+
+          <!-- Right: Brand Name, Tagline, Phone, WhatsApp, Email -->
+          <div class="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label class="text-xs font-bold text-zinc-300 block mb-1">Agency Brand Name</label>
+              <input type="text" id="qk-name" oninput="syncQuickBrandToGlobal()" placeholder="THE BLANK PAGE" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs font-bold" />
+            </div>
+            <div>
+              <label class="text-xs font-bold text-zinc-300 block mb-1">Navbar Tagline</label>
+              <input type="text" id="qk-tagline" oninput="syncQuickBrandToGlobal()" placeholder="Where Strategy Meets Bold Execution" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs" />
+            </div>
+            <div>
+              <label class="text-xs font-bold text-emerald-400 block mb-1">📞 Primary Agency Phone Number</label>
+              <input type="text" id="qk-phone" oninput="syncQuickBrandToGlobal()" placeholder="+91 98765 43210" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs font-bold" />
+            </div>
+            <div>
+              <label class="text-xs font-bold text-emerald-400 block mb-1">💬 WhatsApp Number (With Country Code)</label>
+              <input type="text" id="qk-whatsapp" oninput="syncQuickBrandToGlobal()" placeholder="919876543210" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs font-bold text-emerald-400" />
+            </div>
+            <div>
+              <label class="text-xs font-bold text-zinc-300 block mb-1">✉️ Official Agency Email</label>
+              <input type="email" id="qk-email" oninput="syncQuickBrandToGlobal()" placeholder="hello@theblankpage.agency" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs" />
+            </div>
+            <div>
+              <label class="text-xs font-bold text-zinc-300 block mb-1">🌐 Website Domain</label>
+              <input type="text" id="qk-domain" oninput="syncQuickBrandToGlobal()" placeholder="theblankpage.agency" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs" />
+            </div>
+          </div>
+        </div>
+      `;
+      panelHome.insertBefore(quickBrandCard, panelHome.children[1]);
+    }
+
+    /* 2. Inject All Missing Page Headings Customizer in Tab 10 (Global) */
+    const panelGlobal = document.getElementById('panel-global');
+    if (panelGlobal && !document.getElementById('hd-all-pages-card')) {
+      const hdCard = document.createElement('div');
+      hdCard.id = 'hd-all-pages-card';
+      hdCard.className = 'admin-card rounded-3xl p-6 space-y-4';
+      hdCard.innerHTML = `
+        <h3 class="text-sm font-extrabold uppercase text-indigo-400 border-b border-[#242429] pb-2">All Page Headings Customizer</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div><label class="text-[11px] text-zinc-400 block mb-1">Home Services Heading</label><input type="text" id="hd-hm-srv" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" /></div>
+          <div><label class="text-[11px] text-zinc-400 block mb-1">Home Work Heading</label><input type="text" id="hd-hm-wrk" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" /></div>
+          <div><label class="text-[11px] text-zinc-400 block mb-1">4-Step Process Heading</label><input type="text" id="hd-proc" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" /></div>
+          <div><label class="text-[11px] text-zinc-400 block mb-1">Awards Heading</label><input type="text" id="hd-awd" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" /></div>
+          <div><label class="text-[11px] text-zinc-400 block mb-1">Quotation Page Heading</label><input type="text" id="hd-qt" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" /></div>
+          <div><label class="text-[11px] text-zinc-400 block mb-1">Work / Portfolio Page Heading</label><input type="text" id="hd-pf" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" /></div>
+          <div><label class="text-[11px] text-zinc-400 block mb-1">Client Tracker Page Heading</label><input type="text" id="hd-tr" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" /></div>
+          <div><label class="text-[11px] text-zinc-400 block mb-1">FAQ Heading</label><input type="text" id="hd-faq" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" /></div>
+          <div><label class="text-[11px] text-zinc-400 block mb-1">Contact Page Heading</label><input type="text" id="hd-cnt" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" /></div>
+        </div>
+      `;
+      panelGlobal.appendChild(hdCard);
+    }
+
+    /* 3. Two-Way Sync Between Tab 1 Quick Brand Studio & Tab 10 Global Fields */
+    window.syncQuickBrandToGlobal = function () {
+      document.getElementById('gl-name').value = document.getElementById('qk-name').value;
+      document.getElementById('gl-tagline').value = document.getElementById('qk-tagline').value;
+      document.getElementById('gl-phone').value = document.getElementById('qk-phone').value;
+      document.getElementById('gl-whatsapp').value = document.getElementById('qk-whatsapp').value;
+      document.getElementById('gl-email').value = document.getElementById('qk-email').value;
+      document.getElementById('gl-domain').value = document.getElementById('qk-domain').value;
+      db.brand.logoText = document.getElementById('qk-logo-text').value.trim().toUpperCase();
+      db.brand.logoSize = Number(document.getElementById('qk-logo-size').value || 40);
+
+      /* Also update India / Primary Studio #1 phone & email automatically */
+      if (db.studios && db.studios[0]) {
+        db.studios[0].phone = document.getElementById('qk-phone').value;
+        db.studios[0].email = document.getElementById('qk-email').value;
+      }
+      window.syncGlobalLogoToQuick();
+    };
+
+    window.syncGlobalLogoToQuick = function () {
+      const logoUrl = document.getElementById('gl-logo').value.trim();
+      const logoTxt = (document.getElementById('qk-logo-text')?.value || db?.brand?.logoText || document.getElementById('gl-name').value || 'BP').substring(0, 3).toUpperCase();
+      const qkPrev = document.getElementById('quick-logo-preview');
+      if (qkPrev) {
+        if (logoUrl) qkPrev.innerHTML = `<img src="${logoUrl}" class="w-full h-full object-cover" />`;
+        else qkPrev.innerHTML = `<span>${logoTxt}</span>`;
+      }
+      if (typeof updateLogoLivePreview === 'function') updateLogoLivePreview();
+    };
+
+    /* 4. Hook into Populate & Save + Enable Automatic Debounced Save on Any Input Change */
+    const basePopulate = window.populateAllInputsFromDB;
+    window.populateAllInputsFromDB = function () {
+      if (typeof basePopulate === 'function') basePopulate();
+      if (!db || !db.brand) return;
+
+      const setV = (id, val) => { const el = document.getElementById(id); if (el) el.value = val ?? ''; };
+      setV('qk-name', db.brand.name);
+      setV('qk-tagline', db.brand.tagline);
+      setV('qk-phone', db.brand.phone);
+      setV('qk-whatsapp', db.brand.whatsapp);
+      setV('qk-email', db.brand.email);
+      setV('qk-domain', db.brand.domain);
+      setV('qk-logo-text', db.brand.logoText || (db.brand.name || 'BP').substring(0, 2).toUpperCase());
+      setV('qk-logo-size', db.brand.logoSize || 40);
+
+      const h = db.headings || {};
+      setV('hd-hm-srv', h.homeSrvHeading);
+      setV('hd-hm-wrk', h.homeWorkHeading);
+      setV('hd-proc', h.processHeading);
+      setV('hd-awd', h.awardsHeading);
+      setV('hd-qt', h.quotePageHeading);
+      setV('hd-pf', h.pfPageHeading);
+      setV('hd-tr', h.trPageHeading);
+      setV('hd-faq', h.faqHeading);
+      setV('hd-cnt', h.contactHeading);
+
+      window.syncGlobalLogoToQuick();
+    };
+
+    const baseSaveAll = window.saveAndPushAll;
+    window.saveAndPushAll = async function (label = 'Auto-Saved Changes') {
+      const getV = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+
+      db.brand.logoText = getV('qk-logo-text').trim().toUpperCase();
+      db.brand.logoSize = Number(getV('qk-logo-size') || 40);
+
+      /* Sync Primary Phone & Email with Studio #1 so Contact Page updates immediately */
+      const currentPhone = getV('gl-phone') || getV('qk-phone');
+      const currentEmail = getV('gl-email') || getV('qk-email');
+      if (db.studios && db.studios[0]) {
+        if (currentPhone) db.studios[0].phone = currentPhone;
+        if (currentEmail) db.studios[0].email = currentEmail;
+      }
+
+      db.headings = db.headings || {};
+      if (getV('hd-hm-srv')) db.headings.homeSrvHeading = getV('hd-hm-srv');
+      if (getV('hd-hm-wrk')) db.headings.homeWorkHeading = getV('hd-hm-wrk');
+      if (getV('hd-proc')) db.headings.processHeading = getV('hd-proc');
+      if (getV('hd-awd')) db.headings.awardsHeading = getV('hd-awd');
+      if (getV('hd-qt')) db.headings.quotePageHeading = getV('hd-qt');
+      if (getV('hd-pf')) db.headings.pfPageHeading = getV('hd-pf');
+      if (getV('hd-tr')) db.headings.trPageHeading = getV('hd-tr');
+      if (getV('hd-faq')) db.headings.faqHeading = getV('hd-faq');
+      if (getV('hd-cnt')) db.headings.contactHeading = getV('hd-cnt');
+
+      if (typeof baseSaveAll === 'function') await baseSaveAll(label);
+      window.syncGlobalLogoToQuick();
+    };
+
+    /* 5. Real-Time Auto-Save Listener (Saves automatically 800ms after you stop typing in ANY box) */
+    let autoSaveTimer = null;
+    document.querySelector('main')?.addEventListener('input', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+        if (e.target.id && e.target.id.startsWith('gl-')) {
+          document.getElementById('qk-name').value = document.getElementById('gl-name').value;
+          document.getElementById('qk-tagline').value = document.getElementById('gl-tagline').value;
+          document.getElementById('qk-phone').value = document.getElementById('gl-phone').value;
+          document.getElementById('qk-whatsapp').value = document.getElementById('gl-whatsapp').value;
+          document.getElementById('qk-email').value = document.getElementById('gl-email').value;
+          document.getElementById('qk-domain').value = document.getElementById('gl-domain').value;
+        }
+        clearTimeout(autoSaveTimer);
+        setCloudStatus('Typing... (Auto-Saving)', true);
+        autoSaveTimer = setTimeout(() => {
+          window.saveAndPushAll('Real-Time Auto-Save');
+        }, 800);
+      }
+    });
+
+    /* Populate immediately if already logged in */
+    if (window.db && window.db.brand) {
+      window.populateAllInputsFromDB();
+    } else {
+      setTimeout(() => { if (typeof window.populateAllInputsFromDB === 'function') window.populateAllInputsFromDB(); }, 900);
+    }
+  })();
+</script>
+<!-- ==================== ADMIN.HTML : MASTER RECOVERY PATCH COMPLETE ==================== -->
