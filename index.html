@@ -2493,3 +2493,43 @@
   })();
 </script>
 <!-- ==================== ADMIN.HTML : MASTER RECOVERY PATCH COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : NOTIFICATION TOAST & FINAL POLISH PATCH (PASTE AT VERY BOTTOM) ==================== -->
+<div id="admin-toast-box" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+  <div class="px-5 py-3 rounded-2xl bg-emerald-500 text-zinc-950 font-extrabold text-xs shadow-2xl flex items-center gap-2 border border-emerald-300">
+    <span id="toast-icon">✓</span>
+    <span id="toast-msg">Changes saved successfully!</span>
+  </div>
+</div>
+
+<script>
+  (function () {
+    window.showAdminToast = function (msg = 'Changes saved successfully!', isError = false) {
+      const box = document.getElementById('admin-toast-box');
+      const txt = document.getElementById('toast-msg');
+      const icon = document.getElementById('toast-icon');
+      if (!box || !txt) return;
+
+      txt.innerText = msg;
+      if (isError) {
+        box.firstElementChild.className = 'px-5 py-3 rounded-2xl bg-rose-600 text-white font-extrabold text-xs shadow-2xl flex items-center gap-2 border border-rose-400';
+        icon.innerText = '✕';
+      } else {
+        box.firstElementChild.className = 'px-5 py-3 rounded-2xl bg-emerald-500 text-zinc-950 font-extrabold text-xs shadow-2xl flex items-center gap-2 border border-emerald-300';
+        icon.innerText = '✓';
+      }
+
+      box.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => {
+        box.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    };
+
+    /* Hook toast into saveAndPushAll */
+    const baseSave = window.saveAndPushAll;
+    window.saveAndPushAll = async function (label) {
+      if (typeof baseSave === 'function') await baseSave(label);
+      window.showAdminToast(label || 'Changes saved & synced live!');
+    };
+  })();
+</script>
+<!-- ==================== ADMIN.HTML : NOTIFICATION TOAST PATCH COMPLETE ==================== -->
