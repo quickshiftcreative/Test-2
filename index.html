@@ -2897,3 +2897,173 @@
   })();
 </script>
 <!-- ==================== ADMIN.HTML : FULL-STACK AGENCY MASTER PATCH COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : HAMBURGER & NAVIGATION MENU STUDIO PATCH (PASTE AT VERY BOTTOM) ==================== -->
+<script>
+  (function () {
+    const DEFAULT_NAV_ITEMS = [
+      { id: 'home', label: 'Home', icon: '🏠', visible: true },
+      { id: 'services', label: 'Services', icon: '⚡', visible: true },
+      { id: 'quotation', label: 'Instant Quote', icon: '🛒', visible: true },
+      { id: 'portfolio', label: 'Work', icon: '🎬', visible: true },
+      { id: 'tracker', label: 'Client Tracker', icon: '📊', visible: true },
+      { id: 'about', label: 'About', icon: '👥', visible: true },
+      { id: 'reviews', label: 'Reviews', icon: '★', visible: true },
+      { id: 'contact', label: 'Contact', icon: '📞', visible: true },
+      { id: 'policies', label: 'Policies', icon: '⚖️', visible: false }
+    ];
+
+    function ensureNavConfigInDB() {
+      if (!window.db) return;
+      db.navMenuConfig = db.navMenuConfig || {};
+      db.navMenuConfig.iconStyle = db.navMenuConfig.iconStyle || 'three_line';
+      db.navMenuConfig.drawerTitle = db.navMenuConfig.drawerTitle || 'Menu & Quick Access';
+      db.navMenuConfig.showSearchInDrawer = db.navMenuConfig.showSearchInDrawer !== false;
+      db.navMenuConfig.showVipPassInDrawer = db.navMenuConfig.showVipPassInDrawer !== false;
+      db.navMenuConfig.vipPassText = db.navMenuConfig.vipPassText || '💳 VIP Partner Pass';
+      db.navMenuConfig.bottomCtaText = db.navMenuConfig.bottomCtaText || '💬 Chat on WhatsApp Desk';
+      if (!Array.isArray(db.navMenuConfig.items) || db.navMenuConfig.items.length === 0) {
+        db.navMenuConfig.items = JSON.parse(JSON.stringify(DEFAULT_NAV_ITEMS));
+      }
+    }
+
+    /* Inject Hamburger & Menu Studio Card into Tab 1 (Home) */
+    const panelHome = document.getElementById('panel-home');
+    if (panelHome && !document.getElementById('adm-hamburger-studio-card')) {
+      const menuCard = document.createElement('div');
+      menuCard.id = 'adm-hamburger-studio-card';
+      menuCard.className = 'admin-card rounded-3xl p-6 space-y-5 border-indigo-500/40';
+      menuCard.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#242429] pb-3">
+          <div>
+            <span class="text-[10px] font-extrabold uppercase text-indigo-400">Navigation & Phone Hamburger Studio</span>
+            <h3 class="text-base font-bold text-white">🍔 Customize PC/Tablet Menu Bar & Phone Hamburger Menu</h3>
+            <p class="text-xs text-zinc-400">PC & Tablet par horizontal pill menu dikhega, aur Phone par Cart ke baaju mein Hamburger menu. Yahan se dono ko pura edit karein.</p>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" onclick="addCustomMenuNavItem()" class="px-3.5 py-2 rounded-xl bg-indigo-600 text-white font-extrabold text-xs">+ Add Menu Link</button>
+            <button type="button" onclick="saveAndPushAll('Updated Hamburger & Navigation Menu')" class="px-4 py-2 rounded-xl bg-emerald-500 text-zinc-950 font-extrabold text-xs">✓ Save Menu</button>
+          </div>
+        </div>
+
+        <!-- Hamburger Style & Drawer Settings -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div>
+            <label class="text-xs font-bold text-emerald-400 block mb-1">Phone Hamburger Icon Style</label>
+            <select id="nav-cfg-icon-style" onchange="syncNavStudioToDB()" class="w-full px-3 py-2.5 rounded-xl adm-input text-xs font-bold">
+              <option value="three_line">☰ 3-Line Classic Hamburger</option>
+              <option value="two_line">＝ 2-Line Minimal (Apple Style)</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-zinc-300 block mb-1">Hamburger Drawer Title</label>
+            <input type="text" id="nav-cfg-title" oninput="syncNavStudioToDB()" placeholder="Menu & Quick Access" class="w-full px-3 py-2.5 rounded-xl adm-input text-xs font-bold" />
+          </div>
+          <div>
+            <label class="text-xs font-bold text-zinc-300 block mb-1">VIP Button Text in Drawer</label>
+            <input type="text" id="nav-cfg-vip-txt" oninput="syncNavStudioToDB()" placeholder="💳 VIP Partner Pass" class="w-full px-3 py-2.5 rounded-xl adm-input text-xs" />
+          </div>
+          <div>
+            <label class="text-xs font-bold text-zinc-300 block mb-1">Bottom WhatsApp CTA Text</label>
+            <input type="text" id="nav-cfg-cta-txt" oninput="syncNavStudioToDB()" placeholder="💬 Chat on WhatsApp Desk" class="w-full px-3 py-2.5 rounded-xl adm-input text-xs" />
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-4 text-xs font-bold">
+          <label class="flex items-center gap-2 cursor-pointer text-zinc-300">
+            <input type="checkbox" id="nav-cfg-show-search" onchange="syncNavStudioToDB()" class="w-4 h-4 accent-indigo-500" checked />
+            Show "Quick Search" in Phone Hamburger
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-amber-300">
+            <input type="checkbox" id="nav-cfg-show-vip" onchange="syncNavStudioToDB()" class="w-4 h-4 accent-amber-400" checked />
+            Show "VIP Partner Pass" in Phone Hamburger
+          </label>
+        </div>
+
+        <!-- Menu Items List (Icon, Name, Target Page, Order, Show/Hide) -->
+        <div class="space-y-2 pt-2 border-t border-[#242429]">
+          <div class="text-xs font-extrabold uppercase text-zinc-400">Menu Items (Edit Emoji/Icon, Name, Order & Visibility)</div>
+          <div id="adm-nav-items-list" class="space-y-2"></div>
+        </div>
+      `;
+      panelHome.insertBefore(menuCard, panelHome.children[2]);
+    }
+
+    window.renderNavItemsStudio = function () {
+      ensureNavConfigInDB();
+      const box = document.getElementById('adm-nav-items-list');
+      if (!box) return;
+
+      document.getElementById('nav-cfg-icon-style').value = db.navMenuConfig.iconStyle || 'three_line';
+      document.getElementById('nav-cfg-title').value = db.navMenuConfig.drawerTitle || 'Menu & Quick Access';
+      document.getElementById('nav-cfg-vip-txt').value = db.navMenuConfig.vipPassText || '💳 VIP Partner Pass';
+      document.getElementById('nav-cfg-cta-txt').value = db.navMenuConfig.bottomCtaText || '💬 Chat on WhatsApp Desk';
+      document.getElementById('nav-cfg-show-search').checked = db.navMenuConfig.showSearchInDrawer !== false;
+      document.getElementById('nav-cfg-show-vip').checked = db.navMenuConfig.showVipPassInDrawer !== false;
+
+      box.innerHTML = (db.navMenuConfig.items || []).map((item, idx) => `
+        <div class="grid grid-cols-12 gap-2 items-center p-2.5 rounded-2xl bg-[#09090b] border border-[#242429] text-xs">
+          <input type="text" value="${item.icon || ''}" oninput="db.navMenuConfig.items[${idx}].icon=this.value" placeholder="🏠" class="col-span-2 sm:col-span-1 px-2 py-1.5 rounded-lg adm-input text-center font-bold" />
+          <input type="text" value="${item.label || ''}" oninput="db.navMenuConfig.items[${idx}].label=this.value" placeholder="Menu Label" class="col-span-5 sm:col-span-4 px-3 py-1.5 rounded-lg adm-input font-bold" />
+          <input type="text" value="${item.id || ''}" oninput="db.navMenuConfig.items[${idx}].id=this.value" placeholder="Page ID (e.g. services) or URL" class="col-span-5 sm:col-span-3 px-2.5 py-1.5 rounded-lg adm-input text-zinc-400 font-mono text-[11px]" />
+          <label class="col-span-5 sm:col-span-2 flex items-center justify-center gap-1.5 font-bold ${item.visible !== false ? 'text-emerald-400' : 'text-zinc-500'} cursor-pointer">
+            <input type="checkbox" ${item.visible !== false ? 'checked' : ''} onchange="db.navMenuConfig.items[${idx}].visible=this.checked; renderNavItemsStudio(); saveAndPushAll('Toggled Menu Visibility');" />
+            <span>${item.visible !== false ? 'Visible' : 'Hidden'}</span>
+          </label>
+          <div class="col-span-7 sm:col-span-2 flex items-center justify-end gap-1">
+            <button type="button" onclick="moveNavMenuItem(${idx}, -1)" class="px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-white">↑</button>
+            <button type="button" onclick="moveNavMenuItem(${idx}, 1)" class="px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-white">↓</button>
+            <button type="button" onclick="if(canUserDelete()){db.navMenuConfig.items.splice(${idx},1);renderNavItemsStudio();saveAndPushAll('Deleted Menu Item');}" class="px-2 py-1 rounded bg-rose-500/20 text-rose-300 font-bold">✕</button>
+          </div>
+        </div>
+      `).join('');
+    };
+
+    window.syncNavStudioToDB = function () {
+      ensureNavConfigInDB();
+      db.navMenuConfig.iconStyle = document.getElementById('nav-cfg-icon-style').value;
+      db.navMenuConfig.drawerTitle = document.getElementById('nav-cfg-title').value;
+      db.navMenuConfig.vipPassText = document.getElementById('nav-cfg-vip-txt').value;
+      db.navMenuConfig.bottomCtaText = document.getElementById('nav-cfg-cta-txt').value;
+      db.navMenuConfig.showSearchInDrawer = document.getElementById('nav-cfg-show-search').checked;
+      db.navMenuConfig.showVipPassInDrawer = document.getElementById('nav-cfg-show-vip').checked;
+    };
+
+    window.moveNavMenuItem = function (idx, dir) {
+      ensureNavConfigInDB();
+      const arr = db.navMenuConfig.items;
+      const target = idx + dir;
+      if (target < 0 || target >= arr.length) return;
+      const temp = arr[idx]; arr[idx] = arr[target]; arr[target] = temp;
+      window.renderNavItemsStudio();
+      saveAndPushAll('Reordered Navigation Menu');
+    };
+
+    window.addCustomMenuNavItem = function () {
+      ensureNavConfigInDB();
+      db.navMenuConfig.items.push({
+        id: 'contact',
+        label: 'Book Call',
+        icon: '📅',
+        visible: true
+      });
+      window.renderNavItemsStudio();
+      saveAndPushAll('Added Custom Menu Link');
+    };
+
+    /* Hook into Populate & Save */
+    const oldPop = window.populateAllInputsFromDB;
+    window.populateAllInputsFromDB = function () {
+      if (typeof oldPop === 'function') oldPop();
+      window.renderNavItemsStudio();
+    };
+
+    const oldSave = window.saveAndPushAll;
+    window.saveAndPushAll = async function (lbl) {
+      window.syncNavStudioToDB();
+      if (typeof oldSave === 'function') await oldSave(lbl);
+    };
+
+    setTimeout(() => { if (window.db) window.renderNavItemsStudio(); }, 600);
+  })();
+</script>
+<!-- ==================== ADMIN.HTML : HAMBURGER & NAVIGATION MENU STUDIO PATCH COMPLETE ==================== -->
