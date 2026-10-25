@@ -2874,3 +2874,26 @@
   })();
 </script>
 <!-- ==================== ADMIN.HTML : LUXURY GLASS & WIDGETS PATCH COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : FULL-STACK AGENCY MASTER PATCH (PASTE AT VERY BOTTOM) ==================== -->
+<script>
+  (function () {
+    /* Inject "VIP Pitch Link Generator" into Tab 10 (Global) or Top Header */
+    const topRow = document.querySelector('header .flex.flex-wrap.items-center.gap-2');
+    if (topRow && !document.getElementById('top-pitch-btn')) {
+      const pitchBtn = document.createElement('button');
+      pitchBtn.id = 'top-pitch-btn';
+      pitchBtn.type = 'button';
+      pitchBtn.onclick = () => {
+        const bName = prompt('Enter Target Brand Name for VIP Pitch Link (e.g. Mamaearth):');
+        if (!bName) return;
+        const link = window.location.origin + window.location.pathname.replace('admin.html', 'index.html') + '?pitch=' + encodeURIComponent(bName.trim());
+        navigator.clipboard.writeText(link);
+        alert(`✅ VIP Pitch Link Copied for ${bName}:\n\n${link}`);
+      };
+      pitchBtn.className = 'px-3.5 py-2 rounded-xl bg-indigo-600/20 border border-indigo-500/40 text-indigo-300 text-xs font-extrabold hover:bg-indigo-600/30 transition';
+      pitchBtn.innerHTML = '⚡ Create VIP Pitch Link';
+      topRow.prepend(pitchBtn);
+    }
+  })();
+</script>
+<!-- ==================== ADMIN.HTML : FULL-STACK AGENCY MASTER PATCH COMPLETE ==================== -->
