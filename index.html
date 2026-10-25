@@ -4399,3 +4399,418 @@
   })();
 </script>
 <!-- ==================== ADMIN.HTML : DEDICATED "🍔 MENU STUDIO" PATCH COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : DEDICATED "🎬 LOADER & ENTRANCE STUDIO" WORKSPACE PATCH (PASTE AT VERY BOTTOM) ==================== -->
+<style>
+  @keyframes simZoomPortal {
+    0% { transform: scale(1); opacity: 1; }
+    65% { transform: scale(5.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes simFlipBurst {
+    0% { transform: perspective(500px) rotateY(0deg) scale(1); opacity: 1; }
+    65% { transform: perspective(500px) rotateY(360deg) scale(3.5); opacity: 0; }
+    100% { transform: perspective(500px) rotateY(0deg) scale(1); opacity: 1; }
+  }
+  @keyframes simCurtainSplit {
+    0% { clip-path: inset(0 0 0 0); }
+    60% { clip-path: inset(50% 0 50% 0); opacity: 0.2; }
+    100% { clip-path: inset(0 0 0 0); opacity: 1; }
+  }
+  @keyframes simIrisPortal {
+    0% { clip-path: circle(100% at 50% 50%); }
+    60% { clip-path: circle(0% at 50% 50%); }
+    100% { clip-path: circle(100% at 50% 50%); }
+  }
+  @keyframes simGlassMelt {
+    0% { filter: blur(0px); transform: scale(1); opacity: 1; }
+    60% { filter: blur(18px); transform: scale(1.15); opacity: 0; }
+    100% { filter: blur(0px); transform: scale(1); opacity: 1; }
+  }
+  @keyframes simShutterUp {
+    0% { transform: translateY(0); }
+    60% { transform: translateY(-100%); }
+    100% { transform: translateY(0); }
+  }
+
+  .sim-exit-zoom_portal .sim-logo-box { animation: simZoomPortal 1.15s cubic-bezier(0.7, 0, 0.2, 1); }
+  .sim-exit-flip_3d_burst .sim-logo-box { animation: simFlipBurst 1.15s cubic-bezier(0.7, 0, 0.2, 1); }
+  .sim-exit-curtain_split { animation: simCurtainSplit 1.15s cubic-bezier(0.7, 0, 0.2, 1); }
+  .sim-exit-iris_portal { animation: simIrisPortal 1.15s cubic-bezier(0.7, 0, 0.2, 1); }
+  .sim-exit-glass_melt { animation: simGlassMelt 1.15s ease-in-out; }
+  .sim-exit-shutter_up { animation: simShutterUp 1.15s cubic-bezier(0.7, 0, 0.2, 1); }
+</style>
+
+<script id="dedicated-loader-studio-v12">
+  (function () {
+    const EXIT_ANIMATIONS = [
+      { id: 'zoom_portal',   title: '🚀 1. 3D Logo Fly-Through', desc: 'Logo zooms in 3D toward camera & opens site (Apple Keynote)' },
+      { id: 'flip_3d_burst', title: '🌀 2. 3D Flip & Burst',     desc: '360° 3D spatial logo spin & expand reveal' },
+      { id: 'curtain_split', title: '🎭 3. Cinema Split Curtain', desc: 'Luxury theater split reveal from center' },
+      { id: 'iris_portal',   title: '⭕ 4. VisionOS Iris Portal', desc: 'Circular portal iris transition around logo' },
+      { id: 'glass_melt',    title: '🥂 5. Liquid Glass Melt',    desc: 'Frosted blur dissolve into sharp homepage' },
+      { id: 'shutter_up',    title: '⚡ 6. Cyber Shutter Lift',   desc: 'High-speed vertical studio curtain lift' }
+    ];
+
+    const HOME_ENTRANCES = [
+      { id: 'cascade',    title: '🌊 1. Apple Staggered Cascade', desc: 'Smooth upward glide of hero text & cards' },
+      { id: 'zoom_3d',    title: '🕶️ 2. 3D Spatial Depth Zoom',   desc: 'Hero stage emerges from 3D depth' },
+      { id: 'blur_focus', title: '✨ 3. Cinema Blur-to-Sharp',    desc: 'Cinematic optical lens focus entrance' },
+      { id: 'elastic',    title: '🎯 4. iOS Spring Bounce',       desc: 'Tactile elastic spring physics reveal' }
+    ];
+
+    const THEME_PREVIEWS = {
+      obsidian_gold:  { bg: 'radial-gradient(circle, #241c0c 0%, #09090b 75%)', accent: '#f59e0b' },
+      cyber_indigo:   { bg: 'radial-gradient(circle, #171b42 0%, #09090b 75%)', accent: '#6366f1' },
+      emerald_matrix: { bg: 'radial-gradient(circle, #0b2e23 0%, #09090b 75%)', accent: '#10b981' },
+      tinted_glass:   { bg: 'linear-gradient(135deg, rgba(99,102,241,0.28), rgba(9,9,11,0.85))', accent: '#f59e0b' }
+    };
+
+    function ensureLoaderStudioDB() {
+      if (!window.db) return;
+      db.loaderConfig = db.loaderConfig || {};
+      const l = db.loaderConfig;
+      l.enabled = l.enabled !== false;
+      l.frequency = l.frequency || 'always';
+      l.exitAnim = l.exitAnim || 'zoom_portal';
+      l.homeEntrance = l.homeEntrance || 'cascade';
+      l.bgTheme = l.bgTheme || 'obsidian_gold';
+      l.progressStyle = l.progressStyle || 'laser_bar';
+      l.logoShape = l.logoShape || 'rounded';
+      l.logoSize = l.logoSize ?? 96;
+      l.showOrbitRings = l.showOrbitRings !== false;
+      l.durationMs = l.durationMs ?? 1450;
+      l.customLoaderLogo = l.customLoaderLogo || '';
+      l.headlineText = l.headlineText ?? '';
+      l.taglineText = l.taglineText || 'Initializing Global Brand & E-Commerce Studio...';
+      l.statusSteps = l.statusSteps || 'Loading 3D Visual Engine..., Syncing Live Pricing & Catalog..., Ready for Launch';
+    }
+
+    /* 1. Create Dedicated Tab "🎬 Loader & Entrance" in Top Admin Bar + Section #panel-loader */
+    function buildDedicatedLoaderStudioTab() {
+      const menuTab = document.getElementById('adm-tab-menu') || document.getElementById('adm-tab-home');
+      if (menuTab && !document.getElementById('adm-tab-loader')) {
+        const btn = document.createElement('button');
+        btn.id = 'adm-tab-loader';
+        btn.type = 'button';
+        btn.onclick = function () { switchAdminTab('loader'); };
+        btn.className = 'adm-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-[#111114] text-amber-300 border border-amber-500/30 whitespace-nowrap';
+        btn.innerHTML = '🎬 Loader & Entrance';
+        menuTab.insertAdjacentElement('afterend', btn);
+      }
+
+      const mainEl = document.querySelector('main');
+      if (mainEl && !document.getElementById('panel-loader')) {
+        const sec = document.createElement('section');
+        sec.id = 'panel-loader';
+        sec.className = 'adm-panel hidden space-y-6';
+        sec.innerHTML = `
+          <!-- Header Banner -->
+          <div class="p-5 rounded-3xl bg-gradient-to-r from-amber-950/60 via-[#111114] to-indigo-950/60 border border-amber-500/30 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase tracking-widest text-amber-400">Apple Keynote & Awwwards Motion Studio</span>
+              <h2 class="text-xl font-bold text-white mt-0.5">🎬 3D Logo Loading Screen & Home Entrance Studio</h2>
+              <p class="text-xs text-zinc-300">Apne uploaded Brand Logo ko Loading Screen par dikhayein, 100% load hone par 3D Zoom-In / Portal Animation chunein, aur Live Simulator mein preview dekhein.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" onclick="window.playLoaderStudioSimulation()" class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs">▶ Play 3D Exit Animation</button>
+              <button type="button" onclick="saveAndPushAll('Updated 3D Loader & Home Entrance Studio')" class="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-extrabold text-xs shadow-xl">✓ Save & Publish Loader</button>
+            </div>
+          </div>
+
+          <!-- CARD 1: LIVE INTERACTIVE 3D LOADER SIMULATOR + 6 EXIT ANIMATIONS -->
+          <div class="admin-card rounded-3xl p-6 space-y-5 border-amber-500/30">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#242429] pb-3">
+              <div>
+                <span class="text-[10px] font-extrabold uppercase text-amber-400">Step 1 • 100% Completion Exit Animation & Live Preview</span>
+                <h3 class="text-base font-bold text-white">🚀 Choose What Happens When Loading Reaches 100% (Click Any Card to Test Live)</h3>
+              </div>
+              <label class="flex items-center gap-2 text-xs font-extrabold text-emerald-400 cursor-pointer">
+                <input type="checkbox" id="ldr-cfg-enabled" onchange="window.syncLoaderStudioToDB(false)" class="w-4 h-4 accent-emerald-500" checked />
+                Enable Animated Loading Screen
+              </label>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+              <!-- Left: 6 Famous Exit Animation Cards -->
+              <div class="lg:col-span-7 space-y-3">
+                <div id="ldr-exit-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
+              </div>
+
+              <!-- Right: Live 3D Loader Simulator Screen -->
+              <div class="lg:col-span-5 relative rounded-3xl overflow-hidden border border-white/15 min-h-[310px] flex items-center justify-center bg-[#09090b]">
+                <!-- Underlying Simulated Home Page -->
+                <div class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center opacity-50 pointer-events-none">
+                  <span class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[9px] font-bold">HOME PAGE BEHIND LOADER</span>
+                  <h4 class="text-xl font-black text-white mt-2">Defining Culture. Scaling Brands.</h4>
+                  <p class="text-[10px] text-zinc-400 mt-1">Watch how your loader reveals this home screen at 100%!</p>
+                </div>
+
+                <!-- Simulated Loader Overlay -->
+                <div id="ldr-live-sim-screen" class="relative z-10 w-full h-full min-h-[310px] flex flex-col items-center justify-center p-6 text-center space-y-4 transition-all">
+                  <div class="sim-logo-box relative flex items-center justify-center">
+                    <div id="sim-orbit-ring" class="absolute -inset-3 rounded-full border border-amber-400/60 border-t-transparent animate-spin"></div>
+                    <div id="sim-logo-emblem" class="w-20 h-20 rounded-2xl bg-white/10 border border-white/25 flex items-center justify-center overflow-hidden shadow-2xl font-black text-white text-xl">BP</div>
+                  </div>
+                  <div class="space-y-1">
+                    <div id="sim-brand-title" class="text-base font-extrabold text-white">THE BLANK PAGE</div>
+                    <div id="sim-status-line" class="text-[10px] font-mono text-zinc-400 uppercase">100% • Ready for Launch</div>
+                  </div>
+                  <div class="w-44 h-1.5 rounded-full bg-white/15 overflow-hidden">
+                    <div id="sim-bar-fill" class="h-full w-full rounded-full bg-gradient-to-r from-indigo-500 via-amber-400 to-emerald-400"></div>
+                  </div>
+                  <button type="button" onclick="window.playLoaderStudioSimulation()" class="px-3 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-[10px] font-extrabold text-amber-300 border border-white/15">
+                    ▶ Click to Test 100% Zoom/Reveal
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 2: UPLOADED LOGO SYNC, SHAPE, SIZE & BACKGROUND THEME -->
+          <div class="admin-card rounded-3xl p-6 space-y-5 border-emerald-500/30">
+            <div class="border-b border-[#242429] pb-3">
+              <span class="text-[10px] font-extrabold uppercase text-emerald-400">Step 2 • Logo Appearance, Speed & Theme</span>
+              <h3 class="text-base font-bold text-white">🖼️ Brand Logo Sync, 3D Orbit Rings, Speed & Color Theme</h3>
+              <p class="text-xs text-zinc-400">By default, aapne Home Tab mein jo Brand Logo upload kiya hai wahi Loading Screen par dikhega. Aap chahein toh yahan se uska shape, size ya alag custom loader logo bhi set kar sakte hain.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label class="text-xs font-bold text-emerald-400 block mb-1">Loader Background Theme</label>
+                <select id="ldr-cfg-theme" onchange="window.syncLoaderStudioToDB(false)" class="w-full px-3 py-2.5 rounded-xl adm-input text-xs font-bold">
+                  <option value="obsidian_gold">👑 Obsidian & Metallic Gold</option>
+                  <option value="cyber_indigo">🌌 Deep Cyber Indigo</option>
+                  <option value="emerald_matrix">💎 Emerald Matrix Glow</option>
+                  <option value="tinted_glass">🥂 Tinted See-Through Blur Glass</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs font-bold text-zinc-300 block mb-1">Logo Frame Shape on Loader</label>
+                <select id="ldr-cfg-shape" onchange="window.syncLoaderStudioToDB(false)" class="w-full px-3 py-2.5 rounded-xl adm-input text-xs font-bold">
+                  <option value="rounded">Apple Rounded Glass Squircle</option>
+                  <option value="circle">Perfect Circle Emblem</option>
+                  <option value="raw_png">Transparent PNG (No Box Frame)</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs font-bold text-zinc-300 block mb-1">Progress Indicator Style</label>
+                <select id="ldr-cfg-prog-style" onchange="window.syncLoaderStudioToDB(false)" class="w-full px-3 py-2.5 rounded-xl adm-input text-xs font-bold">
+                  <option value="laser_bar">⚡ Laser Glow Bar + Percentage</option>
+                  <option value="minimal_pct">🔢 Giant Minimal Percentage Only</option>
+                  <option value="pulse_dots">••• Pulsing Dots + Percentage</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs font-bold text-zinc-300 block mb-1">When to Show Loader</label>
+                <select id="ldr-cfg-freq" onchange="window.syncLoaderStudioToDB(false)" class="w-full px-3 py-2.5 rounded-xl adm-input text-xs font-bold">
+                  <option value="always">Every Page Load / Refresh</option>
+                  <option value="once_per_session">Only Once Per Browser Visit</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-2xl bg-[#09090b] border border-[#242429] items-center">
+              <div>
+                <label class="text-xs font-bold text-zinc-300 block mb-1">Loader Logo Size (<span id="ldr-sz-lbl">96</span>px)</label>
+                <input type="range" id="ldr-cfg-size" min="64" max="150" value="96" oninput="window.syncLoaderStudioToDB(false)" class="w-full accent-amber-400" />
+              </div>
+              <div>
+                <label class="text-xs font-bold text-zinc-300 block mb-1">Loading Duration (<span id="ldr-dur-lbl">1.4</span> sec)</label>
+                <input type="range" id="ldr-cfg-duration" min="700" max="2800" step="100" value="1400" oninput="window.syncLoaderStudioToDB(false)" class="w-full accent-indigo-400" />
+              </div>
+              <label class="flex items-center gap-2 text-xs font-extrabold text-amber-300 cursor-pointer pt-2">
+                <input type="checkbox" id="ldr-cfg-rings" onchange="window.syncLoaderStudioToDB(false)" class="w-4 h-4 accent-amber-400" checked />
+                ✨ Show 3D Orbiting Halo Rings Around Logo
+              </label>
+            </div>
+
+            <!-- Optional Override Logo Upload + Custom Loading Text -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="space-y-1.5">
+                <label class="text-xs font-bold text-zinc-300 block">Custom Loader Logo Override (Leave blank to automatically use your Main Brand Logo)</label>
+                <div class="flex gap-2">
+                  <input type="text" id="ldr-cfg-custom-logo" oninput="window.syncLoaderStudioToDB(false)" placeholder="Automatically using Main Agency Logo..." class="flex-1 px-3 py-2 rounded-xl adm-input text-xs" />
+                  <label class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold cursor-pointer shrink-0">
+                    📁 Upload Logo
+                    <input type="file" accept="image/*" onchange="uploadDirectCallback(this, false, function(u){ document.getElementById('ldr-cfg-custom-logo').value=u; window.syncLoaderStudioToDB(false); saveAndPushAll('Uploaded Loader Logo'); })" class="hidden" />
+                  </label>
+                  <button type="button" onclick="document.getElementById('ldr-cfg-custom-logo').value=''; window.syncLoaderStudioToDB(false);" class="px-2.5 py-2 rounded-xl bg-rose-500/20 text-rose-300 text-xs font-bold">Use Main Logo</button>
+                </div>
+              </div>
+              <div class="space-y-1.5">
+                <label class="text-xs font-bold text-zinc-300 block">Loading Status Steps (Comma Separated)</label>
+                <input type="text" id="ldr-cfg-steps" oninput="window.syncLoaderStudioToDB(false)" placeholder="Loading 3D Visual Engine..., Syncing Catalog..., Ready for Launch" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs font-bold" />
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 3: HOME PAGE ENTRANCE ANIMATION STUDIO -->
+          <div class="admin-card rounded-3xl p-6 space-y-4 border-indigo-500/30">
+            <div class="border-b border-[#242429] pb-3">
+              <span class="text-[10px] font-extrabold uppercase text-indigo-400">Step 3 • Home Screen Entrance Choreography</span>
+              <h3 class="text-base font-bold text-white">🏠 Choose How Your Home Page Enters After the Loader Finishes</h3>
+            </div>
+            <div id="ldr-home-entrance-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+          </div>
+        `;
+        mainEl.appendChild(sec);
+      }
+    }
+
+    /* 2. Render & Sync Functions */
+    window.renderLoaderStudioWorkspace = function () {
+      buildDedicatedLoaderStudioTab();
+      ensureLoaderStudioDB();
+      if (!window.db) return;
+      const l = db.loaderConfig;
+
+      const setV = (id, v) => { const el = document.getElementById(id); if (el) el.value = v ?? ''; };
+      const setC = (id, v) => { const el = document.getElementById(id); if (el) el.checked = Boolean(v); };
+
+      setC('ldr-cfg-enabled', l.enabled !== false);
+      setV('ldr-cfg-theme', l.bgTheme || 'obsidian_gold');
+      setV('ldr-cfg-shape', l.logoShape || 'rounded');
+      setV('ldr-cfg-prog-style', l.progressStyle || 'laser_bar');
+      setV('ldr-cfg-freq', l.frequency || 'always');
+      setV('ldr-cfg-size', l.logoSize ?? 96);
+      setV('ldr-cfg-duration', l.durationMs ?? 1450);
+      setC('ldr-cfg-rings', l.showOrbitRings !== false);
+      setV('ldr-cfg-custom-logo', l.customLoaderLogo || '');
+      setV('ldr-cfg-steps', l.statusSteps || '');
+
+      window.updateLoaderStudioCardsAndPreview(false);
+    };
+
+    window.selectLoaderExitAnim = function (animId) {
+      ensureLoaderStudioDB();
+      db.loaderConfig.exitAnim = animId;
+      window.updateLoaderStudioCardsAndPreview(true);
+    };
+
+    window.selectHomeEntranceAnim = function (entId) {
+      ensureLoaderStudioDB();
+      db.loaderConfig.homeEntrance = entId;
+      window.updateLoaderStudioCardsAndPreview(false);
+    };
+
+    window.playLoaderStudioSimulation = function () {
+      window.updateLoaderStudioCardsAndPreview(true);
+    };
+
+    window.syncLoaderStudioToDB = function (playSim) {
+      if (!window.db) return;
+      ensureLoaderStudioDB();
+      const l = db.loaderConfig;
+      const getV = (id) => document.getElementById(id)?.value ?? '';
+      const getC = (id) => Boolean(document.getElementById(id)?.checked);
+
+      l.enabled = getC('ldr-cfg-enabled');
+      l.bgTheme = getV('ldr-cfg-theme') || 'obsidian_gold';
+      l.logoShape = getV('ldr-cfg-shape') || 'rounded';
+      l.progressStyle = getV('ldr-cfg-prog-style') || 'laser_bar';
+      l.frequency = getV('ldr-cfg-freq') || 'always';
+      l.logoSize = Number(getV('ldr-cfg-size') || 96);
+      l.durationMs = Number(getV('ldr-cfg-duration') || 1450);
+      l.showOrbitRings = getC('ldr-cfg-rings');
+      l.customLoaderLogo = getV('ldr-cfg-custom-logo');
+      l.statusSteps = getV('ldr-cfg-steps');
+
+      window.updateLoaderStudioCardsAndPreview(playSim);
+    };
+
+    window.updateLoaderStudioCardsAndPreview = function (playSim) {
+      if (!window.db) return;
+      const l = db.loaderConfig;
+
+      const szLbl = document.getElementById('ldr-sz-lbl');
+      if (szLbl) szLbl.innerText = l.logoSize || 96;
+      const durLbl = document.getElementById('ldr-dur-lbl');
+      if (durLbl) durLbl.innerText = ((l.durationMs || 1400) / 1000).toFixed(1);
+
+      /* Render 6 Exit Animation Cards */
+      const exitGrid = document.getElementById('ldr-exit-cards-grid');
+      if (exitGrid) {
+        exitGrid.innerHTML = EXIT_ANIMATIONS.map(a => {
+          const isSel = a.id === (l.exitAnim || 'zoom_portal');
+          return `
+            <button type="button" onclick="window.selectLoaderExitAnim('${a.id}')" class="p-3.5 rounded-2xl text-left transition border ${isSel ? 'bg-amber-500/20 border-amber-400 text-white shadow-lg' : 'bg-[#09090b] border-[#242429] text-zinc-300 hover:border-white/30'}">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold">${a.title}</span>
+                <span class="text-[10px] font-black ${isSel ? 'text-amber-300' : 'text-zinc-500'}">${isSel ? '● ACTIVE' : 'Test ↗'}</span>
+              </div>
+              <p class="text-[10px] text-zinc-400 mt-1">${a.desc}</p>
+            </button>
+          `;
+        }).join('');
+      }
+
+      /* Render 4 Home Entrance Cards */
+      const homeGrid = document.getElementById('ldr-home-entrance-grid');
+      if (homeGrid) {
+        homeGrid.innerHTML = HOME_ENTRANCES.map(h => {
+          const isSel = h.id === (l.homeEntrance || 'cascade');
+          return `
+            <button type="button" onclick="window.selectHomeEntranceAnim('${h.id}')" class="p-4 rounded-2xl text-left transition border ${isSel ? 'bg-indigo-600/25 border-indigo-400 text-white shadow-lg' : 'bg-[#09090b] border-[#242429] text-zinc-300 hover:border-white/30'}">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold">${h.title}</span>
+                <span class="text-[10px] font-black ${isSel ? 'text-emerald-400' : 'text-zinc-500'}">${isSel ? '✓ Selected' : 'Select'}</span>
+              </div>
+              <p class="text-[10px] text-zinc-400 mt-1">${h.desc}</p>
+            </button>
+          `;
+        }).join('');
+      }
+
+      /* Update Live Simulator Box */
+      const simScreen = document.getElementById('ldr-live-sim-screen');
+      const simEmblem = document.getElementById('sim-logo-emblem');
+      const simRing = document.getElementById('sim-orbit-ring');
+      const simTitle = document.getElementById('sim-brand-title');
+      if (simScreen && simEmblem) {
+        const th = THEME_PREVIEWS[l.bgTheme || 'obsidian_gold'] || THEME_PREVIEWS.obsidian_gold;
+        simScreen.style.background = th.bg;
+        if (simRing) simRing.style.display = l.showOrbitRings !== false ? 'block' : 'none';
+
+        const radMap = { rounded: '20px', circle: '9999px', raw_png: '0px' };
+        simEmblem.style.borderRadius = radMap[l.logoShape || 'rounded'] || '20px';
+        simEmblem.style.background = l.logoShape === 'raw_png' ? 'transparent' : 'rgba(255,255,255,0.1)';
+        simEmblem.style.border = l.logoShape === 'raw_png' ? 'none' : '1px solid rgba(255,255,255,0.25)';
+
+        const activeLogoUrl = (l.customLoaderLogo || db.brand?.logo || '').trim();
+        const fallbackTxt = (db.brand?.logoText || db.brand?.name || 'BP').substring(0, 3).toUpperCase();
+        if (activeLogoUrl) {
+          simEmblem.innerHTML = `<img src="${activeLogoUrl}" class="w-full h-full object-contain p-1.5" />`;
+        } else {
+          simEmblem.innerHTML = `<span>${fallbackTxt}</span>`;
+        }
+        if (simTitle) simTitle.innerText = db.brand?.name || 'THE BLANK PAGE';
+
+        if (playSim) {
+          simScreen.className = 'relative z-10 w-full h-full min-h-[310px] flex flex-col items-center justify-center p-6 text-center space-y-4 transition-all';
+          void simScreen.offsetWidth;
+          simScreen.classList.add('sim-exit-' + (l.exitAnim || 'zoom_portal'));
+        }
+      }
+    };
+
+    /* 3. Hook into Admin Populate & Save */
+    const oldPop = window.populateAllInputsFromDB;
+    window.populateAllInputsFromDB = function () {
+      if (typeof oldPop === 'function') oldPop();
+      window.renderLoaderStudioWorkspace();
+    };
+
+    const oldSave = window.saveAndPushAll;
+    window.saveAndPushAll = async function (lbl) {
+      if (document.getElementById('ldr-cfg-theme')) {
+        window.syncLoaderStudioToDB(false);
+      }
+      if (typeof oldSave === 'function') await oldSave(lbl);
+    };
+
+    setTimeout(function () {
+      window.renderLoaderStudioWorkspace();
+    }, 550);
+  })();
+</script>
+<!-- ==================== ADMIN.HTML : DEDICATED "🎬 LOADER & ENTRANCE STUDIO" PATCH COMPLETE ==================== -->
