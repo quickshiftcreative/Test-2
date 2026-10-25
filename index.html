@@ -3067,3 +3067,218 @@
   })();
 </script>
 <!-- ==================== ADMIN.HTML : HAMBURGER & NAVIGATION MENU STUDIO PATCH COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : TINTED LIQUID-GLASS & 4 ANIMATION LIVE PREVIEW STUDIO PATCH (PASTE AT VERY BOTTOM) ==================== -->
+<style>
+  @keyframes admPrevSlideScale {
+    0% { opacity: 0; transform: translateY(-12px) scale(0.94); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes admPrevFlip3D {
+    0% { opacity: 0; transform: perspective(600px) rotateX(-22deg) translateY(-8px); }
+    100% { opacity: 1; transform: perspective(600px) rotateX(0deg) translateY(0); }
+  }
+  @keyframes admPrevElastic {
+    0% { opacity: 0; transform: translateY(-20px) scale(0.9); }
+    65% { opacity: 1; transform: translateY(4px) scale(1.03); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes admPrevBlurDissolve {
+    0% { opacity: 0; filter: blur(14px); transform: scale(1.04); }
+    100% { opacity: 1; filter: blur(0px); transform: scale(1); }
+  }
+  .prev-anim-slide_scale { animation: admPrevSlideScale 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  .prev-anim-flip_3d { animation: admPrevFlip3D 0.48s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  .prev-anim-elastic { animation: admPrevElastic 0.52s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+  .prev-anim-blur_dissolve { animation: admPrevBlurDissolve 0.45s ease-out forwards; }
+</style>
+
+<script>
+  (function () {
+    const TINT_RGB_MAP = {
+      obsidian: { rgb: '12, 12, 18', border: 'rgba(255,255,255,0.24)', label: '🌑 Obsidian Smoke' },
+      gold:     { rgb: '28, 22, 10', border: 'rgba(245,158,11,0.50)',  label: '👑 Metallic Gold Tint' },
+      indigo:   { rgb: '16, 18, 42', border: 'rgba(99,102,241,0.50)',  label: '🌌 Indigo Frost Tint' },
+      emerald:  { rgb: '8, 28, 22',  border: 'rgba(16,185,129,0.50)',  label: '💎 Emerald Matrix Tint' }
+    };
+
+    const ANIM_STYLES = [
+      { id: 'slide_scale', title: '1. Apple Liquid Slide', desc: 'Smooth iOS spring slide & zoom' },
+      { id: 'flip_3d',     title: '2. 3D Perspective Flip', desc: '3D spatial glass tilt reveal' },
+      { id: 'elastic',     title: '3. Elastic Bounce',      desc: 'Dynamic bouncy cascade' },
+      { id: 'blur_dissolve', title: '4. Frosted Blur Fade', desc: 'Cinematic blur-to-sharp fade' }
+    ];
+
+    function injectGlassCustomizerIntoCard() {
+      const studioCard = document.getElementById('adm-hamburger-studio-card');
+      if (!studioCard || document.getElementById('hb-glass-live-studio')) return;
+
+      const glassBox = document.createElement('div');
+      glassBox.id = 'hb-glass-live-studio';
+      glassBox.className = 'p-5 rounded-3xl bg-[#09090b] border border-emerald-500/30 space-y-5';
+      glassBox.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#242429] pb-3">
+          <div>
+            <span class="text-[10px] font-extrabold uppercase text-emerald-400">Tinted Liquid-Glass & Animation Studio</span>
+            <h4 class="text-sm font-bold text-white">🥂 Adjust Glass Tint, Background Blur & Preview All 4 Animations Live</h4>
+          </div>
+          <button type="button" onclick="replayHamburgerLivePreview()" class="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-extrabold">
+            ▶ Replay Animation Preview
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <!-- Left Controls: Sliders, Tint Tone & 4 Animation Selector Cards -->
+          <div class="lg:col-span-7 space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <div>
+                <label class="text-xs font-bold text-zinc-300 block mb-1">Glass Tint Opacity (<span id="hb-tint-val-lbl">52</span>%)</label>
+                <input type="range" id="hb-cfg-tint-opacity" min="18" max="90" value="52" oninput="updateHamburgerGlassPreview()" class="w-full accent-emerald-400 mt-1" />
+                <span class="text-[10px] text-zinc-500">Lower = More See-Through</span>
+              </div>
+              <div>
+                <label class="text-xs font-bold text-zinc-300 block mb-1">Background Blur (<span id="hb-blur-val-lbl">28</span>px)</label>
+                <input type="range" id="hb-cfg-glass-blur" min="6" max="45" value="28" oninput="updateHamburgerGlassPreview()" class="w-full accent-indigo-400 mt-1" />
+                <span class="text-[10px] text-zinc-500">Higher = Frosted Glass</span>
+              </div>
+              <div>
+                <label class="text-xs font-bold text-amber-300 block mb-1">Glass Tint Color Tone</label>
+                <select id="hb-cfg-tint-tone" onchange="updateHamburgerGlassPreview()" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold">
+                  <option value="obsidian">🌑 Obsidian Smoke</option>
+                  <option value="gold">👑 Metallic Gold Tint</option>
+                  <option value="indigo">🌌 Indigo Frost Tint</option>
+                  <option value="emerald">💎 Emerald Matrix Tint</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- 4 Animation Cards Selector -->
+            <div>
+              <label class="text-xs font-extrabold uppercase text-zinc-400 block mb-2">Click Any of the 4 Animation Styles to Preview Before Saving:</label>
+              <div id="hb-anim-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
+            </div>
+          </div>
+
+          <!-- Right Side: Live Tinted Glass Simulator over Colourful Background -->
+          <div class="lg:col-span-5 relative rounded-2xl overflow-hidden border border-white/15 p-4 min-h-[260px] flex items-center justify-center" style="background: radial-gradient(circle at 20% 20%, #6366f1 0%, transparent 45%), radial-gradient(circle at 80% 75%, #10b981 0%, transparent 45%), radial-gradient(circle at 50% 50%, #f59e0b 0%, #09090b 70%);">
+            <!-- Simulated Website Text Behind the Glass -->
+            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none opacity-65 text-center p-4">
+              <span class="text-[10px] font-black uppercase tracking-widest text-amber-300">BACKGROUND WEBSITE CONTENT</span>
+              <div class="text-2xl font-black text-white leading-tight mt-1">THE BLANK PAGE</div>
+              <p class="text-[11px] text-zinc-200 mt-1">Notice how this background text blurs & shines through your tinted glass menu!</p>
+            </div>
+
+            <!-- Live Simulated Single-Column Tinted Glass Hamburger Menu -->
+            <div id="hb-live-preview-drawer" class="relative z-10 w-full max-w-[270px] rounded-2xl p-3.5 space-y-2 transition-all">
+              <div class="flex items-center justify-between border-b border-white/20 pb-2 mb-1">
+                <span class="text-[10px] font-extrabold uppercase text-white">Live Menu Preview</span>
+                <span id="hb-prev-badge" class="text-[9px] px-2 py-0.5 rounded-full bg-white/15 text-emerald-300 font-bold">Single Column</span>
+              </div>
+              <div class="px-3 py-2 rounded-xl bg-white text-zinc-950 font-extrabold text-xs flex justify-between items-center shadow">
+                <span>(01) 🏠 Home</span><span>→</span>
+              </div>
+              <div class="px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-white font-bold text-xs flex justify-between items-center">
+                <span>(02) ⚡ Services</span><span>→</span>
+              </div>
+              <div class="px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-white font-bold text-xs flex justify-between items-center">
+                <span>(03) 👥 About Us</span><span>→</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      studioCard.insertBefore(glassBox, studioCard.children[2]);
+    }
+
+    window.selectHamburgerAnimStyle = function (animId) {
+      db.navMenuConfig = db.navMenuConfig || {};
+      db.navMenuConfig.animStyle = animId;
+      window.updateHamburgerGlassPreview(true);
+    };
+
+    window.replayHamburgerLivePreview = function () {
+      window.updateHamburgerGlassPreview(true);
+    };
+
+    window.updateHamburgerGlassPreview = function (triggerAnim = false) {
+      if (!window.db) return;
+      db.navMenuConfig = db.navMenuConfig || {};
+
+      const opEl = document.getElementById('hb-cfg-tint-opacity');
+      const blEl = document.getElementById('hb-cfg-glass-blur');
+      const tnEl = document.getElementById('hb-cfg-tint-tone');
+
+      if (opEl) {
+        db.navMenuConfig.tintOpacity = Number(opEl.value);
+        document.getElementById('hb-tint-val-lbl').innerText = opEl.value;
+      }
+      if (blEl) {
+        db.navMenuConfig.glassBlur = Number(blEl.value);
+        document.getElementById('hb-blur-val-lbl').innerText = blEl.value;
+      }
+      if (tnEl) {
+        db.navMenuConfig.tintTone = tnEl.value;
+      }
+
+      const activeAnim = db.navMenuConfig.animStyle || 'slide_scale';
+      const grid = document.getElementById('hb-anim-cards-grid');
+      if (grid) {
+        grid.innerHTML = ANIM_STYLES.map(a => {
+          const isSel = a.id === activeAnim;
+          return `
+            <button type="button" onclick="selectHamburgerAnimStyle('${a.id}')" class="p-3 rounded-2xl text-left transition border ${isSel ? 'bg-indigo-600/25 border-indigo-400 text-white shadow-lg' : 'bg-black/60 border-white/10 text-zinc-300 hover:border-white/30'}">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold">${a.title}</span>
+                <span class="text-[10px] font-black ${isSel ? 'text-emerald-400' : 'text-zinc-500'}">${isSel ? '● ACTIVE' : 'Preview'}</span>
+              </div>
+              <p class="text-[10px] text-zinc-400 mt-0.5">${a.desc}</p>
+            </button>
+          `;
+        }).join('');
+      }
+
+      /* Apply Live Tinted Glass CSS to Simulator Card */
+      const prevDrawer = document.getElementById('hb-live-preview-drawer');
+      if (prevDrawer) {
+        const tone = TINT_RGB_MAP[db.navMenuConfig.tintTone || 'obsidian'] || TINT_RGB_MAP.obsidian;
+        const alpha = (db.navMenuConfig.tintOpacity ?? 52) / 100;
+        const blur = db.navMenuConfig.glassBlur ?? 28;
+
+        prevDrawer.style.background = `linear-gradient(145deg, rgba(255,255,255,0.16) 0%, rgba(${tone.rgb}, ${alpha}) 50%, rgba(${tone.rgb}, ${Math.min(0.95, alpha + 0.12)}) 100%)`;
+        prevDrawer.style.backdropFilter = `blur(${blur}px) saturate(190%)`;
+        prevDrawer.style.webkitBackdropFilter = `blur(${blur}px) saturate(190%)`;
+        prevDrawer.style.border = `1px solid ${tone.border}`;
+        prevDrawer.style.boxShadow = `0 25px 50px -12px rgba(0,0,0,0.75), inset 0 1px 1px rgba(255,255,255,0.32)`;
+
+        if (triggerAnim) {
+          prevDrawer.classList.remove('prev-anim-slide_scale', 'prev-anim-flip_3d', 'prev-anim-elastic', 'prev-anim-blur_dissolve');
+          void prevDrawer.offsetWidth;
+          prevDrawer.classList.add('prev-anim-' + activeAnim);
+        }
+      }
+    };
+
+    /* Hook into renderNavItemsStudio & populateAllInputsFromDB */
+    const origRenderNav = window.renderNavItemsStudio;
+    window.renderNavItemsStudio = function () {
+      if (typeof origRenderNav === 'function') origRenderNav();
+      injectGlassCustomizerIntoCard();
+      if (!window.db || !db.navMenuConfig) return;
+
+      const opEl = document.getElementById('hb-cfg-tint-opacity');
+      const blEl = document.getElementById('hb-cfg-glass-blur');
+      const tnEl = document.getElementById('hb-cfg-tint-tone');
+      if (opEl) opEl.value = db.navMenuConfig.tintOpacity ?? 52;
+      if (blEl) blEl.value = db.navMenuConfig.glassBlur ?? 28;
+      if (tnEl) tnEl.value = db.navMenuConfig.tintTone || 'obsidian';
+
+      window.updateHamburgerGlassPreview(false);
+    };
+
+    setTimeout(() => {
+      injectGlassCustomizerIntoCard();
+      if (typeof window.renderNavItemsStudio === 'function') window.renderNavItemsStudio();
+    }, 750);
+  })();
+</script>
+<!-- ==================== ADMIN.HTML : TINTED LIQUID-GLASS & 4 ANIMATION STUDIO PATCH COMPLETE ==================== -->
