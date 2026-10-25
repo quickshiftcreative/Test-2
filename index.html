@@ -3282,3 +3282,78 @@
   })();
 </script>
 <!-- ==================== ADMIN.HTML : TINTED LIQUID-GLASS & 4 ANIMATION STUDIO PATCH COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : ACTIVE TAB & UNIQUE HAMBURGER STUDIO PATCH (PASTE AT VERY BOTTOM) ==================== -->
+<script>
+  (function () {
+    const origRenderNavStudio = window.renderNavItemsStudio;
+    window.renderNavItemsStudio = function () {
+      if (typeof origRenderNavStudio === 'function') origRenderNavStudio();
+      if (!window.db) return;
+      db.navMenuConfig = db.navMenuConfig || {};
+
+      const studioCard = document.getElementById('adm-hamburger-studio-card');
+      if (!studioCard || document.getElementById('unique-hb-extra-controls')) return;
+
+      const extraBox = document.createElement('div');
+      extraBox.id = 'unique-hb-extra-controls';
+      extraBox.className = 'p-5 rounded-3xl bg-[#09090b] border border-indigo-500/30 space-y-4 mt-4';
+      extraBox.innerHTML = `
+        <div class="border-b border-[#242429] pb-2">
+          <span class="text-[10px] font-extrabold uppercase text-indigo-400">Advanced Navigation & Growth Controls</span>
+          <h4 class="text-sm font-bold text-white">⭐ Active Tab Style & Unique Hamburger Widgets</h4>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-bold text-zinc-300 block mb-1">Active Navbar Tab Indicator Style</label>
+            <select id="nav-cfg-active-style" onchange="syncUniqueNavControls()" class="w-full px-3 py-2.5 rounded-xl adm-input text-xs font-bold text-emerald-400">
+              <option value="glass_pill">✨ Luxury Glass Pill with Accent Dot</option>
+              <option value="minimal_underline">➖ Minimal Bottom Underline</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-emerald-400 block mb-1">Live Agency Availability Badge Text</label>
+            <input type="text" id="nav-cfg-avail-text" oninput="syncUniqueNavControls()" placeholder="🟢 Available for Q3 Sprints • Fast Onboarding" class="w-full px-3 py-2.5 rounded-xl adm-input text-xs font-bold" />
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-4 text-xs font-bold pt-1">
+          <label class="flex items-center gap-2 cursor-pointer text-emerald-300">
+            <input type="checkbox" id="nav-cfg-show-avail" onchange="syncUniqueNavControls()" class="w-4 h-4 accent-emerald-500" checked />
+            Show Availability Badge in Hamburger
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-indigo-300">
+            <input type="checkbox" id="nav-cfg-show-voice" onchange="syncUniqueNavControls()" class="w-4 h-4 accent-indigo-500" checked />
+            Show "Quick Voice Brief" Button in Hamburger
+          </label>
+        </div>
+      `;
+
+      studioCard.appendChild(extraBox);
+
+      /* Populate values */
+      document.getElementById('nav-cfg-active-style').value = db.navMenuConfig.activeIndicatorStyle || 'glass_pill';
+      document.getElementById('nav-cfg-avail-text').value = db.navMenuConfig.availabilityText || '🟢 Available for Q3 Sprints • Fast Onboarding';
+      document.getElementById('nav-cfg-show-avail').checked = db.navMenuConfig.showAvailabilityBadge !== false;
+      document.getElementById('nav-cfg-show-voice').checked = db.navMenuConfig.showVoiceBriefBtn !== false;
+    };
+
+    window.syncUniqueNavControls = function () {
+      if (!window.db) return;
+      db.navMenuConfig = db.navMenuConfig || {};
+      db.navMenuConfig.activeIndicatorStyle = document.getElementById('nav-cfg-active-style').value;
+      db.navMenuConfig.availabilityText = document.getElementById('nav-cfg-avail-text').value;
+      db.navMenuConfig.showAvailabilityBadge = document.getElementById('nav-cfg-show-avail').checked;
+      db.navMenuConfig.showVoiceBriefBtn = document.getElementById('nav-cfg-show-voice').checked;
+    };
+
+    const origSave = window.saveAndPushAll;
+    window.saveAndPushAll = async function (lbl) {
+      window.syncUniqueNavControls();
+      if (typeof origSave === 'function') await origSave(lbl);
+    };
+
+    setTimeout(() => { if (typeof window.renderNavItemsStudio === 'function') window.renderNavItemsStudio(); }, 900);
+  })();
+</script>
+<!-- ==================== ADMIN.HTML : ACTIVE TAB & UNIQUE HAMBURGER STUDIO PATCH COMPLETE ==================== -->
