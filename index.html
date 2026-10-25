@@ -3795,3 +3795,607 @@
   })();
 </script>
 <!-- ==================== ADMIN.HTML : AUTO-CLEANER & DIAGNOSTIC PATCH COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : DEDICATED "🍔 MENU STUDIO" WORKSPACE TAB & A-TO-Z CUSTOMIZER (PASTE AT VERY BOTTOM) ==================== -->
+<script id="dedicated-menu-workspace-v11">
+  (function () {
+    const DEFAULT_ITEMS = [
+      { id: 'home', label: 'Home', icon: '🏠', badge: '', customIconImg: '', visible: true },
+      { id: 'services', label: 'Services', icon: '⚡', badge: '', customIconImg: '', visible: true },
+      { id: 'quotation', label: 'Instant Quote', icon: '🛒', badge: 'INSTANT', customIconImg: '', visible: true },
+      { id: 'portfolio', label: 'Work', icon: '🎬', badge: '', customIconImg: '', visible: true },
+      { id: 'tracker', label: 'Client Tracker', icon: '📊', badge: 'LIVE', customIconImg: '', visible: true },
+      { id: 'about', label: 'About', icon: '👥', badge: '', customIconImg: '', visible: true },
+      { id: 'reviews', label: 'Reviews', icon: '★', badge: '', customIconImg: '', visible: true },
+      { id: 'contact', label: 'Contact', icon: '📞', badge: '', customIconImg: '', visible: true },
+      { id: 'policies', label: 'Policies', icon: '⚖️', badge: '', customIconImg: '', visible: false }
+    ];
+
+    const TINT_RGB_MAP = {
+      obsidian: { rgb: '12, 12, 18', border: 'rgba(255,255,255,0.24)' },
+      gold:     { rgb: '28, 22, 10', border: 'rgba(245,158,11,0.50)' },
+      indigo:   { rgb: '16, 18, 42', border: 'rgba(99,102,241,0.50)' },
+      emerald:  { rgb: '8, 28, 22',  border: 'rgba(16,185,129,0.50)' },
+      crimson:  { rgb: '34, 10, 18', border: 'rgba(244,63,94,0.50)' }
+    };
+
+    const ANIM_STYLES = [
+      { id: 'slide_scale', title: '1. Apple Liquid Slide', desc: 'Smooth iOS spring slide & zoom' },
+      { id: 'flip_3d',     title: '2. 3D Perspective Flip', desc: '3D spatial glass tilt reveal' },
+      { id: 'elastic',     title: '3. Elastic Bounce',      desc: 'Dynamic bouncy cascade' },
+      { id: 'blur_dissolve', title: '4. Frosted Blur Fade', desc: 'Cinematic blur-to-sharp fade' }
+    ];
+
+    function ensureMenuStudioConfig() {
+      if (!window.db) return;
+      db.navMenuConfig = db.navMenuConfig || {};
+      const c = db.navMenuConfig;
+      c.iconStyle = c.iconStyle || 'three_line';
+      c.btnLabel = c.btnLabel ?? '';
+      c.btnShape = c.btnShape || 'rounded';
+      c.btnSize = c.btnSize ?? 40;
+      c.customBtnImg = c.customBtnImg || '';
+      c.customCloseImg = c.customCloseImg || '';
+      c.desktopMenuStyle = c.desktopMenuStyle || 'pill';
+      c.drawerLayoutStyle = c.drawerLayoutStyle || 'single_dropdown';
+      c.activeIndicatorStyle = c.activeIndicatorStyle || 'glass_pill';
+      c.tintTone = c.tintTone || 'obsidian';
+      c.tintOpacity = c.tintOpacity ?? 52;
+      c.glassBlur = c.glassBlur ?? 28;
+      c.animStyle = c.animStyle || 'slide_scale';
+      c.drawerTitle = c.drawerTitle || 'Menu & Quick Access';
+      c.availabilityText = c.availabilityText || '🟢 Available for New Brand Launches & Scale';
+      c.showAvailabilityBadge = c.showAvailabilityBadge !== false;
+      c.showVoiceBriefBtn = c.showVoiceBriefBtn !== false;
+      c.showSearchInDrawer = c.showSearchInDrawer !== false;
+      c.showVipPassInDrawer = c.showVipPassInDrawer !== false;
+      c.vipPassText = c.vipPassText || '💳 VIP Partner Pass';
+      c.bottomCtaText = c.bottomCtaText || '💬 Chat on WhatsApp Desk';
+      if (!Array.isArray(c.items) || c.items.length === 0) {
+        c.items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+      }
+    }
+
+    /* 1. Remove Old Embedded Hamburger Card from Tab 1 (Home) & Create Dedicated "🍔 Menu Studio" Tab + Panel */
+    function buildDedicatedMenuWorkspace() {
+      const oldHomeCard = document.getElementById('adm-hamburger-studio-card');
+      if (oldHomeCard) oldHomeCard.remove();
+
+      /* Inject Tab Button in Top Admin Navbar right after "1. Home" */
+      const homeTabBtn = document.getElementById('adm-tab-home');
+      if (homeTabBtn && !document.getElementById('adm-tab-menu')) {
+        const menuTabBtn = document.createElement('button');
+        menuTabBtn.id = 'adm-tab-menu';
+        menuTabBtn.type = 'button';
+        menuTabBtn.onclick = function () { switchAdminTab('menu'); };
+        menuTabBtn.className = 'adm-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-[#111114] text-emerald-300 border border-emerald-500/30 whitespace-nowrap';
+        menuTabBtn.innerHTML = '🍔 Menu Studio';
+        homeTabBtn.insertAdjacentElement('afterend', menuTabBtn);
+      }
+
+      /* Inject Dedicated Panel #panel-menu inside <main> */
+      const mainContainer = document.querySelector('main');
+      if (mainContainer && !document.getElementById('panel-menu')) {
+        const panel = document.createElement('section');
+        panel.id = 'panel-menu';
+        panel.className = 'adm-panel hidden space-y-6';
+        panel.innerHTML = `
+          <!-- Top Banner -->
+          <div class="p-5 rounded-3xl bg-gradient-to-r from-indigo-950/70 via-[#111114] to-emerald-950/60 border border-indigo-500/30 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase tracking-widest text-emerald-400">Dedicated Navigation & Hamburger Control Center</span>
+              <h2 class="text-xl font-bold text-white mt-0.5">🍔 Complete Menu, Custom Hamburger Image & Layout Studio</h2>
+              <p class="text-xs text-zinc-300">Yahan se apne Menu Button ki Photo/Icon, Desktop & Phone Menu Style, Tinted Glass, aur har Menu Link (Add/Hide/Delete/Reorder) ko A-to-Z control karein.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" onclick="window.resetDefaultMenuLinks()" class="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-bold text-zinc-200">↺ Restore Default Links</button>
+              <button type="button" onclick="saveAndPushAll('Saved Menu Studio Changes')" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-extrabold text-xs shadow-xl">✓ Save & Publish Menu Live</button>
+            </div>
+          </div>
+
+          <!-- CARD 1: HAMBURGER BUTTON ICON, CUSTOM IMAGE UPLOAD & SHAPE STUDIO -->
+          <div class="admin-card rounded-3xl p-6 space-y-5 border-emerald-500/30">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#242429] pb-3">
+              <div>
+                <span class="text-[10px] font-extrabold uppercase text-emerald-400">Step 1 • Menu Trigger Button</span>
+                <h3 class="text-base font-bold text-white">🎨 Hamburger Button Icon Style & Custom Image Upload</h3>
+              </div>
+              <!-- Live Button Preview Pill -->
+              <div class="flex items-center gap-3 px-4 py-2 rounded-2xl bg-[#09090b] border border-white/10">
+                <span class="text-[11px] font-bold text-zinc-400">Live Button Preview:</span>
+                <div id="ms-live-btn-preview" class="flex items-center justify-center px-3 h-10 rounded-xl bg-white/10 border border-white/20 text-white font-bold text-xs">☰</div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label class="text-xs font-bold text-emerald-400 block mb-1">Choose Button Icon Style</label>
+                <select id="ms-icon-style" onchange="window.syncMenuStudioUI(false)" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs font-bold">
+                  <option value="three_line">☰ 1. Classic 3-Line Hamburger</option>
+                  <option value="two_line">＝ 2. Apple Minimal 2-Line</option>
+                  <option value="staggered">≣ 3. Asymmetric Staggered Bars</option>
+                  <option value="bento_dots">⠿ 4. 9-Dots Bento Grid</option>
+                  <option value="four_dots">∷ 5. 4-Dots App Launcher</option>
+                  <option value="pill_text">💊 6. Text Pill (MENU ☰)</option>
+                  <option value="custom_image">🖼️ 7. Custom Uploaded Image / GIF</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs font-bold text-zinc-300 block mb-1">Button Text Label (Optional)</label>
+                <input type="text" id="ms-btn-label" oninput="window.syncMenuStudioUI(false)" placeholder="Leave blank or type MENU" maxlength="10" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs font-bold uppercase" />
+              </div>
+              <div>
+                <label class="text-xs font-bold text-zinc-300 block mb-1">Button Corner Shape</label>
+                <select id="ms-btn-shape" onchange="window.syncMenuStudioUI(false)" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs font-bold">
+                  <option value="rounded">Rounded Glass Square (12px)</option>
+                  <option value="circle">Perfect Circle / Pill (999px)</option>
+                  <option value="square">Sharp Modern Square (6px)</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs font-bold text-zinc-300 block mb-1">Button Size (<span id="ms-btn-size-lbl">40</span>px)</label>
+                <input type="range" id="ms-btn-size" min="34" max="54" value="40" oninput="window.syncMenuStudioUI(false)" class="w-full accent-emerald-400 mt-2" />
+              </div>
+            </div>
+
+            <!-- Custom Hamburger Image Upload Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-2xl bg-[#09090b] border border-[#242429]">
+              <div class="space-y-2">
+                <label class="text-xs font-bold text-indigo-300 block">🖼️ Custom Menu Button Image / Icon (Auto-selects Custom Image Mode)</label>
+                <div class="flex gap-2">
+                  <input type="text" id="ms-custom-btn-img" oninput="window.syncMenuStudioUI(false)" placeholder="Paste Image/Icon/SVG URL or Upload..." class="flex-1 px-3 py-2 rounded-xl adm-input text-xs" />
+                  <label class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold cursor-pointer shrink-0">
+                    📁 Upload Icon
+                    <input type="file" accept="image/*" onchange="uploadDirectCallback(this, false, function(u){ document.getElementById('ms-custom-btn-img').value=u; document.getElementById('ms-icon-style').value='custom_image'; window.syncMenuStudioUI(false); saveAndPushAll('Uploaded Custom Hamburger Icon'); })" class="hidden" />
+                  </label>
+                  <button type="button" onclick="document.getElementById('ms-custom-btn-img').value=''; window.syncMenuStudioUI(false);" class="px-2.5 py-2 rounded-xl bg-rose-500/20 text-rose-300 text-xs font-bold">✕</button>
+                </div>
+              </div>
+              <div class="space-y-2">
+                <label class="text-xs font-bold text-zinc-400 block">✕ Custom "Close Menu" Image (Optional — when menu is open)</label>
+                <div class="flex gap-2">
+                  <input type="text" id="ms-custom-close-img" oninput="window.syncMenuStudioUI(false)" placeholder="Optional Close Icon URL or Upload..." class="flex-1 px-3 py-2 rounded-xl adm-input text-xs" />
+                  <label class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold cursor-pointer shrink-0">
+                    📁 Upload Close Icon
+                    <input type="file" accept="image/*" onchange="uploadDirectCallback(this, false, function(u){ document.getElementById('ms-custom-close-img').value=u; window.syncMenuStudioUI(false); saveAndPushAll('Uploaded Custom Close Icon'); })" class="hidden" />
+                  </label>
+                  <button type="button" onclick="document.getElementById('ms-custom-close-img').value=''; window.syncMenuStudioUI(false);" class="px-2.5 py-2 rounded-xl bg-rose-500/20 text-rose-300 text-xs font-bold">✕</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 2: INTERNET MENU STYLES (DESKTOP + MOBILE DRAWER LAYOUTS) & TINTED GLASS SIMULATOR -->
+          <div class="admin-card rounded-3xl p-6 space-y-5 border-indigo-500/30">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#242429] pb-3">
+              <div>
+                <span class="text-[10px] font-extrabold uppercase text-indigo-400">Step 2 • Menu Architecture, Glass Tint & Animations</span>
+                <h3 class="text-base font-bold text-white">🌐 Choose PC/Tablet Menu Bar Style, Hamburger Layout & Tinted Glass</h3>
+              </div>
+              <button type="button" onclick="window.syncMenuStudioUI(true)" class="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-extrabold">▶ Replay Live Animation</button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              <div class="lg:col-span-7 space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                  <div>
+                    <label class="text-xs font-bold text-emerald-400 block mb-1">💻 PC & Tablet Menu Style</label>
+                    <select id="ms-desktop-style" onchange="window.syncMenuStudioUI(true)" class="w-full px-3 py-2.5 rounded-xl adm-input text-xs font-bold">
+                      <option value="pill">1. Floating Liquid-Glass Bar</option>
+                      <option value="island">2. iOS Dynamic Island Capsule</option>
+                      <option value="minimal">3. Minimal Clean Top Bar</option>
+                      <option value="hamburger">4. Hamburger Menu on PC Too</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="text-xs font-bold text-indigo-400 block mb-1">📱 Hamburger Drawer Layout</label>
+                    <select id="ms-drawer-layout" onchange="window.syncMenuStudioUI(true)" class="w-full px-3 py-2.5 rounded-xl adm-input text-xs font-bold">
+                      <option value="single_dropdown">1. Single-Column Glass Dropdown</option>
+                      <option value="fullscreen_glass">2. Full-Screen Luxury Overlay</option>
+                      <option value="right_drawer">3. Right-Side Slide Drawer</option>
+                      <option value="left_drawer">4. Left-Side App Drawer</option>
+                      <option value="bottom_sheet">5. iOS Bottom Sheet Menu</option>
+                      <option value="bento_grid">6. 2-Column Bento Touch Grid</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="text-xs font-bold text-amber-300 block mb-1">✨ Active Page Highlight</label>
+                    <select id="ms-active-style" onchange="window.syncMenuStudioUI(false)" class="w-full px-3 py-2.5 rounded-xl adm-input text-xs font-bold">
+                      <option value="glass_pill">Glowing Glass Pill + Dot</option>
+                      <option value="minimal_underline">Minimal Underline</option>
+                      <option value="none">Pure Glass (No Highlight Box)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Sliders for Tint & Blur -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 p-4 rounded-2xl bg-[#09090b] border border-[#242429]">
+                  <div>
+                    <label class="text-xs font-bold text-zinc-300 block mb-1">Glass Tint (<span id="ms-tint-lbl">52</span>%)</label>
+                    <input type="range" id="ms-tint-opacity" min="18" max="92" value="52" oninput="window.syncMenuStudioUI(false)" class="w-full accent-emerald-400" />
+                  </div>
+                  <div>
+                    <label class="text-xs font-bold text-zinc-300 block mb-1">Background Blur (<span id="ms-blur-lbl">28</span>px)</label>
+                    <input type="range" id="ms-glass-blur" min="6" max="45" value="28" oninput="window.syncMenuStudioUI(false)" class="w-full accent-indigo-400" />
+                  </div>
+                  <div>
+                    <label class="text-xs font-bold text-zinc-300 block mb-1">Glass Color Tone</label>
+                    <select id="ms-tint-tone" onchange="window.syncMenuStudioUI(false)" class="w-full px-3 py-1.5 rounded-xl adm-input text-xs font-bold">
+                      <option value="obsidian">🌑 Obsidian Smoke</option>
+                      <option value="gold">👑 Metallic Gold Tint</option>
+                      <option value="indigo">🌌 Indigo Frost Tint</option>
+                      <option value="emerald">💎 Emerald Matrix Tint</option>
+                      <option value="crimson">🌹 Royal Crimson Tint</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- 4 Animation Selector Cards -->
+                <div id="ms-anim-cards" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
+              </div>
+
+              <!-- Right Side: Live Tinted Glass Menu Simulator -->
+              <div class="lg:col-span-5 relative rounded-3xl overflow-hidden border border-white/15 p-5 min-h-[300px] flex items-center justify-center" style="background: radial-gradient(circle at 20% 20%, #6366f1 0%, transparent 45%), radial-gradient(circle at 80% 75%, #10b981 0%, transparent 45%), radial-gradient(circle at 50% 50%, #f59e0b 0%, #09090b 72%);">
+                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none opacity-65 text-center p-4">
+                  <span class="text-[10px] font-black uppercase tracking-widest text-amber-300">WEBSITE BACKGROUND BEHIND MENU</span>
+                  <div class="text-2xl font-black text-white mt-1">THE BLANK PAGE</div>
+                  <p class="text-[11px] text-zinc-200 mt-1">Live Tinted Glass Blur & Layout Preview</p>
+                </div>
+                <div id="ms-live-drawer-sim" class="relative z-10 w-full max-w-[290px] rounded-2xl p-4 space-y-2 transition-all"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 3: A-TO-Z MENU ITEMS BUILDER (ADD, HIDE, DELETE, REORDER, CUSTOM LINKS & BADGES) -->
+          <div class="admin-card rounded-3xl p-6 space-y-5 border-amber-500/30">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#242429] pb-3">
+              <div>
+                <span class="text-[10px] font-extrabold uppercase text-amber-400">Step 3 • Add, Hide, Delete or Reorder Menu Links</span>
+                <h3 class="text-base font-bold text-white">🔗 Complete Navigation Links & Custom Action Manager</h3>
+                <p class="text-xs text-zinc-400">Kisi bhi menu ka naam, emoji/photo icon, badge (NEW/HOT), target page ya external link badlein, ya Hide/Delete karein.</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" onclick="window.addMenuStudioLink('page')" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs">+ Add Page Link</button>
+                <button type="button" onclick="window.addMenuStudioLink('url')" class="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-extrabold text-xs">🔗 + Add External URL / Action</button>
+              </div>
+            </div>
+
+            <!-- Drawer Header & Footer Widgets Config -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div>
+                <label class="text-[11px] font-bold text-zinc-400 block mb-1">Hamburger Header Title</label>
+                <input type="text" id="ms-drawer-title" oninput="window.syncMenuStudioUI(false)" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" />
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-emerald-400 block mb-1">Live Availability Status Text</label>
+                <input type="text" id="ms-avail-txt" oninput="window.syncMenuStudioUI(false)" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" />
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-zinc-400 block mb-1">VIP Pass Button Text</label>
+                <input type="text" id="ms-vip-txt" oninput="window.syncMenuStudioUI(false)" class="w-full px-3 py-2 rounded-xl adm-input text-xs" />
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-zinc-400 block mb-1">Bottom WhatsApp CTA Text</label>
+                <input type="text" id="ms-cta-txt" oninput="window.syncMenuStudioUI(false)" class="w-full px-3 py-2 rounded-xl adm-input text-xs" />
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-4 text-xs font-bold">
+              <label class="flex items-center gap-2 cursor-pointer text-emerald-300"><input type="checkbox" id="ms-chk-avail" onchange="window.syncMenuStudioUI(false)" class="w-4 h-4 accent-emerald-500" /> Show Availability Badge</label>
+              <label class="flex items-center gap-2 cursor-pointer text-indigo-300"><input type="checkbox" id="ms-chk-voice" onchange="window.syncMenuStudioUI(false)" class="w-4 h-4 accent-indigo-500" /> Show Voice Brief Shortcut</label>
+              <label class="flex items-center gap-2 cursor-pointer text-zinc-300"><input type="checkbox" id="ms-chk-search" onchange="window.syncMenuStudioUI(false)" class="w-4 h-4 accent-indigo-500" /> Show Quick Search Button</label>
+              <label class="flex items-center gap-2 cursor-pointer text-amber-300"><input type="checkbox" id="ms-chk-vip" onchange="window.syncMenuStudioUI(false)" class="w-4 h-4 accent-amber-400" /> Show VIP Partner Pass Button</label>
+            </div>
+
+            <!-- Menu Items Rows Container -->
+            <div id="ms-items-container" class="space-y-2.5 pt-2 border-t border-[#242429]"></div>
+          </div>
+        `;
+        mainContainer.appendChild(panel);
+      }
+    }
+
+    /* 2. Populate & Render the Dedicated Menu Studio */
+    window.renderDedicatedMenuStudio = function () {
+      buildDedicatedMenuWorkspace();
+      ensureMenuStudioConfig();
+      if (!window.db) return;
+      const c = db.navMenuConfig;
+
+      const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v ?? ''; };
+      const setChk = (id, v) => { const el = document.getElementById(id); if (el) el.checked = Boolean(v); };
+
+      setVal('ms-icon-style', c.iconStyle);
+      setVal('ms-btn-label', c.btnLabel);
+      setVal('ms-btn-shape', c.btnShape);
+      setVal('ms-btn-size', c.btnSize);
+      const szLbl = document.getElementById('ms-btn-size-lbl');
+      if (szLbl) szLbl.innerText = c.btnSize;
+
+      setVal('ms-custom-btn-img', c.customBtnImg);
+      setVal('ms-custom-close-img', c.customCloseImg);
+      setVal('ms-desktop-style', c.desktopMenuStyle);
+      setVal('ms-drawer-layout', c.drawerLayoutStyle);
+      setVal('ms-active-style', c.activeIndicatorStyle);
+      setVal('ms-tint-opacity', c.tintOpacity);
+      setVal('ms-glass-blur', c.glassBlur);
+      setVal('ms-tint-tone', c.tintTone);
+      setVal('ms-drawer-title', c.drawerTitle);
+      setVal('ms-avail-txt', c.availabilityText);
+      setVal('ms-vip-txt', c.vipPassText);
+      setVal('ms-cta-txt', c.bottomCtaText);
+
+      setChk('ms-chk-avail', c.showAvailabilityBadge !== false);
+      setChk('ms-chk-voice', c.showVoiceBriefBtn !== false);
+      setChk('ms-chk-search', c.showSearchInDrawer !== false);
+      setChk('ms-chk-vip', c.showVipPassInDrawer !== false);
+
+      window.renderMenuStudioItemsList();
+      window.updateMenuStudioVisualPreview(false);
+    };
+
+    /* 3. Render Individual Menu Item Rows with Destination Selector, Custom Image Icon, Badge, Hide/Show & Delete */
+    window.renderMenuStudioItemsList = function () {
+      const box = document.getElementById('ms-items-container');
+      if (!box || !window.db) return;
+      const items = db.navMenuConfig.items || [];
+
+      const presetDestinations = [
+        { val: 'home', lbl: '🏠 Page: Home' },
+        { val: 'services', lbl: '⚡ Page: Services' },
+        { val: 'quotation', lbl: '🛒 Page: Instant Quote' },
+        { val: 'portfolio', lbl: '🎬 Page: Work / Portfolio' },
+        { val: 'tracker', lbl: '📊 Page: Client Tracker' },
+        { val: 'about', lbl: '👥 Page: About Us' },
+        { val: 'reviews', lbl: '★ Page: Reviews' },
+        { val: 'contact', lbl: '📞 Page: Contact Desk' },
+        { val: 'policies', lbl: '⚖️ Page: Legal Policies' },
+        { val: 'action:book_call', lbl: '📅 Popup: 15-Min Call Booker' },
+        { val: 'action:vip_pass', lbl: '💳 Popup: 3D VIP Partner Pass' },
+        { val: 'action:search', lbl: '🔍 Popup: Quick Search Palette' },
+        { val: 'action:whatsapp', lbl: '💬 Direct: Open WhatsApp Chat' },
+        ...(db.customPages || []).map(cp => ({ val: 'custom:' + cp.slug, lbl: '📄 Custom Page: ' + (cp.navLabel || cp.title) }))
+      ];
+
+      box.innerHTML = items.map((item, idx) => {
+        const isKnownPreset = presetDestinations.some(p => p.val === item.id);
+        return `
+          <div class="p-3.5 rounded-2xl bg-[#09090b] border ${item.visible !== false ? 'border-[#242429]' : 'border-rose-500/20 opacity-60'} grid grid-cols-1 lg:grid-cols-12 gap-2.5 items-center text-xs">
+            <!-- Icon or Uploaded Mini Image -->
+            <div class="lg:col-span-2 flex items-center gap-1.5">
+              <span class="text-[10px] font-mono text-zinc-500 w-6">(0${idx + 1})</span>
+              ${item.customIconImg ? `<img src="${item.customIconImg}" class="w-7 h-7 rounded-lg object-contain bg-white/5 border border-white/10 shrink-0" />` : ''}
+              <input type="text" value="${item.icon || ''}" oninput="db.navMenuConfig.items[${idx}].icon=this.value; window.updateMenuStudioVisualPreview(false);" placeholder="Icon" class="w-12 px-2 py-1.5 rounded-lg adm-input text-center font-bold" />
+              <label title="Upload Custom Mini Icon Image" class="px-2 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-[10px] cursor-pointer">
+                🖼️
+                <input type="file" accept="image/*" onchange="uploadDirectCallback(this, false, function(u){ db.navMenuConfig.items[${idx}].customIconImg=u; window.renderMenuStudioItemsList(); window.updateMenuStudioVisualPreview(false); saveAndPushAll('Uploaded Menu Item Icon'); })" class="hidden" />
+              </label>
+              ${item.customIconImg ? `<button type="button" onclick="db.navMenuConfig.items[${idx}].customIconImg=''; window.renderMenuStudioItemsList();" class="text-[10px] text-rose-400">✕</button>` : ''}
+            </div>
+
+            <!-- Menu Label -->
+            <div class="lg:col-span-2">
+              <input type="text" value="${item.label || ''}" oninput="db.navMenuConfig.items[${idx}].label=this.value; window.updateMenuStudioVisualPreview(false);" placeholder="Menu Name" class="w-full px-3 py-1.5 rounded-lg adm-input font-extrabold text-white" />
+            </div>
+
+            <!-- Optional Badge (NEW, HOT, LIVE) -->
+            <div class="lg:col-span-2">
+              <input type="text" value="${item.badge || ''}" oninput="db.navMenuConfig.items[${idx}].badge=this.value; window.updateMenuStudioVisualPreview(false);" placeholder="Badge (e.g. NEW)" maxlength="10" class="w-full px-2.5 py-1.5 rounded-lg adm-input text-[11px] font-bold text-emerald-300 uppercase" />
+            </div>
+
+            <!-- Target Destination Preset OR Custom URL -->
+            <div class="lg:col-span-3 flex gap-1.5">
+              <select onchange="if(this.value!=='__custom__'){ db.navMenuConfig.items[${idx}].id=this.value; window.renderMenuStudioItemsList(); }" class="w-1/2 px-2 py-1.5 rounded-lg adm-input text-[11px] font-bold text-indigo-300">
+                ${presetDestinations.map(p => `<option value="${p.val}" ${item.id === p.val ? 'selected' : ''}>${p.lbl}</option>`).join('')}
+                <option value="__custom__" ${!isKnownPreset ? 'selected' : ''}>🔗 Custom URL / ID...</option>
+              </select>
+              <input type="text" value="${item.id || ''}" oninput="db.navMenuConfig.items[${idx}].id=this.value" placeholder="Page ID or https://..." class="w-1/2 px-2.5 py-1.5 rounded-lg adm-input text-[11px] font-mono text-zinc-300" />
+            </div>
+
+            <!-- Show/Hide Toggle & Reorder / Delete Buttons -->
+            <div class="lg:col-span-3 flex items-center justify-end gap-1.5">
+              <button type="button" onclick="db.navMenuConfig.items[${idx}].visible = !(db.navMenuConfig.items[${idx}].visible !== false); window.renderMenuStudioItemsList(); window.updateMenuStudioVisualPreview(false); saveAndPushAll('Toggled Menu Item Visibility');" class="px-2.5 py-1.5 rounded-lg text-[11px] font-extrabold ${item.visible !== false ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-zinc-800 text-zinc-400'}">
+                ${item.visible !== false ? '👁️ Shown' : '🚫 Hidden'}
+              </button>
+              <button type="button" title="Move Up" onclick="window.moveMenuStudioItem(${idx}, -1)" class="px-2 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white">↑</button>
+              <button type="button" title="Move Down" onclick="window.moveMenuStudioItem(${idx}, 1)" class="px-2 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white">↓</button>
+              <button type="button" title="Delete Menu Item" onclick="window.deleteMenuStudioItem(${idx})" class="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 font-bold">🗑️</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    };
+
+    /* 4. Sync Form Controls to DB & Update Live Previews */
+    window.syncMenuStudioUI = function (replayAnim) {
+      if (!window.db) return;
+      ensureMenuStudioConfig();
+      const c = db.navMenuConfig;
+      const getV = (id) => document.getElementById(id)?.value ?? '';
+      const getC = (id) => Boolean(document.getElementById(id)?.checked);
+
+      c.iconStyle = getV('ms-icon-style') || 'three_line';
+      c.btnLabel = getV('ms-btn-label');
+      c.btnShape = getV('ms-btn-shape') || 'rounded';
+      c.btnSize = Number(getV('ms-btn-size') || 40);
+      c.customBtnImg = getV('ms-custom-btn-img');
+      c.customCloseImg = getV('ms-custom-close-img');
+      c.desktopMenuStyle = getV('ms-desktop-style') || 'pill';
+      c.drawerLayoutStyle = getV('ms-drawer-layout') || 'single_dropdown';
+      c.activeIndicatorStyle = getV('ms-active-style') || 'glass_pill';
+      c.tintOpacity = Number(getV('ms-tint-opacity') || 52);
+      c.glassBlur = Number(getV('ms-glass-blur') || 28);
+      c.tintTone = getV('ms-tint-tone') || 'obsidian';
+      c.drawerTitle = getV('ms-drawer-title') || 'Menu & Quick Access';
+      c.availabilityText = getV('ms-avail-txt');
+      c.vipPassText = getV('ms-vip-txt');
+      c.bottomCtaText = getV('ms-cta-txt');
+      c.showAvailabilityBadge = getC('ms-chk-avail');
+      c.showVoiceBriefBtn = getC('ms-chk-voice');
+      c.showSearchInDrawer = getC('ms-chk-search');
+      c.showVipPassInDrawer = getC('ms-chk-vip');
+
+      const szLbl = document.getElementById('ms-btn-size-lbl');
+      if (szLbl) szLbl.innerText = c.btnSize;
+      const tLbl = document.getElementById('ms-tint-lbl');
+      if (tLbl) tLbl.innerText = c.tintOpacity;
+      const bLbl = document.getElementById('ms-blur-lbl');
+      if (bLbl) bLbl.innerText = c.glassBlur;
+
+      window.updateMenuStudioVisualPreview(replayAnim);
+    };
+
+    window.selectMenuStudioAnim = function (animId) {
+      db.navMenuConfig.animStyle = animId;
+      window.updateMenuStudioVisualPreview(true);
+    };
+
+    window.updateMenuStudioVisualPreview = function (triggerAnim) {
+      if (!window.db) return;
+      const c = db.navMenuConfig;
+
+      /* Update Live Button Preview */
+      const btnPrev = document.getElementById('ms-live-btn-preview');
+      if (btnPrev) {
+        const radMap = { rounded: '12px', circle: '9999px', square: '6px' };
+        btnPrev.style.height = (c.btnSize || 40) + 'px';
+        btnPrev.style.minWidth = (c.btnSize || 40) + 'px';
+        btnPrev.style.borderRadius = radMap[c.btnShape || 'rounded'] || '12px';
+
+        const lblHtml = c.btnLabel ? `<span class="text-[10px] font-extrabold uppercase mr-1.5">${c.btnLabel}</span>` : '';
+        if (c.iconStyle === 'custom_image' && c.customBtnImg) {
+          btnPrev.innerHTML = `${lblHtml}<img src="${c.customBtnImg}" class="w-5 h-5 object-contain rounded" />`;
+        } else if (c.iconStyle === 'two_line') {
+          btnPrev.innerHTML = `${lblHtml}<span class="text-sm font-black">＝</span>`;
+        } else if (c.iconStyle === 'staggered') {
+          btnPrev.innerHTML = `${lblHtml}<span class="text-sm font-black text-emerald-400">≣</span>`;
+        } else if (c.iconStyle === 'bento_dots') {
+          btnPrev.innerHTML = `${lblHtml}<span class="text-sm font-black">⠿</span>`;
+        } else if (c.iconStyle === 'four_dots') {
+          btnPrev.innerHTML = `${lblHtml}<span class="text-sm font-black">∷</span>`;
+        } else if (c.iconStyle === 'pill_text') {
+          btnPrev.innerHTML = `<span class="text-[10px] font-extrabold uppercase mr-1">${c.btnLabel || 'MENU'}</span><span class="text-emerald-400">☰</span>`;
+        } else {
+          btnPrev.innerHTML = `${lblHtml}<span class="text-sm font-black">☰</span>`;
+        }
+      }
+
+      /* Render 4 Animation Cards */
+      const animGrid = document.getElementById('ms-anim-cards');
+      const activeAnim = c.animStyle || 'slide_scale';
+      if (animGrid) {
+        animGrid.innerHTML = ANIM_STYLES.map(a => {
+          const isSel = a.id === activeAnim;
+          return `
+            <button type="button" onclick="window.selectMenuStudioAnim('${a.id}')" class="p-3 rounded-2xl text-left transition border ${isSel ? 'bg-indigo-600/25 border-indigo-400 text-white shadow-lg' : 'bg-[#09090b] border-[#242429] text-zinc-300 hover:border-white/30'}">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold">${a.title}</span>
+                <span class="text-[10px] font-black ${isSel ? 'text-emerald-400' : 'text-zinc-500'}">${isSel ? '● ACTIVE' : 'Preview'}</span>
+              </div>
+              <p class="text-[10px] text-zinc-400 mt-0.5">${a.desc}</p>
+            </button>
+          `;
+        }).join('');
+      }
+
+      /* Update Live Drawer Simulator */
+      const sim = document.getElementById('ms-live-drawer-sim');
+      if (sim) {
+        const tone = TINT_RGB_MAP[c.tintTone || 'obsidian'] || TINT_RGB_MAP.obsidian;
+        const alpha = (c.tintOpacity ?? 52) / 100;
+        const blur = c.glassBlur ?? 28;
+        const visItems = (c.items || []).filter(x => x.visible !== false).slice(0, 4);
+        const isBento = c.drawerLayoutStyle === 'bento_grid';
+
+        sim.style.background = `linear-gradient(145deg, rgba(255,255,255,0.16) 0%, rgba(${tone.rgb}, ${alpha}) 55%, rgba(${tone.rgb}, ${Math.min(0.95, alpha + 0.12)}) 100%)`;
+        sim.style.backdropFilter = `blur(${blur}px) saturate(190%)`;
+        sim.style.webkitBackdropFilter = `blur(${blur}px) saturate(190%)`;
+        sim.style.border = `1px solid ${tone.border}`;
+        sim.style.boxShadow = `0 25px 50px -12px rgba(0,0,0,0.75), inset 0 1px 1px rgba(255,255,255,0.32)`;
+
+        sim.innerHTML = `
+          <div class="flex items-center justify-between border-b border-white/20 pb-2 mb-2">
+            <span class="text-[10px] font-extrabold uppercase text-white truncate">${c.drawerTitle || 'Menu'}</span>
+            <span class="text-[9px] px-2 py-0.5 rounded-full bg-white/15 text-emerald-300 font-bold">${c.drawerLayoutStyle.replace('_', ' ')}</span>
+          </div>
+          <div class="${isBento ? 'grid grid-cols-2 gap-1.5' : 'space-y-1.5'}">
+            ${visItems.map((it, i) => `
+              <div class="px-3 py-2 rounded-xl ${i === 0 && c.activeIndicatorStyle !== 'none' ? 'bg-emerald-500/20 border border-emerald-400/50' : 'bg-white/10 border border-white/15'} text-white font-bold text-xs flex justify-between items-center">
+                <span class="truncate">${it.icon || ''} ${it.label} ${it.badge ? `<small class="text-[9px] text-emerald-300">(${it.badge})</small>` : ''}</span>
+                <span>→</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+
+        if (triggerAnim) {
+          sim.classList.remove('prev-anim-slide_scale', 'prev-anim-flip_3d', 'prev-anim-elastic', 'prev-anim-blur_dissolve');
+          void sim.offsetWidth;
+          sim.classList.add('prev-anim-' + activeAnim);
+        }
+      }
+    };
+
+    /* 5. Item Actions: Add, Move, Delete, Reset */
+    window.addMenuStudioLink = function (type) {
+      ensureMenuStudioConfig();
+      if (type === 'url') {
+        const lbl = prompt('Enter Menu Button Name (e.g. Book 15m Call, Instagram, Catalogue PDF):', 'Book Audit Call');
+        if (!lbl) return;
+        const url = prompt('Enter Target URL or Action (e.g. https://... or action:book_call):', 'action:book_call');
+        if (!url) return;
+        db.navMenuConfig.items.push({ id: url.trim(), label: lbl.trim(), icon: '✨', badge: 'NEW', customIconImg: '', visible: true });
+      } else {
+        db.navMenuConfig.items.push({ id: 'services', label: 'New Menu Tab', icon: '⚡', badge: '', customIconImg: '', visible: true });
+      }
+      window.renderMenuStudioItemsList();
+      window.updateMenuStudioVisualPreview(false);
+      saveAndPushAll('Added New Menu Link');
+    };
+
+    window.moveMenuStudioItem = function (idx, dir) {
+      const arr = db.navMenuConfig.items;
+      const target = idx + dir;
+      if (target < 0 || target >= arr.length) return;
+      const temp = arr[idx]; arr[idx] = arr[target]; arr[target] = temp;
+      window.renderMenuStudioItemsList();
+      window.updateMenuStudioVisualPreview(false);
+      saveAndPushAll('Reordered Menu Link');
+    };
+
+    window.deleteMenuStudioItem = function (idx) {
+      if (typeof canUserDelete === 'function' && !canUserDelete()) return;
+      db.navMenuConfig.items.splice(idx, 1);
+      window.renderMenuStudioItemsList();
+      window.updateMenuStudioVisualPreview(false);
+      saveAndPushAll('Deleted Menu Link');
+    };
+
+    window.resetDefaultMenuLinks = function () {
+      if (!confirm('Restore default 8 navigation links?')) return;
+      db.navMenuConfig.items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+      window.renderMenuStudioItemsList();
+      window.updateMenuStudioVisualPreview(false);
+      saveAndPushAll('Restored Default Menu Links');
+    };
+
+    /* 6. Hook into Admin Lifecycle */
+    const prevPop = window.populateAllInputsFromDB;
+    window.populateAllInputsFromDB = function () {
+      if (typeof prevPop === 'function') prevPop();
+      window.renderDedicatedMenuStudio();
+    };
+
+    const prevSave = window.saveAndPushAll;
+    window.saveAndPushAll = async function (lbl) {
+      if (document.getElementById('ms-icon-style')) {
+        window.syncMenuStudioUI(false);
+      }
+      if (typeof prevSave === 'function') await prevSave(lbl);
+    };
+
+    setTimeout(function () {
+      window.renderDedicatedMenuStudio();
+    }, 500);
+  })();
+</script>
+<!-- ==================== ADMIN.HTML : DEDICATED "🍔 MENU STUDIO" PATCH COMPLETE ==================== -->
