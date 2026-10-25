@@ -3357,3 +3357,303 @@
   })();
 </script>
 <!-- ==================== ADMIN.HTML : ACTIVE TAB & UNIQUE HAMBURGER STUDIO PATCH COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : COMPLETE SERVICE & CATEGORY MANAGER + NAV HIGHLIGHT CONTROL PATCH (PASTE AT VERY BOTTOM) ==================== -->
+<script>
+  (function () {
+    /* 1. Add "Zero Highlight (Pure Glass)" Option in Navigation Active Indicator Dropdown */
+    setTimeout(() => {
+      const actSel = document.getElementById('nav-cfg-active-style');
+      if (actSel && !actSel.querySelector('option[value="none"]')) {
+        const opt = document.createElement('option');
+        opt.value = 'none';
+        opt.innerText = '🥂 Pure Glass (No Active Highlight Box)';
+        actSel.appendChild(opt);
+      }
+    }, 1000);
+
+    /* 2. Inject Quick Category Manager Bar at Top of Workspace 2 (Services Tab) */
+    const panelServices = document.getElementById('panel-services');
+    if (panelServices && !document.getElementById('adm-category-quick-manager')) {
+      const catBar = document.createElement('div');
+      catBar.id = 'adm-category-quick-manager';
+      catBar.className = 'admin-card rounded-3xl p-5 space-y-3 border-emerald-500/40';
+      catBar.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span class="text-[10px] font-extrabold uppercase text-emerald-400">Full Service & Category Control</span>
+            <h3 class="text-sm font-bold text-white">⚡ Manage Filter Categories, Reorder, Add or Delete Any Service</h3>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" onclick="window.quickCreateServiceWithCategory()" class="px-3.5 py-2 rounded-xl bg-emerald-500 text-zinc-950 font-extrabold text-xs shadow">
+              + Create New Category & Service
+            </button>
+            <button type="button" onclick="window.loadFullStack5ServicesPreset()" class="px-3.5 py-2 rounded-xl bg-indigo-600/25 border border-indigo-500/40 text-indigo-300 font-extrabold text-xs">
+              📦 Load 5 Full-Stack Agency Categories
+            </button>
+          </div>
+        </div>
+        <div id="adm-active-category-chips" class="flex flex-wrap gap-2 pt-1"></div>
+      `;
+      panelServices.insertBefore(catBar, panelServices.children[1]);
+    }
+
+    /* 3. Upgrade renderAdminServices with Up/Down Move, Duplicate, Delete Category & Instant Auto-Save */
+    window.renderAdminServices = function () {
+      if (!window.db) return;
+      db.services = db.services || [];
+
+      /* Render Active Category Filter Chips with 1-Click Rename or Delete */
+      const chipBox = document.getElementById('adm-active-category-chips');
+      if (chipBox) {
+        const uniqueCats = [...new Set(db.services.map(s => (s.badge || 'General').trim()).filter(Boolean))];
+        chipBox.innerHTML = uniqueCats.map(cName => {
+          const count = db.services.filter(s => (s.badge || '').trim() === cName).length;
+          const safeName = cName.replace(/'/g, "\\'");
+          return `
+            <div class="px-3 py-1.5 rounded-xl bg-[#09090b] border border-[#242429] flex items-center gap-2 text-xs">
+              <span class="font-extrabold text-indigo-300">${cName}</span>
+              <span class="text-[10px] text-zinc-500">(${count})</span>
+              <button type="button" title="Rename Category" onclick="window.renameServiceCategoryGroup('${safeName}')" class="text-zinc-400 hover:text-white">✏️</button>
+              <button type="button" title="Delete All Services in this Category" onclick="window.deleteEntireCategoryGroup('${safeName}')" class="text-rose-400 hover:text-rose-300 font-bold">✕</button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const container = document.getElementById('adm-services-list');
+      if (!container) return;
+
+      if (db.services.length === 0) {
+        container.innerHTML = `<div class="p-8 rounded-3xl admin-card text-center text-xs text-zinc-400">No services present. Click "+ Create New Category & Service" above to add one.</div>`;
+        return;
+      }
+
+      container.innerHTML = db.services.map((cat, cIdx) => {
+        const key = 'SRV-' + cIdx;
+        const isOpen = openAccordions.has(key);
+        const hasMedia = Boolean(cat.mediaUrl);
+        const isVid = hasMedia && (cat.mediaUrl.startsWith('data:video') || cat.mediaUrl.endsWith('.mp4'));
+        const thumbHTML = hasMedia
+          ? (isVid ? `<video src="${cat.mediaUrl}" muted loop autoplay class="w-full h-24 object-cover rounded-xl"></video>` : `<img src="${cat.mediaUrl}" class="w-full h-24 object-cover rounded-xl" />`)
+          : `<div class="w-full h-24 rounded-xl preview-thumb flex items-center justify-center text-[10px] text-zinc-500 border border-white/10">No Pop-up Media</div>`;
+
+        return `
+          <div class="admin-card rounded-3xl overflow-hidden">
+            <div onclick="toggleAccordion('${key}')" class="p-5 flex flex-wrap items-center justify-between gap-3 cursor-pointer hover:bg-white/[0.02]">
+              <div class="flex items-center gap-3">
+                <span class="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 text-xs font-extrabold">${cat.index || '(0' + (cIdx + 1) + ')'}</span>
+                <div>
+                  <h4 class="text-sm font-bold text-white">${cat.title || 'Untitled Service'}</h4>
+                  <span class="text-[11px] text-emerald-400 font-bold">Category Tab: ${cat.badge || 'General'}</span>
+                  <span class="text-[11px] text-zinc-500"> • ${(cat.subServices || []).length} Deliverables</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
+                <button type="button" title="Move Up" onclick="window.moveServiceCard(${cIdx}, -1)" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs">↑</button>
+                <button type="button" title="Move Down" onclick="window.moveServiceCard(${cIdx}, 1)" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs">↓</button>
+                <button type="button" title="Duplicate Service" onclick="window.duplicateServiceCard(${cIdx})" class="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 text-xs font-bold">📋 Copy</button>
+                <button type="button" title="Delete Service" onclick="window.deleteServiceCategory(${cIdx})" class="px-3 py-1 rounded-lg bg-rose-500/20 text-rose-300 text-xs font-bold">🗑️ Delete</button>
+                <button type="button" onclick="toggleAccordion('${key}')" class="ml-2 text-xs font-bold text-indigo-400">${isOpen ? '▲ Collapse' : '▼ Edit'}</button>
+              </div>
+            </div>
+
+            ${isOpen ? `
+              <div class="p-6 pt-2 border-t border-[#242429] space-y-4">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                  <div class="lg:col-span-9 space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                      <div>
+                        <label class="text-[10px] text-zinc-400 block mb-1">Number Badge</label>
+                        <input type="text" value="${cat.index || ''}" oninput="db.services[${cIdx}].index=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" />
+                      </div>
+                      <div>
+                        <label class="text-[10px] text-emerald-400 font-bold block mb-1">Filter Category Name</label>
+                        <input type="text" value="${cat.badge || ''}" oninput="db.services[${cIdx}].badge=this.value" placeholder="e.g. Paid Ads" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold text-emerald-300" />
+                      </div>
+                      <div class="sm:col-span-2">
+                        <label class="text-[10px] text-zinc-400 block mb-1">Main Service Title</label>
+                        <input type="text" value="${cat.title || ''}" oninput="db.services[${cIdx}].title=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" />
+                      </div>
+                    </div>
+                    <div>
+                      <label class="text-[10px] text-zinc-400 block mb-1">Service Card Description</label>
+                      <textarea rows="2" oninput="db.services[${cIdx}].description=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs">${cat.description || ''}</textarea>
+                    </div>
+                  </div>
+                  <div class="lg:col-span-3 space-y-1.5">
+                    ${thumbHTML}
+                    <div class="flex justify-between gap-1">
+                      <label class="flex-1 text-center py-1 rounded bg-white/10 hover:bg-white/20 text-[10px] font-bold text-white cursor-pointer">Upload Media<input type="file" accept="image/*,video/*" onchange="uploadDirectCallback(this, false, (u)=>{db.services[${cIdx}].mediaUrl=u;renderAdminServices();pushToFirebase('Updated Service Media');})" class="hidden" /></label>
+                      <button type="button" onclick="db.services[${cIdx}].mediaUrl='';renderAdminServices();pushToFirebase('Removed Service Media');" class="px-2 py-1 rounded bg-rose-500/20 text-rose-300 text-[10px] font-bold">✕</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space-y-2 pt-2 border-t border-[#242429]">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold uppercase text-emerald-400">Sub-Services / Deliverables Inside Pop-up</span>
+                    <button type="button" onclick="window.addSubService(${cIdx})" class="px-3 py-1.5 rounded-xl bg-emerald-500 text-zinc-950 text-xs font-extrabold">+ Add Sub-Service</button>
+                  </div>
+                  ${(cat.subServices || []).map((sub, sIdx) => `
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center p-2 rounded-xl bg-[#09090b] border border-[#242429]">
+                      <input type="text" value="${sub.name || ''}" oninput="db.services[${cIdx}].subServices[${sIdx}].name=this.value" placeholder="Deliverable Name" class="sm:col-span-6 px-3 py-1.5 rounded-lg adm-input text-xs font-bold" />
+                      <input type="number" value="${sub.priceINR || 0}" oninput="db.services[${cIdx}].subServices[${sIdx}].priceINR=Number(this.value)" placeholder="Price ₹" class="sm:col-span-3 px-3 py-1.5 rounded-lg adm-input text-xs font-bold text-emerald-400" />
+                      <select onchange="db.services[${cIdx}].subServices[${sIdx}].billing=this.value; pushToFirebase('Updated Billing');" class="sm:col-span-2 px-2 py-1.5 rounded-lg adm-input text-xs">
+                        <option value="One-Time" ${sub.billing==='One-Time'?'selected':''}>One-Time</option>
+                        <option value="Monthly" ${sub.billing==='Monthly'?'selected':''}>Monthly</option>
+                        <option value="Quarterly" ${sub.billing==='Quarterly'?'selected':''}>Quarterly</option>
+                      </select>
+                      <button type="button" onclick="window.deleteSubService(${cIdx}, ${sIdx})" class="sm:col-span-1 py-1.5 rounded-lg bg-rose-500/20 text-rose-400 text-xs font-bold">🗑️✕</button>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    };
+
+    /* 4. Category & Service Actions (With Instant Cloud Push) */
+    window.quickCreateServiceWithCategory = function () {
+      const catTag = prompt('Enter Filter Category Name (e.g. Paid Ads, Legal & Barcodes, Photography, Web Dev):', 'New Category');
+      if (!catTag) return;
+      const srvTitle = prompt('Enter Main Service Title:', catTag + ' Solutions');
+      if (!srvTitle) return;
+
+      db.services = db.services || [];
+      const n = db.services.length;
+      db.services.push({
+        id: 'CAT-' + Date.now(),
+        index: `(0${n + 1})`,
+        title: srvTitle.trim(),
+        badge: catTag.trim(),
+        mediaUrl: '',
+        description: 'Complete end-to-end execution and dedicated specialist support.',
+        subServices: [
+          { id: 'SUB-' + Date.now(), name: srvTitle.trim() + ' — Core Package', priceINR: 12000, billing: 'One-Time' }
+        ]
+      });
+      openAccordions.add('SRV-' + n);
+      window.renderAdminServices();
+      pushToFirebase('Created Service: ' + srvTitle);
+    };
+
+    window.moveServiceCard = function (idx, dir) {
+      const arr = db.services;
+      const target = idx + dir;
+      if (target < 0 || target >= arr.length) return;
+      const temp = arr[idx]; arr[idx] = arr[target]; arr[target] = temp;
+      arr.forEach((s, i) => { s.index = `(0${i + 1})`; });
+      window.renderAdminServices();
+      pushToFirebase('Reordered Services');
+    };
+
+    window.duplicateServiceCard = function (idx) {
+      const orig = db.services[idx];
+      if (!orig) return;
+      const copy = JSON.parse(JSON.stringify(orig));
+      copy.id = 'CAT-' + Date.now();
+      copy.title = orig.title + ' (Copy)';
+      copy.index = `(0${db.services.length + 1})`;
+      (copy.subServices || []).forEach((s, i) => { s.id = 'SUB-' + Date.now() + '-' + i; });
+      db.services.splice(idx + 1, 0, copy);
+      window.renderAdminServices();
+      pushToFirebase('Duplicated Service');
+    };
+
+    window.deleteServiceCategory = function (cIdx) {
+      if (!canUserDelete()) return;
+      db.services.splice(cIdx, 1);
+      window.renderAdminServices();
+      pushToFirebase('Deleted Service Card');
+    };
+
+    window.addSubService = function (cIdx) {
+      db.services[cIdx].subServices = db.services[cIdx].subServices || [];
+      db.services[cIdx].subServices.push({ id: 'SUB-' + Date.now(), name: 'New Deliverable', priceINR: 7500, billing: 'One-Time' });
+      window.renderAdminServices();
+      pushToFirebase('Added Deliverable');
+    };
+
+    window.deleteSubService = function (cIdx, sIdx) {
+      if (!canUserDelete()) return;
+      db.services[cIdx].subServices.splice(sIdx, 1);
+      window.renderAdminServices();
+      pushToFirebase('Deleted Deliverable');
+    };
+
+    window.renameServiceCategoryGroup = function (oldCat) {
+      const newCat = prompt(`Rename category "${oldCat}" to:`, oldCat);
+      if (!newCat || !newCat.trim() || newCat.trim() === oldCat) return;
+      (db.services || []).forEach(s => {
+        if ((s.badge || '').trim() === oldCat) s.badge = newCat.trim();
+      });
+      window.renderAdminServices();
+      pushToFirebase(`Renamed Category ${oldCat} to ${newCat}`);
+    };
+
+    window.deleteEntireCategoryGroup = function (catName) {
+      if (!canUserDelete()) return;
+      if (!confirm(`Delete ALL service cards under category "${catName}"?`)) return;
+      db.services = (db.services || []).filter(s => (s.badge || '').trim() !== catName);
+      window.renderAdminServices();
+      pushToFirebase(`Deleted Category Group: ${catName}`);
+    };
+
+    window.loadFullStack5ServicesPreset = function () {
+      if (!confirm('Load all 5 Full-Stack Agency Categories (E-Commerce, Meta/Google/TikTok Ads, Photography/CGI, Graphic/Social Media, Trademark/GS1 Barcodes)?')) return;
+      db.services = [
+        {
+          id: 'CAT-1', index: '(01)', title: 'E-Commerce & Quick Commerce Scale', badge: 'Marketplaces', mediaUrl: '',
+          description: 'End-to-end organic growth, A+ cataloging, keyword SEO, and onboarding across Amazon Global, Amazon India, Flipkart, Blinkit, Zepto & Instamart.',
+          subServices: [
+            { id: 'SUB-101', name: 'Amazon Global & India Complete Account Management', priceINR: 18000, billing: 'Monthly' },
+            { id: 'SUB-102', name: 'Flipkart Catalog & Organic Growth Management', priceINR: 12000, billing: 'Monthly' },
+            { id: 'SUB-103', name: 'Blinkit, Zepto & Instamart Dark-Store Onboarding', priceINR: 15000, billing: 'One-Time' }
+          ]
+        },
+        {
+          id: 'CAT-2', index: '(02)', title: 'Performance Marketing (Meta, Google & TikTok Ads)', badge: 'Paid Ads', mediaUrl: '',
+          description: 'High-ROAS paid acquisition campaigns, funnel scaling, and retargeting across Meta, Google Shopping/Search, and TikTok Ads.',
+          subServices: [
+            { id: 'SUB-201', name: 'Meta (Instagram & Facebook) High-ROAS Ad Management', priceINR: 20000, billing: 'Monthly' },
+            { id: 'SUB-202', name: 'Google Search, Shopping & Performance Max Ads', priceINR: 20000, billing: 'Monthly' },
+            { id: 'SUB-203', name: 'TikTok & Global Paid Media Scaling', priceINR: 22000, billing: 'Monthly' }
+          ]
+        },
+        {
+          id: 'CAT-3', index: '(03)', title: 'Product Photography, Videography & 3D CGI', badge: 'Production', mediaUrl: '',
+          description: 'Studio product photography, commercial ad shoots, 3D product modeling/renders, and high-converting video editing.',
+          subServices: [
+            { id: 'SUB-301', name: 'Pro Product Photography & Infographics Shoot', priceINR: 15000, billing: 'One-Time' },
+            { id: 'SUB-302', name: 'Commercial Product Videography & Pro Video Editing', priceINR: 22000, billing: 'One-Time' },
+            { id: 'SUB-303', name: '3D CGI Product Renders & Exploded-View Animation', priceINR: 25000, billing: 'One-Time' }
+          ]
+        },
+        {
+          id: 'CAT-4', index: '(04)', title: 'Graphic Design & Social Media Growth Management', badge: 'Creative', mediaUrl: '',
+          description: 'Brand identity, packaging design, A+ graphics, and complete social media content calendar, reels, and organic growth management.',
+          subServices: [
+            { id: 'SUB-401', name: 'Complete Social Media Growth Planning & Management', priceINR: 15000, billing: 'Monthly' },
+            { id: 'SUB-402', name: 'Brand Identity, Packaging & All Graphic Design Suite', priceINR: 18000, billing: 'One-Time' }
+          ]
+        },
+        {
+          id: 'CAT-5', index: '(05)', title: 'Trademark, GS1 Barcodes, QR & Brand Licensing', badge: 'Compliance', mediaUrl: '',
+          description: 'Indian Trademark registration, brand licensing, official GS1 barcode registration, custom barcode/QR generation, and legal documentation.',
+          subServices: [
+            { id: 'SUB-501', name: 'Indian Trademark Registration & Brand Registry Filing', priceINR: 8500, billing: 'One-Time' },
+            { id: 'SUB-502', name: 'Official GS1 Barcode Registration & SKU Barcode/QR Suite', priceINR: 6500, billing: 'One-Time' },
+            { id: 'SUB-503', name: 'Complete Business Licensing, GST/APOB & Documentation', priceINR: 7500, billing: 'One-Time' }
+          ]
+        }
+      ];
+      window.renderAdminServices();
+      pushToFirebase('Loaded 5 Full-Stack Agency Categories');
+    };
+
+    setTimeout(() => { if (window.db) window.renderAdminServices(); }, 600);
+  })();
+</script>
+<!-- ==================== ADMIN.HTML : COMPLETE SERVICE & CATEGORY MANAGER PATCH COMPLETE ==================== -->
