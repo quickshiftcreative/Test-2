@@ -6046,3 +6046,389 @@
 })();
 </script>
 <!-- ==================== MASTER FINAL CLEAN ENGINE: BACKEND COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : 100% WORKING SERVICES FETCHER, EDITOR & GLOBAL SYNC PATCH (PASTE AT VERY BOTTOM OF admin.html) ==================== -->
+<script id="admin-services-bridge-and-editor-v17">
+(function () {
+  /* 1. CRITICAL FIX: Bridge top-level `let db` with `window.db` so `window.db` is NEVER undefined */
+  try {
+    Object.defineProperty(window, 'db', {
+      get: function () { return typeof db !== 'undefined' ? db : null; },
+      set: function (val) { if (typeof db !== 'undefined') db = val; },
+      configurable: true
+    });
+  } catch (e) {}
+
+  /* 2. The 5 Full-Stack Frontend Services (Used to Sync Frontend Services into Backend) */
+  const FRONTEND_FULLSTACK_SERVICES = [
+    {
+      id: 'CAT-1', index: '(01)', title: 'E-Commerce & Quick Commerce Scale', badge: 'Marketplaces', mediaUrl: '',
+      description: 'Dominating Amazon Global, Amazon India, Flipkart, Blinkit, Zepto, and Swiggy Instamart with organic keyword SEO and A+ content.',
+      subServices: [
+        { id: 'SUB-101', name: 'Amazon Global & India Complete Management', priceINR: 20000, billing: 'Monthly' },
+        { id: 'SUB-102', name: 'Flipkart & Quick-Commerce Dark Store Setup', priceINR: 15000, billing: 'Monthly' },
+        { id: 'SUB-103', name: 'A+ Content, EBC & Brand Storefront Redesign', priceINR: 7500, billing: 'One-Time' }
+      ]
+    },
+    {
+      id: 'CAT-2', index: '(02)', title: 'Performance Marketing & Paid Ads (Meta, Google, TikTok)', badge: 'Paid Ads', mediaUrl: '',
+      description: 'High-ROAS paid acquisition campaigns across Meta (Instagram/FB), Google Shopping/Search, and TikTok Ads.',
+      subServices: [
+        { id: 'SUB-201', name: 'Meta & Google Ads Full Management (ROAS Focus)', priceINR: 25000, billing: 'Monthly' },
+        { id: 'SUB-202', name: 'TikTok & Global Paid Media Scaling', priceINR: 22000, billing: 'Monthly' }
+      ]
+    },
+    {
+      id: 'CAT-3', index: '(03)', title: 'Commercial Photography, Videography & CGI', badge: 'Production', mediaUrl: '',
+      description: 'High-end commercial product photography, videography, CGI 3D product renders, and commercial video direction.',
+      subServices: [
+        { id: 'SUB-301', name: 'Commercial Product Photography & Styling (10 SKUs)', priceINR: 18000, billing: 'One-Time' },
+        { id: 'SUB-302', name: 'CGI 3D Product Videos & Commercial Reels', priceINR: 25000, billing: 'One-Time' }
+      ]
+    },
+    {
+      id: 'CAT-4', index: '(04)', title: 'Brand Identity, Graphic Design & Social Media', badge: 'Creative', mediaUrl: '',
+      description: 'Complete brand guidelines, packaging die-lines, all graphic design assets, and full social media management & growth planning.',
+      subServices: [
+        { id: 'SUB-401', name: 'Social Media Growth Planning & Content Management', priceINR: 15000, billing: 'Monthly' },
+        { id: 'SUB-402', name: 'Brand Identity & Packaging Die-Line Design System', priceINR: 20000, billing: 'One-Time' }
+      ]
+    },
+    {
+      id: 'CAT-5', index: '(05)', title: 'Legal, Trademarks, GS1 Barcodes & Documentation', badge: 'Compliance', mediaUrl: '',
+      description: 'Indian and international trademark registration, licensing, GS1 barcode registration, QR code generation, and official compliance documentation.',
+      subServices: [
+        { id: 'SUB-501', name: 'Indian Trademark Registration & Legal Filing', priceINR: 8500, billing: 'One-Time' },
+        { id: 'SUB-502', name: 'Official GS1 Barcode Registration & QR Code Generation', priceINR: 6000, billing: 'One-Time' }
+      ]
+    }
+  ];
+
+  let syncChannel = null;
+  try { syncChannel = new BroadcastChannel('OG_AGENCY_LIVE_SYNC_V13'); } catch (e) {}
+
+  /* 3. Ensure Frontend Services Are Fetched into `db.services` on First Load */
+  window.ensureFrontendServicesSynced = function () {
+    if (!db) db = loadLocalDB();
+    try {
+      const cachedRaw = localStorage.getItem(LOCAL_CACHE_KEY);
+      if (cachedRaw) {
+        const cachedObj = JSON.parse(cachedRaw);
+        if (Array.isArray(cachedObj.services) && cachedObj.services.length > (db.services || []).length && !localStorage.getItem('OG_USER_EDITED_SERVICES_V17')) {
+          db.services = cachedObj.services;
+        }
+      }
+    } catch (e) {}
+
+    /* If still holding only the 2 old placeholder services and never edited yet, load the 5 Frontend Services */
+    if ((!Array.isArray(db.services) || db.services.length <= 2) && !localStorage.getItem('OG_USER_EDITED_SERVICES_V17')) {
+      db.services = JSON.parse(JSON.stringify(FRONTEND_FULLSTACK_SERVICES));
+      localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(db));
+    }
+  };
+
+  /* 4. Instant Save + Broadcast + Firebase Push Engine */
+  let srvSaveTimer = null;
+  window.instantSyncServicesAndDB = function (actionNote, immediateCloud) {
+    if (!db) return;
+    localStorage.setItem('OG_USER_EDITED_SERVICES_V17', '1');
+    localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(db));
+
+    if (syncChannel) {
+      try { syncChannel.postMessage({ type: 'DB_UPDATED', db: db }); } catch (e) {}
+    }
+
+    clearTimeout(srvSaveTimer);
+    srvSaveTimer = setTimeout(async function () {
+      if (typeof pushToFirebase === 'function') {
+        await pushToFirebase(actionNote || 'Updated Services & Content');
+      }
+    }, immediateCloud ? 50 : 350);
+  };
+
+  /* 5. Build Ultra-Clean, Always-Visible Services & Category Editor inside `#panel-services` */
+  window.renderAdminServices = function () {
+    window.ensureFrontendServicesSynced();
+    if (!db) return;
+    db.services = Array.isArray(db.services) ? db.services : [];
+
+    /* Remove any duplicate/old category bars */
+    const oldCatBar = document.getElementById('adm-category-quick-manager');
+    if (oldCatBar) oldCatBar.remove();
+
+    const container = document.getElementById('adm-services-list');
+    if (!container) return;
+
+    const uniqueCats = [...new Set(db.services.map(s => (s.badge || 'General').trim()).filter(Boolean))];
+
+    const topManagerHTML = `
+      <div class="admin-card rounded-3xl p-5 sm:p-6 space-y-4 border-2 border-emerald-500/40 bg-[#111114] mb-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#242429] pb-4">
+          <div>
+            <span class="text-[10px] font-extrabold uppercase tracking-widest text-emerald-400">Live Frontend ↔ Backend Services Studio</span>
+            <h3 class="text-lg font-extrabold text-white mt-0.5">⚡ Manage All Categories, Existing Services & Deliverables (${db.services.length} Categories Active)</h3>
+            <p class="text-xs text-zinc-400">Yahan niche aapki saari existing services khuli hui hain. Kisi bhi box mein click karke naam, category, price badlein, delete karein ya nayi service add karein.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="window.addNewServiceCategoryV17()" class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs shadow-lg transition">
+              ➕ Add New Service / Category
+            </button>
+            <button type="button" onclick="window.restoreFrontend5ServicesV17()" class="px-3.5 py-2.5 rounded-xl bg-indigo-600/25 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-600/40 font-extrabold text-xs transition">
+              🔄 Sync / Reset 5 Frontend Services
+            </button>
+          </div>
+        </div>
+
+        <!-- Active Category Filter Pills (Rename or Delete Entire Category) -->
+        <div class="space-y-2">
+          <div class="text-[11px] font-extrabold uppercase text-zinc-400">Active Website Category Tabs (Click ✏️ to Rename or ✕ to Delete Category):</div>
+          <div class="flex flex-wrap gap-2">
+            ${uniqueCats.length === 0 ? `<span class="text-xs text-zinc-500">No categories yet.</span>` : uniqueCats.map(catName => {
+              const count = db.services.filter(s => (s.badge || '').trim() === catName).length;
+              const safeCat = catName.replace(/'/g, "\\'");
+              return `
+                <div class="px-3.5 py-1.5 rounded-xl bg-[#09090b] border border-white/15 flex items-center gap-2 text-xs">
+                  <span class="font-extrabold text-emerald-400">${catName}</span>
+                  <span class="text-[10px] text-zinc-400">(${count})</span>
+                  <button type="button" title="Rename Category" onclick="window.renameCategoryV17('${safeCat}')" class="px-1.5 py-0.5 rounded bg-white/10 hover:bg-white/20 text-white text-[10px]">✏️ Rename</button>
+                  <button type="button" title="Delete Category" onclick="window.deleteCategoryGroupV17('${safeCat}')" class="px-1.5 py-0.5 rounded bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 text-[10px] font-bold">✕</button>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+
+    const cardsHTML = db.services.length === 0
+      ? `<div class="p-10 rounded-3xl admin-card text-center space-y-3">
+           <p class="text-sm text-zinc-300 font-bold">Abhi koi service nahi hai.</p>
+           <button type="button" onclick="window.addNewServiceCategoryV17()" class="px-5 py-2.5 rounded-xl bg-emerald-500 text-zinc-950 font-extrabold text-xs">+ Add First Service</button>
+         </div>`
+      : db.services.map((cat, cIdx) => {
+          const subs = Array.isArray(cat.subServices) ? cat.subServices : [];
+          return `
+            <div class="admin-card rounded-3xl p-6 space-y-5 border border-[#27272a] bg-[#111114] mb-5">
+              <!-- Card Top Header -->
+              <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#242429] pb-4">
+                <div class="flex items-center gap-3">
+                  <span class="px-3 py-1.5 rounded-xl bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs font-black">${cat.index || '(0' + (cIdx + 1) + ')'}</span>
+                  <div>
+                    <h4 class="text-base font-extrabold text-white">${cat.title || 'Untitled Service'}</h4>
+                    <span class="text-[11px] font-bold text-emerald-400">Category Tab: ${cat.badge || 'General'}</span>
+                    <span class="text-[11px] text-zinc-400"> • ${subs.length} Sub-Services</span>
+                  </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <button type="button" onclick="window.moveServiceV17(${cIdx}, -1)" class="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-bold" title="Move Up">↑</button>
+                  <button type="button" onclick="window.moveServiceV17(${cIdx}, 1)" class="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-bold" title="Move Down">↓</button>
+                  <button type="button" onclick="window.duplicateServiceV17(${cIdx})" class="px-3 py-1.5 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 text-xs font-extrabold">📋 Copy</button>
+                  <button type="button" onclick="window.deleteServiceV17(${cIdx})" class="px-3.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 text-xs font-extrabold">🗑️ Delete Service</button>
+                </div>
+              </div>
+
+              <!-- Main Service Fields (Number, Category Tag, Title, Description, Media) -->
+              <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5">
+                <div class="md:col-span-2">
+                  <label class="text-[11px] font-bold text-zinc-400 block mb-1">Number Badge</label>
+                  <input type="text" value="${(cat.index || '').replace(/"/g, '&quot;')}" oninput="db.services[${cIdx}].index=this.value; window.instantSyncServicesAndDB('Edited Service Index');" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" />
+                </div>
+                <div class="md:col-span-3">
+                  <label class="text-[11px] font-bold text-emerald-400 block mb-1">Category Filter Name *</label>
+                  <input type="text" value="${(cat.badge || '').replace(/"/g, '&quot;')}" oninput="db.services[${cIdx}].badge=this.value; window.instantSyncServicesAndDB('Edited Service Category');" placeholder="e.g. Marketplaces" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-extrabold text-emerald-300" />
+                </div>
+                <div class="md:col-span-7">
+                  <label class="text-[11px] font-bold text-white block mb-1">Service Main Title *</label>
+                  <input type="text" value="${(cat.title || '').replace(/"/g, '&quot;')}" oninput="db.services[${cIdx}].title=this.value; window.instantSyncServicesAndDB('Edited Service Title');" placeholder="Service Title" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs font-extrabold text-white" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5 items-start">
+                <div class="md:col-span-8">
+                  <label class="text-[11px] font-bold text-zinc-400 block mb-1">Service Card Description</label>
+                  <textarea rows="2" oninput="db.services[${cIdx}].description=this.value; window.instantSyncServicesAndDB('Edited Service Description');" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs">${cat.description || ''}</textarea>
+                </div>
+                <div class="md:col-span-4">
+                  <label class="text-[11px] font-bold text-indigo-300 block mb-1">Pop-up Image / Video URL (Optional)</label>
+                  <div class="flex gap-1.5">
+                    <input type="text" value="${(cat.mediaUrl || '').replace(/"/g, '&quot;')}" oninput="db.services[${cIdx}].mediaUrl=this.value; window.instantSyncServicesAndDB('Edited Service Media');" placeholder="Paste URL or Upload..." class="flex-1 px-3 py-2 rounded-xl adm-input text-xs" />
+                    <label class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold cursor-pointer shrink-0">
+                      📁
+                      <input type="file" accept="image/*,video/*" onchange="uploadDirectCallback(this, false, function(u){ db.services[${cIdx}].mediaUrl=u; window.renderAdminServices(); window.instantSyncServicesAndDB('Uploaded Service Media', true); })" class="hidden" />
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sub-Services / Deliverables List -->
+              <div class="p-4 rounded-2xl bg-[#09090b] border border-[#242429] space-y-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <span class="text-xs font-extrabold uppercase text-emerald-400">📦 Deliverables / Sub-Services Inside Pop-up (${subs.length})</span>
+                  <button type="button" onclick="window.addDeliverableV17(${cIdx})" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-extrabold text-xs">
+                    + Add Deliverable Item
+                  </button>
+                </div>
+
+                <div class="space-y-2">
+                  ${subs.length === 0 ? `<p class="text-xs text-zinc-500">No deliverables added yet. Click "+ Add Deliverable Item".</p>` : subs.map((sub, sIdx) => `
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center p-2.5 rounded-xl bg-[#111114] border border-white/10">
+                      <input type="text" value="${(sub.name || '').replace(/"/g, '&quot;')}" oninput="db.services[${cIdx}].subServices[${sIdx}].name=this.value; window.instantSyncServicesAndDB('Edited Deliverable Name');" placeholder="Deliverable Name" class="sm:col-span-6 px-3 py-2 rounded-lg adm-input text-xs font-bold text-white" />
+                      <div class="sm:col-span-3 flex items-center gap-1">
+                        <span class="text-xs font-bold text-zinc-400">₹</span>
+                        <input type="number" value="${Number(sub.priceINR || 0)}" oninput="db.services[${cIdx}].subServices[${sIdx}].priceINR=Number(this.value || 0); window.instantSyncServicesAndDB('Edited Deliverable Price');" placeholder="Price INR" class="w-full px-3 py-2 rounded-lg adm-input text-xs font-extrabold text-emerald-400" />
+                      </div>
+                      <select onchange="db.services[${cIdx}].subServices[${sIdx}].billing=this.value; window.instantSyncServicesAndDB('Edited Billing Type', true);" class="sm:col-span-2 px-2.5 py-2 rounded-lg adm-input text-xs font-bold text-zinc-200">
+                        <option value="One-Time" ${sub.billing === 'One-Time' ? 'selected' : ''}>One-Time</option>
+                        <option value="Monthly" ${sub.billing === 'Monthly' ? 'selected' : ''}>Monthly</option>
+                        <option value="Quarterly" ${sub.billing === 'Quarterly' ? 'selected' : ''}>Quarterly</option>
+                      </select>
+                      <button type="button" onclick="window.deleteDeliverableV17(${cIdx}, ${sIdx})" class="sm:col-span-1 py-2 rounded-lg bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 text-xs font-extrabold">🗑️✕</button>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+    container.innerHTML = topManagerHTML + cardsHTML;
+  };
+
+  /* 6. Action Handlers for Add, Edit, Delete, Move, Duplicate & Category Management */
+  window.addNewServiceCategoryV17 = function () {
+    const catName = prompt('1. Enter Category Filter Name (e.g. Marketplaces, Paid Ads, Production, Web Dev):', 'New Category');
+    if (!catName) return;
+    const srvTitle = prompt('2. Enter Main Service Card Title:', catName.trim() + ' Growth Package');
+    if (!srvTitle) return;
+
+    db.services = db.services || [];
+    const nextNum = db.services.length + 1;
+    db.services.push({
+      id: 'CAT-' + Date.now(),
+      index: `(0${nextNum})`,
+      title: srvTitle.trim(),
+      badge: catName.trim(),
+      mediaUrl: '',
+      description: 'Complete end-to-end execution and dedicated specialist support.',
+      subServices: [
+        { id: 'SUB-' + Date.now(), name: srvTitle.trim() + ' — Complete Deliverable', priceINR: 12000, billing: 'One-Time' }
+      ]
+    });
+    window.renderAdminServices();
+    window.instantSyncServicesAndDB('Added New Service: ' + srvTitle, true);
+  };
+
+  window.addNewServiceCategory = window.addNewServiceCategoryV17;
+
+  window.deleteServiceV17 = function (cIdx) {
+    if (!confirm(`Delete service "${db.services[cIdx]?.title || ''}"?`)) return;
+    db.services.splice(cIdx, 1);
+    db.services.forEach((s, i) => { s.index = `(0${i + 1})`; });
+    window.renderAdminServices();
+    window.instantSyncServicesAndDB('Deleted Service Card', true);
+  };
+
+  window.duplicateServiceV17 = function (cIdx) {
+    const orig = db.services[cIdx];
+    if (!orig) return;
+    const copy = JSON.parse(JSON.stringify(orig));
+    copy.id = 'CAT-' + Date.now();
+    copy.title = (copy.title || 'Service') + ' (Copy)';
+    (copy.subServices || []).forEach((sub, i) => { sub.id = 'SUB-' + Date.now() + '-' + i; });
+    db.services.splice(cIdx + 1, 0, copy);
+    db.services.forEach((s, i) => { s.index = `(0${i + 1})`; });
+    window.renderAdminServices();
+    window.instantSyncServicesAndDB('Duplicated Service Card', true);
+  };
+
+  window.moveServiceV17 = function (cIdx, dir) {
+    const target = cIdx + dir;
+    if (target < 0 || target >= db.services.length) return;
+    const tmp = db.services[cIdx];
+    db.services[cIdx] = db.services[target];
+    db.services[target] = tmp;
+    db.services.forEach((s, i) => { s.index = `(0${i + 1})`; });
+    window.renderAdminServices();
+    window.instantSyncServicesAndDB('Reordered Service Cards', true);
+  };
+
+  window.addDeliverableV17 = function (cIdx) {
+    db.services[cIdx].subServices = db.services[cIdx].subServices || [];
+    db.services[cIdx].subServices.push({
+      id: 'SUB-' + Date.now(),
+      name: 'New Deliverable Package',
+      priceINR: 10000,
+      billing: 'One-Time'
+    });
+    window.renderAdminServices();
+    window.instantSyncServicesAndDB('Added Deliverable', true);
+  };
+
+  window.deleteDeliverableV17 = function (cIdx, sIdx) {
+    db.services[cIdx].subServices.splice(sIdx, 1);
+    window.renderAdminServices();
+    window.instantSyncServicesAndDB('Deleted Deliverable', true);
+  };
+
+  window.renameCategoryV17 = function (oldName) {
+    const newName = prompt(`Rename Category "${oldName}" to:`, oldName);
+    if (!newName || !newName.trim() || newName.trim() === oldName) return;
+    (db.services || []).forEach(s => {
+      if ((s.badge || '').trim() === oldName) s.badge = newName.trim();
+    });
+    window.renderAdminServices();
+    window.instantSyncServicesAndDB(`Renamed Category ${oldName} to ${newName}`, true);
+  };
+
+  window.deleteCategoryGroupV17 = function (catName) {
+    if (!confirm(`Delete ALL services inside category "${catName}"?`)) return;
+    db.services = (db.services || []).filter(s => (s.badge || '').trim() !== catName);
+    db.services.forEach((s, i) => { s.index = `(0${i + 1})`; });
+    window.renderAdminServices();
+    window.instantSyncServicesAndDB(`Deleted Category ${catName}`, true);
+  };
+
+  window.restoreFrontend5ServicesV17 = function () {
+    if (!confirm('Load all 5 Full-Stack Frontend Services into Backend & Frontend now?')) return;
+    db.services = JSON.parse(JSON.stringify(FRONTEND_FULLSTACK_SERVICES));
+    window.renderAdminServices();
+    window.instantSyncServicesAndDB('Synced 5 Full-Stack Services', true);
+  };
+
+  /* 7. Hook into Tab Switching & Page Load so Clicking "⚡ 2. Services" ALWAYS Renders Immediately */
+  const origSwitchTab = window.switchAdminTab;
+  window.switchAdminTab = function (tabName) {
+    if (typeof origSwitchTab === 'function') origSwitchTab(tabName);
+    if (tabName === 'services') {
+      window.renderAdminServices();
+    }
+  };
+
+  /* Ensure About, Policies, Headings & All Other Tabs Also Sync in 1 Second When Edited */
+  document.querySelector('main')?.addEventListener('input', function (e) {
+    const id = e.target?.id || '';
+    if (!db) return;
+    if (id === 'ab-heading') db.about.heading = e.target.value;
+    if (id === 'ab-story') db.about.story = e.target.value;
+    if (id === 'ab-mission') db.about.mission = e.target.value;
+    if (id === 'ab-vision') db.about.vision = e.target.value;
+    if (id === 'pol-inp-privacy') db.policies.privacy = e.target.value;
+    if (id === 'pol-inp-terms') db.policies.terms = e.target.value;
+    if (id === 'pol-inp-refund') db.policies.refund = e.target.value;
+    if (id === 'hd-srv-eyebrow') db.headings.srvPageEyebrow = e.target.value;
+    if (id === 'hd-srv-heading') db.headings.srvPageHeading = e.target.value;
+    if (id === 'hd-srv-sub') db.headings.srvPageSub = e.target.value;
+    window.instantSyncServicesAndDB('Live Content Edit', false);
+  });
+
+  /* Initial Boot & Render */
+  setTimeout(function () {
+    window.ensureFrontendServicesSynced();
+    window.renderAdminServices();
+  }, 300);
+
+  setTimeout(function () {
+    window.renderAdminServices();
+  }, 1100);
+})();
+</script>
+<!-- ==================== ADMIN.HTML : 100% WORKING SERVICES FETCHER & EDITOR COMPLETE ==================== -->
