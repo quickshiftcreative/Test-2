@@ -4814,3 +4814,272 @@
   })();
 </script>
 <!-- ==================== ADMIN.HTML : DEDICATED "🎬 LOADER & ENTRANCE STUDIO" PATCH COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : UNBREAKABLE MENU & LOADER CLOUD SAVE FIX PATCH (PASTE AT VERY BOTTOM) ==================== -->
+<script id="admin-menu-save-fix-v13">
+  (function () {
+    let syncChannel = null;
+    try {
+      syncChannel = new BroadcastChannel('OG_AGENCY_LIVE_SYNC_V13');
+    } catch (e) {}
+
+    /* 1. Neutralize Old v7/v8 Functions That Crashed Because Old Home Menu Card Was Removed */
+    window.syncNavStudioToDB = function () {
+      /* Safely redirected to new Menu Studio sync */
+      if (typeof window.collectMenuStudioDataIntoDB === 'function') {
+        window.collectMenuStudioDataIntoDB();
+      }
+    };
+
+    window.syncUniqueNavControls = function () {
+      /* Safely redirected to new Menu Studio sync */
+      if (typeof window.collectMenuStudioDataIntoDB === 'function') {
+        window.collectMenuStudioDataIntoDB();
+      }
+    };
+
+    /* 2. Safe Collector for All Dedicated "🍔 Menu Studio" Fields */
+    window.collectMenuStudioDataIntoDB = function () {
+      if (!window.db) return;
+      db.navMenuConfig = db.navMenuConfig || {};
+      const c = db.navMenuConfig;
+
+      const elIcon = document.getElementById('ms-icon-style');
+      if (!elIcon) return; // Menu studio DOM not built yet
+
+      const getV = function (id, fallback) {
+        const el = document.getElementById(id);
+        return el ? el.value : fallback;
+      };
+      const getC = function (id, fallback) {
+        const el = document.getElementById(id);
+        return el ? Boolean(el.checked) : fallback;
+      };
+
+      c.iconStyle = getV('ms-icon-style', c.iconStyle || 'three_line');
+      c.btnLabel = getV('ms-btn-label', c.btnLabel ?? '');
+      c.btnShape = getV('ms-btn-shape', c.btnShape || 'rounded');
+      c.btnSize = Number(getV('ms-btn-size', c.btnSize ?? 40));
+      c.customBtnImg = getV('ms-custom-btn-img', c.customBtnImg || '');
+      c.customCloseImg = getV('ms-custom-close-img', c.customCloseImg || '');
+      c.desktopMenuStyle = getV('ms-desktop-style', c.desktopMenuStyle || 'pill');
+      c.drawerLayoutStyle = getV('ms-drawer-layout', c.drawerLayoutStyle || 'single_dropdown');
+      c.activeIndicatorStyle = getV('ms-active-style', c.activeIndicatorStyle || 'glass_pill');
+      c.tintOpacity = Number(getV('ms-tint-opacity', c.tintOpacity ?? 52));
+      c.glassBlur = Number(getV('ms-glass-blur', c.glassBlur ?? 28));
+      c.tintTone = getV('ms-tint-tone', c.tintTone || 'obsidian');
+      c.drawerTitle = getV('ms-drawer-title', c.drawerTitle || 'Menu & Quick Access');
+      c.availabilityText = getV('ms-avail-txt', c.availabilityText || '');
+      c.vipPassText = getV('ms-vip-txt', c.vipPassText || '');
+      c.bottomCtaText = getV('ms-cta-txt', c.bottomCtaText || '');
+      c.showAvailabilityBadge = getC('ms-chk-avail', true);
+      c.showVoiceBriefBtn = getC('ms-chk-voice', true);
+      c.showSearchInDrawer = getC('ms-chk-search', true);
+      c.showVipPassInDrawer = getC('ms-chk-vip', true);
+    };
+
+    /* 3. Safe Collector for All Dedicated "🎬 Loader & Entrance" Fields */
+    window.collectLoaderStudioDataIntoDB = function () {
+      if (!window.db) return;
+      const elTheme = document.getElementById('ldr-cfg-theme');
+      if (!elTheme) return;
+
+      db.loaderConfig = db.loaderConfig || {};
+      const l = db.loaderConfig;
+      const getV = function (id, fb) { const el = document.getElementById(id); return el ? el.value : fb; };
+      const getC = function (id, fb) { const el = document.getElementById(id); return el ? Boolean(el.checked) : fb; };
+
+      l.enabled = getC('ldr-cfg-enabled', true);
+      l.bgTheme = getV('ldr-cfg-theme', l.bgTheme || 'obsidian_gold');
+      l.logoShape = getV('ldr-cfg-shape', l.logoShape || 'rounded');
+      l.progressStyle = getV('ldr-cfg-prog-style', l.progressStyle || 'laser_bar');
+      l.frequency = getV('ldr-cfg-freq', l.frequency || 'always');
+      l.logoSize = Number(getV('ldr-cfg-size', l.logoSize ?? 96));
+      l.durationMs = Number(getV('ldr-cfg-duration', l.durationMs ?? 1450));
+      l.showOrbitRings = getC('ldr-cfg-rings', true);
+      l.customLoaderLogo = getV('ldr-cfg-custom-logo', l.customLoaderLogo || '');
+      l.statusSteps = getV('ldr-cfg-steps', l.statusSteps || '');
+    };
+
+    /* 4. Unbreakable Direct Cloud + LocalStorage + Broadcast Save Engine */
+    let directPushTimer = null;
+    window.directPushMenuAndDB = async function (actionNote) {
+      if (!window.db) return;
+      try {
+        window.collectMenuStudioDataIntoDB();
+        window.collectLoaderStudioDataIntoDB();
+      } catch (err) {
+        console.warn('Collector warning:', err);
+      }
+
+      /* Save immediately to localStorage so same-browser tabs update in 0ms */
+      localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(window.db));
+
+      /* Broadcast to open index.html tabs & Split Preview iframe */
+      if (syncChannel) {
+        try { syncChannel.postMessage({ type: 'DB_UPDATED', db: window.db }); } catch (e) {}
+      }
+      if (typeof refreshLivePreviewIframe === 'function') {
+        refreshLivePreviewIframe();
+      }
+
+      /* Push to Firebase Cloud */
+      await pushToFirebase(actionNote || 'Synced Menu & Studio Settings');
+    };
+
+    /* 5. Override syncMenuStudioUI & Selectors so Every Edit in Menu Studio Auto-Saves Immediately */
+    const origSyncMenuUI = window.syncMenuStudioUI;
+    window.syncMenuStudioUI = function (replayAnim) {
+      if (typeof origSyncMenuUI === 'function') {
+        try { origSyncMenuUI(replayAnim); } catch (e) {}
+      }
+      window.collectMenuStudioDataIntoDB();
+      localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(window.db));
+      clearTimeout(directPushTimer);
+      directPushTimer = setTimeout(function () {
+        window.directPushMenuAndDB('Auto-Saved Menu Studio');
+      }, 350);
+    };
+
+    window.selectMenuStudioAnim = function (animId) {
+      if (!window.db) return;
+      db.navMenuConfig = db.navMenuConfig || {};
+      db.navMenuConfig.animStyle = animId;
+      if (typeof window.updateMenuStudioVisualPreview === 'function') {
+        window.updateMenuStudioVisualPreview(true);
+      }
+      window.directPushMenuAndDB('Selected Menu Animation: ' + animId);
+    };
+
+    const origSyncLoader = window.syncLoaderStudioToDB;
+    window.syncLoaderStudioToDB = function (playSim) {
+      if (typeof origSyncLoader === 'function') {
+        try { origSyncLoader(playSim); } catch (e) {}
+      }
+      window.collectLoaderStudioDataIntoDB();
+      localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(window.db));
+      clearTimeout(directPushTimer);
+      directPushTimer = setTimeout(function () {
+        window.directPushMenuAndDB('Auto-Saved Loader Studio');
+      }, 350);
+    };
+
+    window.selectLoaderExitAnim = function (animId) {
+      if (!window.db) return;
+      db.loaderConfig = db.loaderConfig || {};
+      db.loaderConfig.exitAnim = animId;
+      if (typeof window.updateLoaderStudioCardsAndPreview === 'function') {
+        window.updateLoaderStudioCardsAndPreview(true);
+      }
+      window.directPushMenuAndDB('Selected Loader Exit Animation: ' + animId);
+    };
+
+    window.selectHomeEntranceAnim = function (entId) {
+      if (!window.db) return;
+      db.loaderConfig = db.loaderConfig || {};
+      db.loaderConfig.homeEntrance = entId;
+      if (typeof window.updateLoaderStudioCardsAndPreview === 'function') {
+        window.updateLoaderStudioCardsAndPreview(false);
+      }
+      window.directPushMenuAndDB('Selected Home Entrance: ' + entId);
+    };
+
+    /* 6. Replace saveAndPushAll with Crash-Proof Master Save */
+    window.saveAndPushAll = async function (actionLabel) {
+      if (!window.db) return;
+      const val = function (id, fb) { const el = document.getElementById(id); return el ? el.value : fb; };
+      const chk = function (id, fb) { const el = document.getElementById(id); return el ? Boolean(el.checked) : fb; };
+
+      try {
+        /* Sync Quick Brand Bar if edited */
+        if (document.getElementById('qk-name')) {
+          db.brand.name = val('qk-name', db.brand.name);
+          db.brand.tagline = val('qk-tagline', db.brand.tagline);
+          db.brand.phone = val('qk-phone', db.brand.phone);
+          db.brand.whatsapp = val('qk-whatsapp', db.brand.whatsapp);
+          db.brand.email = val('qk-email', db.brand.email);
+          db.brand.domain = val('qk-domain', db.brand.domain);
+          db.brand.logoText = val('qk-logo-text', db.brand.logoText || '').trim().toUpperCase();
+          db.brand.logoSize = Number(val('qk-logo-size', db.brand.logoSize || 40));
+        }
+
+        /* Sync Core Home & Brand Fields */
+        db.brand.announcement = val('hm-announcement', db.brand.announcement);
+        db.visibility.scarcitySlots = Number(val('hm-scarcity-slots', db.visibility.scarcitySlots || 2));
+        db.brand.heroBadge = val('hm-hero-badge', db.brand.heroBadge);
+        db.brand.heroTitle = val('hm-hero-title', db.brand.heroTitle);
+        db.brand.heroSub = val('hm-hero-sub', db.brand.heroSub);
+        db.brand.heroBtn1 = val('hm-btn1', db.brand.heroBtn1);
+        db.brand.heroBtn2 = val('hm-btn2', db.brand.heroBtn2);
+        if (document.getElementById('hm-pills')) {
+          db.brand.pills = val('hm-pills', '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+        }
+        if (document.getElementById('hm-marquee')) {
+          db.brand.marqueeItems = val('hm-marquee', '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+        }
+
+        db.visibility.show3DStage = chk('hm-show-3d', true);
+        db.hero3D = {
+          mode: val('h3d-mode', db.hero3D?.mode || 'character_image'),
+          position: val('h3d-position', db.hero3D?.position || 'right'),
+          scale: Number(val('h3d-scale', db.hero3D?.scale || 100)),
+          offsetX: Number(val('h3d-offx', db.hero3D?.offsetX || 0)),
+          offsetY: Number(val('h3d-offy', db.hero3D?.offsetY || 0)),
+          badgeText: val('h3d-badge', db.hero3D?.badgeText || ''),
+          title: val('h3d-title', db.hero3D?.title || ''),
+          subtitle: val('h3d-sub', db.hero3D?.subtitle || ''),
+          imageUrl: val('h3d-img-url', db.hero3D?.imageUrl || ''),
+          videoUrl: val('h3d-vid-url', db.hero3D?.videoUrl || ''),
+          glbUrl: val('h3d-glb-url', db.hero3D?.glbUrl || ''),
+          splineUrl: val('h3d-spline-url', db.hero3D?.splineUrl || '')
+        };
+
+        db.brand.logo = val('gl-logo', db.brand.logo);
+        db.brand.kineticFooterText = val('gl-kinetic', db.brand.kineticFooterText);
+        db.brand.copyright = val('gl-copy', db.brand.copyright);
+
+        /* Sync Luxury UI Studio */
+        if (document.getElementById('lux-blur-inp')) {
+          db.luxuryUI = {
+            blurPx: Number(val('lux-blur-inp', 24)),
+            radiusPx: Number(val('lux-rad-inp', 24)),
+            spotlight: val('lux-spot-inp', 'gold'),
+            goldShimmer: chk('lux-gold-shimmer', true),
+            showGrader: chk('lux-show-grader', true),
+            showCallBtn: chk('lux-show-callbtn', true)
+          };
+        }
+
+        /* Sync Menu Studio & Loader Studio */
+        window.collectMenuStudioDataIntoDB();
+        window.collectLoaderStudioDataIntoDB();
+      } catch (err) {
+        console.warn('Save sync partial:', err);
+      }
+
+      await window.directPushMenuAndDB(actionLabel || 'Saved All Changes');
+      if (typeof window.showAdminToast === 'function') {
+        window.showAdminToast(actionLabel || '✓ Saved & Live on Frontend!');
+      }
+    };
+
+    /* 7. Attach Change/Input Listeners Inside #panel-menu so Item Edits Auto-Push Immediately */
+    setTimeout(function () {
+      const menuPanel = document.getElementById('panel-menu');
+      if (menuPanel) {
+        menuPanel.addEventListener('input', function () {
+          clearTimeout(directPushTimer);
+          directPushTimer = setTimeout(function () {
+            window.directPushMenuAndDB('Auto-Saved Menu Item Edit');
+          }, 500);
+        });
+        menuPanel.addEventListener('change', function () {
+          clearTimeout(directPushTimer);
+          directPushTimer = setTimeout(function () {
+            window.directPushMenuAndDB('Auto-Saved Menu Option');
+          }, 250);
+        });
+      }
+    }, 900);
+  })();
+</script>
+<!-- ==================== ADMIN.HTML : UNBREAKABLE MENU & LOADER CLOUD SAVE FIX COMPLETE ==================== -->
