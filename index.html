@@ -6432,3 +6432,425 @@
 })();
 </script>
 <!-- ==================== ADMIN.HTML : 100% WORKING SERVICES FETCHER & EDITOR COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : DEDICATED "📞 CONTACT PAGE STUDIO" (EVERY LINE & LINK EDITABLE) PATCH (PASTE AT VERY BOTTOM OF admin.html) ==================== -->
+<script id="admin-contact-page-studio-v18">
+(function () {
+  const DEFAULT_CONTACT_CFG = {
+    eyebrow: 'Global Presence',
+    heading: 'Connect With Our Global Studios',
+    sub: 'Reach out directly to our regional hubs or record a 30-second voice brief below.',
+    formCardHeading: 'Send a Direct Project Brief or 30s Voice Note',
+    showVoiceBox: true,
+    voiceBadge: '🎙️ Walkie-Talkie 30-Second Voice Brief',
+    voiceSub: 'No time to type? Record your voice note and it will be sent directly to our Admin CRM.',
+    voiceBtnStart: '🔴 Start Recording',
+    voiceBtnStop: '⏹️ Stop Recording',
+    voiceBtnReRecord: '🔴 Re-Record Voice Note',
+    phName: 'Your Full Name *',
+    phBrand: 'Brand / Company Name *',
+    phEmail: 'Official Email Address *',
+    phPhone: 'WhatsApp / Mobile Number *',
+    phMsg: 'Tell us about your brand, target marketplaces, or creative requirements...',
+    submitBtnText: 'Submit Project Inquiry & Voice Brief →',
+    successMsg: '✅ Your project brief has been sent successfully!',
+    quickLinks: [
+      { label: '💬 Chat on WhatsApp Desk', url: 'https://wa.me/919876543210' },
+      { label: '✉️ Email Official Desk', url: 'mailto:hello@theblankpage.agency' }
+    ]
+  };
+
+  function ensureContactConfigInDB() {
+    if (!window.db && typeof db !== 'undefined') window.db = db;
+    if (!window.db) return;
+    db.contactPageConfig = {
+      ...DEFAULT_CONTACT_CFG,
+      ...(db.contactPageConfig || {}),
+      quickLinks: Array.isArray(db.contactPageConfig?.quickLinks)
+        ? db.contactPageConfig.quickLinks
+        : JSON.parse(JSON.stringify(DEFAULT_CONTACT_CFG.quickLinks))
+    };
+    /* Keep legacy headings synced */
+    db.headings = db.headings || {};
+    if (db.headings.contactHeading && !db.contactPageConfig._syncedOnce) {
+      db.contactPageConfig.heading = db.headings.contactHeading;
+      db.contactPageConfig.sub = db.headings.contactSub || db.contactPageConfig.sub;
+      db.contactPageConfig._syncedOnce = true;
+    }
+    db.studios = Array.isArray(db.studios) ? db.studios : [];
+  }
+
+  let contactSyncTimer = null;
+  window.syncContactStudioInstant = function (note, immediate) {
+    if (!window.db) return;
+    ensureContactConfigInDB();
+    const c = db.contactPageConfig;
+    const getV = function (id, fb) {
+      const el = document.getElementById(id);
+      return el ? el.value : fb;
+    };
+    const getC = function (id, fb) {
+      const el = document.getElementById(id);
+      return el ? Boolean(el.checked) : fb;
+    };
+
+    if (document.getElementById('cp-eyebrow')) {
+      c.eyebrow = getV('cp-eyebrow', c.eyebrow);
+      c.heading = getV('cp-heading', c.heading);
+      c.sub = getV('cp-sub', c.sub);
+      c.formCardHeading = getV('cp-form-heading', c.formCardHeading);
+      c.showVoiceBox = getC('cp-show-voice', true);
+      c.voiceBadge = getV('cp-voice-badge', c.voiceBadge);
+      c.voiceSub = getV('cp-voice-sub', c.voiceSub);
+      c.voiceBtnStart = getV('cp-voice-start', c.voiceBtnStart);
+      c.voiceBtnStop = getV('cp-voice-stop', c.voiceBtnStop);
+      c.phName = getV('cp-ph-name', c.phName);
+      c.phBrand = getV('cp-ph-brand', c.phBrand);
+      c.phEmail = getV('cp-ph-email', c.phEmail);
+      c.phPhone = getV('cp-ph-phone', c.phPhone);
+      c.phMsg = getV('cp-ph-msg', c.phMsg);
+      c.submitBtnText = getV('cp-submit-txt', c.submitBtnText);
+      c.successMsg = getV('cp-success-msg', c.successMsg);
+
+      /* Mirror into db.headings so all legacy references stay updated */
+      db.headings = db.headings || {};
+      db.headings.contactHeading = c.heading;
+      db.headings.contactSub = c.sub;
+      const oldCntHd = document.getElementById('hd-cnt');
+      if (oldCntHd) oldCntHd.value = c.heading;
+    }
+
+    localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(db));
+    try {
+      const bc = new BroadcastChannel('OG_AGENCY_LIVE_SYNC_V13');
+      bc.postMessage({ type: 'DB_UPDATED', db: db });
+    } catch (e) {}
+
+    clearTimeout(contactSyncTimer);
+    contactSyncTimer = setTimeout(async function () {
+      if (typeof pushToFirebase === 'function') {
+        await pushToFirebase(note || 'Updated Contact Page Content');
+      }
+    }, immediate ? 50 : 350);
+  };
+
+  /* 1. Build Dedicated "📞 Contact Page" Tab & Workspace Panel */
+  window.buildContactPageStudioTab = function () {
+    const revTab = document.getElementById('adm-tab-reviews');
+    if (revTab && !document.getElementById('adm-tab-contact')) {
+      const btn = document.createElement('button');
+      btn.id = 'adm-tab-contact';
+      btn.type = 'button';
+      btn.onclick = function () { switchAdminTab('contact'); };
+      btn.className = 'adm-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-[#111114] text-emerald-300 border border-emerald-500/30 whitespace-nowrap transition';
+      btn.innerHTML = '📞 Contact Page';
+      revTab.insertAdjacentElement('afterend', btn);
+    }
+
+    const mainEl = document.querySelector('main');
+    if (mainEl && !document.getElementById('panel-contact')) {
+      const sec = document.createElement('section');
+      sec.id = 'panel-contact';
+      sec.className = 'adm-panel hidden space-y-6';
+      sec.innerHTML = `
+        <!-- Top Banner -->
+        <div class="p-5 rounded-3xl bg-gradient-to-r from-emerald-950/60 via-[#111114] to-indigo-950/60 border border-emerald-500/30 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <span class="text-[10px] font-extrabold uppercase tracking-widest text-emerald-400">100% Editable Contact Page Studio</span>
+            <h2 class="text-xl font-bold text-white mt-0.5">📞 Edit Every Line, Heading, Studio Card, Form Box & Link on Contact Page</h2>
+            <p class="text-xs text-zinc-300">Yahan se aap Contact Page ki har ek line, button, voice box, placeholders aur studio links ko seedhe edit, add ya delete kar sakte hain.</p>
+          </div>
+          <button type="button" onclick="window.syncContactStudioInstant('Published Contact Page', true); alert('✅ Contact Page Saved & Live!');" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs shadow-xl">
+            ✓ Save & Publish Contact Page
+          </button>
+        </div>
+
+        <!-- STEP 1: TOP PAGE HEADINGS -->
+        <div class="admin-card rounded-3xl p-6 space-y-4 border-indigo-500/30">
+          <div class="border-b border-[#242429] pb-3">
+            <span class="text-[10px] font-extrabold uppercase text-indigo-400">Section 1 • Top Header Lines</span>
+            <h3 class="text-base font-bold text-white">1. Contact Page Top Badge, Main Heading & Subtitle</h3>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <div class="md:col-span-3">
+              <label class="text-[11px] font-bold text-emerald-400 block mb-1">Top Small Badge (Eyebrow)</label>
+              <input type="text" id="cp-eyebrow" oninput="window.syncContactStudioInstant('Edited Contact Eyebrow')" placeholder="Global Presence" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs font-bold" />
+            </div>
+            <div class="md:col-span-9">
+              <label class="text-[11px] font-bold text-white block mb-1">Main Page Heading (H1)</label>
+              <input type="text" id="cp-heading" oninput="window.syncContactStudioInstant('Edited Contact Heading')" placeholder="Connect With Our Global Studios" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs font-extrabold text-white" />
+            </div>
+            <div class="md:col-span-12">
+              <label class="text-[11px] font-bold text-zinc-400 block mb-1">Subtitle / Description Line Below Heading</label>
+              <input type="text" id="cp-sub" oninput="window.syncContactStudioInstant('Edited Contact Subtitle')" placeholder="Reach out directly to our regional hubs or record a 30-second voice brief below." class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs" />
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: GLOBAL STUDIO HUB CARDS (WITH LINKS, ADD, DELETE, REORDER) -->
+        <div class="admin-card rounded-3xl p-6 space-y-4 border-emerald-500/30">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#242429] pb-3">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase text-emerald-400">Section 2 • Office / Studio Cards & Links</span>
+              <h3 class="text-base font-bold text-white">2. Global Studio Hubs (Edit Address, Phone, Email & Custom Action Link)</h3>
+            </div>
+            <button type="button" onclick="window.addStudioCardV18()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-extrabold text-xs shadow">
+              + Add New Studio Card
+            </button>
+          </div>
+          <div id="cp-studios-manager-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+        </div>
+
+        <!-- STEP 3: DIRECT QUICK-CONNECT LINKS / BUTTONS BAR -->
+        <div class="admin-card rounded-3xl p-6 space-y-4 border-amber-500/30">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#242429] pb-3">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase text-amber-400">Section 3 • Extra Clickable Links Bar</span>
+              <h3 class="text-base font-bold text-white">3. Quick-Connect Action Buttons (WhatsApp, Email, Map, Social Links)</h3>
+            </div>
+            <button type="button" onclick="window.addContactQuickLinkV18()" class="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-extrabold text-xs">
+              🔗 + Add Quick Link Button
+            </button>
+          </div>
+          <div id="cp-quick-links-list" class="space-y-2.5"></div>
+        </div>
+
+        <!-- STEP 4: VOICE BRIEF & CONTACT FORM EVERY LINE CUSTOMIZER -->
+        <div class="admin-card rounded-3xl p-6 space-y-5 border-indigo-500/30">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#242429] pb-3">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase text-indigo-400">Section 4 • Form & Voice Brief Box Lines</span>
+              <h3 class="text-base font-bold text-white">4. Edit Voice Note Box, Form Placeholders & Submit Button Text</h3>
+            </div>
+            <label class="flex items-center gap-2 text-xs font-extrabold text-emerald-400 cursor-pointer">
+              <input type="checkbox" id="cp-show-voice" onchange="window.syncContactStudioInstant('Toggled Voice Box', true)" class="w-4 h-4 accent-emerald-500" checked />
+              🎙️ Show 30s Voice Brief Recorder Box
+            </label>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-[11px] font-bold text-white block mb-1">Form Card Main Title</label>
+              <input type="text" id="cp-form-heading" oninput="window.syncContactStudioInstant('Edited Form Heading')" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs font-bold" />
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-indigo-300 block mb-1">Voice Recorder Box Title</label>
+              <input type="text" id="cp-voice-badge" oninput="window.syncContactStudioInstant('Edited Voice Title')" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs font-bold" />
+            </div>
+            <div class="md:col-span-2">
+              <label class="text-[11px] font-bold text-zinc-400 block mb-1">Voice Recorder Subtitle / Instruction Line</label>
+              <input type="text" id="cp-voice-sub" oninput="window.syncContactStudioInstant('Edited Voice Subtitle')" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs" />
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-rose-400 block mb-1">Start Recording Button Text</label>
+              <input type="text" id="cp-voice-start" oninput="window.syncContactStudioInstant('Edited Record Button')" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs font-bold" />
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-amber-300 block mb-1">Stop Recording Button Text</label>
+              <input type="text" id="cp-voice-stop" oninput="window.syncContactStudioInstant('Edited Stop Button')" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs font-bold" />
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-[#242429] grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-[11px] font-bold text-zinc-400 block mb-1">Input 1 Placeholder (Name)</label>
+              <input type="text" id="cp-ph-name" oninput="window.syncContactStudioInstant('Edited Name Placeholder')" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs" />
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-zinc-400 block mb-1">Input 2 Placeholder (Brand Name)</label>
+              <input type="text" id="cp-ph-brand" oninput="window.syncContactStudioInstant('Edited Brand Placeholder')" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs" />
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-zinc-400 block mb-1">Input 3 Placeholder (Email)</label>
+              <input type="text" id="cp-ph-email" oninput="window.syncContactStudioInstant('Edited Email Placeholder')" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs" />
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-zinc-400 block mb-1">Input 4 Placeholder (Phone / WhatsApp)</label>
+              <input type="text" id="cp-ph-phone" oninput="window.syncContactStudioInstant('Edited Phone Placeholder')" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs" />
+            </div>
+            <div class="sm:col-span-2">
+              <label class="text-[11px] font-bold text-zinc-400 block mb-1">Input 5 Placeholder (Project Message Box)</label>
+              <input type="text" id="cp-ph-msg" oninput="window.syncContactStudioInstant('Edited Message Placeholder')" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs" />
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-emerald-400 block mb-1">Submit Button Text</label>
+              <input type="text" id="cp-submit-txt" oninput="window.syncContactStudioInstant('Edited Submit Button')" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs font-extrabold text-emerald-300" />
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-zinc-400 block mb-1">Popup Success Message After Submit</label>
+              <input type="text" id="cp-success-msg" oninput="window.syncContactStudioInstant('Edited Success Alert')" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs" />
+            </div>
+          </div>
+        </div>
+      `;
+      mainEl.appendChild(sec);
+    }
+  };
+
+  /* 2. Render Studio Hub Cards & Quick Links Inside Contact Page Studio */
+  window.renderContactPageStudio = function () {
+    window.buildContactPageStudioTab();
+    ensureContactConfigInDB();
+    if (!window.db) return;
+    const c = db.contactPageConfig;
+
+    const setV = function (id, val) { const el = document.getElementById(id); if (el) el.value = val ?? ''; };
+    setV('cp-eyebrow', c.eyebrow);
+    setV('cp-heading', c.heading);
+    setV('cp-sub', c.sub);
+    setV('cp-form-heading', c.formCardHeading);
+    const chk = document.getElementById('cp-show-voice');
+    if (chk) chk.checked = c.showVoiceBox !== false;
+    setV('cp-voice-badge', c.voiceBadge);
+    setV('cp-voice-sub', c.voiceSub);
+    setV('cp-voice-start', c.voiceBtnStart);
+    setV('cp-voice-stop', c.voiceBtnStop);
+    setV('cp-ph-name', c.phName);
+    setV('cp-ph-brand', c.phBrand);
+    setV('cp-ph-email', c.phEmail);
+    setV('cp-ph-phone', c.phPhone);
+    setV('cp-ph-msg', c.phMsg);
+    setV('cp-submit-txt', c.submitBtnText);
+    setV('cp-success-msg', c.successMsg);
+
+    /* Render Studio Hub Cards */
+    const stBox = document.getElementById('cp-studios-manager-list');
+    if (stBox) {
+      stBox.innerHTML = (db.studios || []).map(function (st, idx) {
+        return `
+          <div class="p-4 rounded-2xl bg-[#09090b] border border-[#242429] space-y-2.5 text-xs">
+            <div class="flex items-center justify-between border-b border-[#242429] pb-2">
+              <span class="font-extrabold text-emerald-400">Studio #${idx + 1}</span>
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="window.moveStudioV18(${idx}, -1)" class="px-2 py-0.5 rounded bg-white/10 text-white">←</button>
+                <button type="button" onclick="window.moveStudioV18(${idx}, 1)" class="px-2 py-0.5 rounded bg-white/10 text-white">→</button>
+                <button type="button" onclick="window.deleteStudioV18(${idx})" class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold">🗑️ Delete</button>
+              </div>
+            </div>
+            <div>
+              <label class="text-[10px] text-zinc-400 block mb-0.5">Top Label / Country</label>
+              <input type="text" value="${(st.country || '').replace(/"/g, '&quot;')}" oninput="db.studios[${idx}].country=this.value; window.syncContactStudioInstant('Edited Studio Country');" placeholder="INDIA STUDIO" class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs font-extrabold text-emerald-400" />
+            </div>
+            <div>
+              <label class="text-[10px] text-zinc-400 block mb-0.5">City / Desk Title</label>
+              <input type="text" value="${(st.city || '').replace(/"/g, '&quot;')}" oninput="db.studios[${idx}].city=this.value; window.syncContactStudioInstant('Edited Studio City');" placeholder="Gujarat & Odisha Desk" class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs font-bold text-white" />
+            </div>
+            <div>
+              <label class="text-[10px] text-zinc-400 block mb-0.5">Address / Location Line</label>
+              <input type="text" value="${(st.address || '').replace(/"/g, '&quot;')}" oninput="db.studios[${idx}].address=this.value; window.syncContactStudioInstant('Edited Studio Address');" placeholder="Address" class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs" />
+            </div>
+            <div>
+              <label class="text-[10px] text-zinc-400 block mb-0.5">Phone Number</label>
+              <input type="text" value="${(st.phone || '').replace(/"/g, '&quot;')}" oninput="db.studios[${idx}].phone=this.value; window.syncContactStudioInstant('Edited Studio Phone');" placeholder="+91 98765 43210" class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs font-bold" />
+            </div>
+            <div>
+              <label class="text-[10px] text-zinc-400 block mb-0.5">Email ID</label>
+              <input type="text" value="${(st.email || '').replace(/"/g, '&quot;')}" oninput="db.studios[${idx}].email=this.value; window.syncContactStudioInstant('Edited Studio Email');" placeholder="india@theblankpage.agency" class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs" />
+            </div>
+            <div class="pt-1 border-t border-white/10 grid grid-cols-2 gap-1.5">
+              <div>
+                <label class="text-[10px] text-indigo-300 block mb-0.5">Button Text (Optional)</label>
+                <input type="text" value="${(st.btnLabel || '').replace(/"/g, '&quot;')}" oninput="db.studios[${idx}].btnLabel=this.value; window.syncContactStudioInstant('Edited Studio Button');" placeholder="📍 Open Map ↗" class="w-full px-2 py-1.5 rounded-lg adm-input text-[11px] font-bold" />
+              </div>
+              <div>
+                <label class="text-[10px] text-indigo-300 block mb-0.5">Button Link / URL</label>
+                <input type="text" value="${(st.btnUrl || '').replace(/"/g, '&quot;')}" oninput="db.studios[${idx}].btnUrl=this.value; window.syncContactStudioInstant('Edited Studio URL');" placeholder="https://..." class="w-full px-2 py-1.5 rounded-lg adm-input text-[11px] font-mono" />
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /* Render Quick Connect Links */
+    const qlBox = document.getElementById('cp-quick-links-list');
+    if (qlBox) {
+      const links = c.quickLinks || [];
+      qlBox.innerHTML = links.length === 0
+        ? `<p class="text-xs text-zinc-500">No quick links added. Click "+ Add Quick Link Button" to add WhatsApp, Instagram, Map, or Call links.</p>`
+        : links.map(function (ql, qIdx) {
+            return `
+              <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center p-2.5 rounded-xl bg-[#09090b] border border-[#242429]">
+                <input type="text" value="${(ql.label || '').replace(/"/g, '&quot;')}" oninput="db.contactPageConfig.quickLinks[${qIdx}].label=this.value; window.syncContactStudioInstant('Edited Quick Link Label');" placeholder="Button Label (e.g. 💬 Chat on WhatsApp)" class="sm:col-span-5 px-3 py-2 rounded-lg adm-input text-xs font-bold text-white" />
+                <input type="text" value="${(ql.url || '').replace(/"/g, '&quot;')}" oninput="db.contactPageConfig.quickLinks[${qIdx}].url=this.value; window.syncContactStudioInstant('Edited Quick Link URL');" placeholder="URL (https://wa.me/... or tel:... or mailto:...)" class="sm:col-span-6 px-3 py-2 rounded-lg adm-input text-xs font-mono text-emerald-400" />
+                <button type="button" onclick="window.deleteContactQuickLinkV18(${qIdx})" class="sm:col-span-1 py-2 rounded-lg bg-rose-500/20 text-rose-300 text-xs font-bold">🗑️✕</button>
+              </div>
+            `;
+          }).join('');
+    }
+  };
+
+  /* 3. Studio & Quick-Link Helper Actions */
+  window.addStudioCardV18 = function () {
+    ensureContactConfigInDB();
+    db.studios.push({
+      id: 'ST-' + Date.now(),
+      country: 'NEW STUDIO DESK',
+      city: 'Regional Operations Hub',
+      address: 'Enter Studio Address or Remote Desk Info',
+      phone: db.brand?.phone || '+91 98765 43210',
+      email: db.brand?.email || 'hello@theblankpage.agency',
+      btnLabel: '💬 Connect on WhatsApp ↗',
+      btnUrl: 'https://wa.me/' + ((db.brand?.whatsapp || '919876543210').replace(/[^0-9]/g, ''))
+    });
+    window.renderContactPageStudio();
+    if (typeof renderAdminStudios === 'function') renderAdminStudios();
+    window.syncContactStudioInstant('Added Studio Hub Card', true);
+  };
+
+  window.deleteStudioV18 = function (idx) {
+    if (!confirm('Delete this Studio Card from Contact Page?')) return;
+    db.studios.splice(idx, 1);
+    window.renderContactPageStudio();
+    if (typeof renderAdminStudios === 'function') renderAdminStudios();
+    window.syncContactStudioInstant('Deleted Studio Hub Card', true);
+  };
+
+  window.moveStudioV18 = function (idx, dir) {
+    const target = idx + dir;
+    if (target < 0 || target >= db.studios.length) return;
+    const tmp = db.studios[idx];
+    db.studios[idx] = db.studios[target];
+    db.studios[target] = tmp;
+    window.renderContactPageStudio();
+    if (typeof renderAdminStudios === 'function') renderAdminStudios();
+    window.syncContactStudioInstant('Reordered Studio Cards', true);
+  };
+
+  window.addContactQuickLinkV18 = function () {
+    ensureContactConfigInDB();
+    db.contactPageConfig.quickLinks.push({
+      label: '📍 View Location / Connect ↗',
+      url: 'https://wa.me/' + ((db.brand?.whatsapp || '919876543210').replace(/[^0-9]/g, ''))
+    });
+    window.renderContactPageStudio();
+    window.syncContactStudioInstant('Added Contact Quick Link', true);
+  };
+
+  window.deleteContactQuickLinkV18 = function (qIdx) {
+    ensureContactConfigInDB();
+    db.contactPageConfig.quickLinks.splice(qIdx, 1);
+    window.renderContactPageStudio();
+    window.syncContactStudioInstant('Deleted Contact Quick Link', true);
+  };
+
+  /* 4. Hook into Tab Switch & Populate */
+  const origSwitch = window.switchAdminTab;
+  window.switchAdminTab = function (tabName) {
+    if (typeof origSwitch === 'function') origSwitch(tabName);
+    if (tabName === 'contact') {
+      window.renderContactPageStudio();
+    }
+  };
+
+  const origPop = window.populateAllInputsFromDB;
+  window.populateAllInputsFromDB = function () {
+    if (typeof origPop === 'function') origPop();
+    window.renderContactPageStudio();
+  };
+
+  setTimeout(function () {
+    window.renderContactPageStudio();
+  }, 400);
+})();
+</script>
+<!-- ==================== ADMIN.HTML : DEDICATED "📞 CONTACT PAGE STUDIO" COMPLETE ==================== -->
