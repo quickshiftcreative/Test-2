@@ -5812,3 +5812,63 @@
   })();
 </script>
 <!-- ==================== ADMIN.HTML : 16 HAMBURGER STYLES & INSTANT SYNC PATCH COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : BULLETPROOF ADMIN HAMBURGER SYNC & INSTANT BROADCAST PATCH (PASTE AT VERY BOTTOM) ==================== -->
+<script id="admin-bulletproof-hamburger-v16">
+  (function () {
+    let adminChannel = null;
+    try {
+      adminChannel = new BroadcastChannel('OG_AGENCY_LIVE_SYNC_V13');
+    } catch (e) {}
+
+    /* Instant Sync & Broadcast Function specifically for Hamburger Studio */
+    window.broadcastHamburgerUpdateNow = function (note) {
+      if (!window.db) return;
+      
+      /* Ensure draftHb or inputs are fully collected */
+      if (typeof window.commitHamburgerDraftToDB === 'function') {
+        window.commitHamburgerDraftToDB();
+      }
+
+      /* Save to LocalStorage immediately */
+      localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(window.db));
+
+      /* Broadcast to all open frontend tabs / split previews */
+      if (adminChannel) {
+        try { adminChannel.postMessage({ type: 'HAMBURGER_UPDATED', db: window.db }); } catch (e) {}
+      }
+      if (typeof refreshLivePreviewIframe === 'function') {
+        refreshLivePreviewIframe();
+      }
+
+      /* Push silently to Firebase Cloud */
+      if (typeof pushToFirebase === 'function') {
+        pushToFirebase(note || 'Updated Hamburger Icon Studio');
+      }
+
+      if (typeof window.showAdminToast === 'function') {
+        window.showAdminToast('🍔 Hamburger Icon Updated & Synced Live!');
+      }
+    };
+
+    /* Override Style Card Clicks to Trigger Instant Broadcast */
+    const origSelectStyle = window.selectHb15StyleInstant;
+    window.selectHb15StyleInstant = function (styleId) {
+      if (typeof origSelectStyle === 'function') origSelectStyle(styleId);
+      window.broadcastHamburgerUpdateNow('Switched Hamburger Icon Style to ' + styleId);
+    };
+
+    const origUpdateDraft = window.updateHamburgerDraftFromInputs;
+    window.updateHamburgerDraftFromInputs = function (testOpen) {
+      if (typeof origUpdateDraft === 'function') origUpdateDraft(testOpen);
+      window.broadcastHamburgerUpdateNow('Updated Hamburger Settings');
+    };
+
+    /* Also hook into the explicit save button */
+    const origSavePub = window.saveAndPublishHamburgerIconNow;
+    window.saveAndPublishHamburgerIconNow = async function () {
+      if (typeof origSavePub === 'function') await origSavePub();
+      window.broadcastHamburgerUpdateNow('Published Hamburger Icon Live');
+    };
+  })();
+</script>
+<!-- ==================== ADMIN.HTML : BULLETPROOF ADMIN HAMBURGER PATCH COMPLETE ==================== -->
