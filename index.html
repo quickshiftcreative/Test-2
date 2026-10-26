@@ -6854,3 +6854,323 @@
 })();
 </script>
 <!-- ==================== ADMIN.HTML : DEDICATED "📞 CONTACT PAGE STUDIO" COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : ZERO-ALERT TYPING FIX, LIQUID-GLASS SAVE SUMMARY POPUP & APPLE MOTION STUDIO (PASTE AT VERY BOTTOM OF admin.html) ==================== -->
+<style id="liquid-glass-save-popup-styles-v19">
+  #liquid-save-summary-modal {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 999999;
+    width: min(410px, calc(100vw - 28px));
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.16) 0%, rgba(15, 15, 22, 0.62) 50%, rgba(10, 10, 16, 0.78) 100%);
+    backdrop-filter: blur(30px) saturate(200%);
+    -webkit-backdrop-filter: blur(30px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.26);
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), 0 0 30px -8px rgba(16, 185, 129, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.35);
+    border-radius: 24px;
+    padding: 18px 20px;
+    color: #ffffff;
+    transform: translate3d(0, -24px, 0) scale(0.95);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+  }
+  #liquid-save-summary-modal.lg-popup-visible {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .lg-edit-pill {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+</style>
+
+<!-- Semi-Transparent Tinted Liquid-Glass Save Summary Popup -->
+<div id="liquid-save-summary-modal" role="status" aria-live="polite">
+  <div class="flex items-start justify-between gap-3 border-b border-white/15 pb-3">
+    <div class="flex items-center gap-2.5">
+      <div class="w-9 h-9 rounded-2xl bg-emerald-500/25 border border-emerald-400/50 flex items-center justify-center text-emerald-300 font-black text-sm shadow-inner">✓</div>
+      <div>
+        <span id="lg-sum-badge" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase tracking-wider">3 Columns Edited</span>
+        <h4 id="lg-sum-title" class="text-sm font-extrabold text-white mt-0.5">Changes Published Globally!</h4>
+      </div>
+    </div>
+    <button type="button" onclick="window.hideLiquidSavePopup()" class="w-7 h-7 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center">✕</button>
+  </div>
+  <div id="lg-sum-items-list" class="mt-3 space-y-1.5 max-h-44 overflow-y-auto pr-1 text-xs"></div>
+  <div class="mt-3 pt-2.5 border-t border-white/15 flex items-center justify-between text-[11px] text-zinc-300">
+    <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Live on Frontend</span>
+    <span id="lg-sum-time" class="font-mono text-[10px] text-zinc-400">Just now</span>
+  </div>
+</div>
+
+<script id="admin-zero-alert-and-liquid-summary-v19">
+(function () {
+  /* 1. Bridge `let db` and `window.db` Safely */
+  try {
+    Object.defineProperty(window, 'db', {
+      get: function () { return typeof db !== 'undefined' ? db : null; },
+      set: function (val) { if (typeof db !== 'undefined') db = val; },
+      configurable: true
+    });
+  } catch (e) {}
+
+  /* 2. BLOCK ANNOYING NATIVE BROWSER ALERT ON SAVE/AUTO-SAVE */
+  const origWindowAlert = window.alert;
+  window.alert = function (msg) {
+    const str = String(msg || '');
+    if (str.includes('All changes have been published globally') || str.includes('Contact Page Saved')) {
+      window.showLiquidSavePopup('Manual Save');
+      return;
+    }
+    return origWindowAlert.apply(window, arguments);
+  };
+
+  /* 3. Track Every Edited Input / Column / Section Name Automatically */
+  const editedColumnsMap = new Map();
+  let quietTypingTimer = null;
+  let popupHideTimer = null;
+
+  function getReadableFieldLabel(el) {
+    if (!el) return 'Website Setting';
+    /* Try finding preceding label */
+    const parent = el.closest('div');
+    const lblEl = parent ? parent.querySelector('label, span.font-bold, span.text-emerald-400') : null;
+    let labelTxt = lblEl ? lblEl.innerText.replace(/\*|:/g, '').trim() : '';
+    if (!labelTxt) {
+      labelTxt = el.getAttribute('placeholder') || el.id || 'Content Field';
+      labelTxt = labelTxt.replace(/\*|\.\.\./g, '').trim();
+    }
+    /* Detect active workspace tab name */
+    const activePanel = el.closest('.adm-panel');
+    let sectionName = 'Studio';
+    if (activePanel) {
+      const pid = activePanel.id.replace('panel-', '').toUpperCase();
+      sectionName = pid;
+    }
+    return `${sectionName} → ${labelTxt.substring(0, 32)}`;
+  }
+
+  function recordFieldEdit(el) {
+    if (!el || !el.tagName) return;
+    if (el.type === 'password') return;
+    const fieldName = getReadableFieldLabel(el);
+    let valPreview = el.type === 'checkbox' ? (el.checked ? 'Enabled (ON)' : 'Disabled (OFF)') : (el.value || '').trim();
+    if (valPreview.length > 34) valPreview = valPreview.substring(0, 34) + '...';
+    editedColumnsMap.set(fieldName, valPreview || '(Empty)');
+  }
+
+  /* 4. Show Semi-Transparent Liquid-Glass Save Summary Popup */
+  window.showLiquidSavePopup = function (triggerLabel) {
+    const modal = document.getElementById('liquid-save-summary-modal');
+    const badge = document.getElementById('lg-sum-badge');
+    const title = document.getElementById('lg-sum-title');
+    const list = document.getElementById('lg-sum-items-list');
+    const timeEl = document.getElementById('lg-sum-time');
+    if (!modal || !list) return;
+
+    const entries = Array.from(editedColumnsMap.entries());
+    const count = entries.length;
+
+    if (count > 0) {
+      badge.innerText = `✨ ${count} ${count === 1 ? 'Item / Column' : 'Items / Columns'} Edited`;
+      title.innerText = 'Saved & Synced in Semi-Glass Studio';
+      list.innerHTML = entries.slice(-6).map(function (pair) {
+        return `
+          <div class="lg-edit-pill px-3 py-2 rounded-xl flex items-center justify-between gap-2">
+            <span class="font-bold text-emerald-300 truncate">${pair[0]}</span>
+            <span class="text-zinc-200 font-mono text-[11px] truncate max-w-[140px]">"${pair[1]}"</span>
+          </div>
+        `;
+      }).join('');
+    } else {
+      badge.innerText = '✨ Studio Synced';
+      title.innerText = triggerLabel || 'All Changes Published Live!';
+      list.innerHTML = `
+        <div class="lg-edit-pill px-3 py-2 rounded-xl text-zinc-200">
+          ✓ Database & visual settings verified and synced to Frontend.
+        </div>
+      `;
+    }
+
+    if (timeEl) timeEl.innerText = new Date().toLocaleTimeString();
+    modal.classList.add('lg-popup-visible');
+
+    /* Clear tracked map after displaying so next edit batch starts fresh */
+    editedColumnsMap.clear();
+
+    clearTimeout(popupHideTimer);
+    popupHideTimer = setTimeout(function () {
+      window.hideLiquidSavePopup();
+    }, 4500);
+  };
+
+  window.hideLiquidSavePopup = function () {
+    const modal = document.getElementById('liquid-save-summary-modal');
+    if (modal) modal.classList.remove('lg-popup-visible');
+  };
+
+  /* 5. Prevent `refreshLivePreviewIframe` From Reloading While Typing */
+  window.refreshLivePreviewIframe = function () {
+    const drw = document.getElementById('live-preview-drawer');
+    if (!drw || drw.classList.contains('hidden')) return;
+    /* Send fast BroadcastChannel message instead of hard iframe reload */
+    try {
+      const ch = new BroadcastChannel('OG_AGENCY_LIVE_SYNC_V13');
+      ch.postMessage({ type: 'DB_UPDATED', db: window.db });
+    } catch (e) {}
+  };
+
+  /* 6. Quiet Debounced Auto-Save (Wait 1.6s After User Stops Typing — Zero Interruption!) */
+  window.quietCollectAndSyncAll = async function (actionNote, showGlassPopup) {
+    if (!window.db) return;
+
+    const val = function (id, fb) { const el = document.getElementById(id); return el ? el.value : fb; };
+    const chk = function (id, fb) { const el = document.getElementById(id); return el ? Boolean(el.checked) : fb; };
+
+    try {
+      if (document.getElementById('hm-announcement')) db.brand.announcement = val('hm-announcement', db.brand.announcement);
+      if (document.getElementById('hm-hero-badge')) db.brand.heroBadge = val('hm-hero-badge', db.brand.heroBadge);
+      if (document.getElementById('hm-hero-title')) db.brand.heroTitle = val('hm-hero-title', db.brand.heroTitle);
+      if (document.getElementById('hm-hero-sub')) db.brand.heroSub = val('hm-hero-sub', db.brand.heroSub);
+      if (document.getElementById('ab-heading')) {
+        db.about = db.about || {};
+        db.about.heading = val('ab-heading', db.about.heading);
+        db.about.story = val('ab-story', db.about.story);
+        db.about.mission = val('ab-mission', db.about.mission);
+        db.about.vision = val('ab-vision', db.about.vision);
+      }
+      if (document.getElementById('pol-inp-privacy')) {
+        db.policies = db.policies || {};
+        db.policies.privacy = val('pol-inp-privacy', db.policies.privacy);
+        db.policies.terms = val('pol-inp-terms', db.policies.terms);
+        db.policies.refund = val('pol-inp-refund', db.policies.refund);
+      }
+      if (document.getElementById('sm-anim-preset')) {
+        db.smoothMotionConfig = {
+          preset: val('sm-anim-preset', 'apple_spring'),
+          durationMs: Number(val('sm-anim-dur', 650)),
+          staggerMs: Number(val('sm-anim-stagger', 45)),
+          gpuBoost: chk('sm-gpu-boost', true)
+        };
+      }
+    } catch (e) {}
+
+    localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(window.db));
+    try {
+      const ch = new BroadcastChannel('OG_AGENCY_LIVE_SYNC_V13');
+      ch.postMessage({ type: 'DB_UPDATED', db: window.db });
+    } catch (e) {}
+
+    if (typeof pushToFirebase === 'function') {
+      await pushToFirebase(actionNote || 'Synced Studio Edits');
+    }
+
+    if (showGlassPopup) {
+      window.showLiquidSavePopup(actionNote || 'Changes Saved & Live');
+    }
+  };
+
+  /* Override `saveAndPushAll` so it NEVER triggers a blocking browser alert() */
+  window.saveAndPushAll = async function (note) {
+    const isAutoTyping = String(note || '').includes('Auto-Save') || String(note || '').includes('Live Content');
+    await window.quietCollectAndSyncAll(note, !isAutoTyping || editedColumnsMap.size > 0);
+  };
+
+  window.easyAutoSave = async function () {
+    await window.quietCollectAndSyncAll('Updated Services', true);
+  };
+
+  /* Capture phase listener on <main> to record which field was edited and debounce auto-save cleanly */
+  const mainEl = document.querySelector('main');
+  if (mainEl) {
+    mainEl.addEventListener('input', function (e) {
+      const t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) {
+        recordFieldEdit(t);
+        setCloudStatus('Typing... (Will Auto-Save Quietly)', true);
+        clearTimeout(quietTypingTimer);
+        quietTypingTimer = setTimeout(function () {
+          window.quietCollectAndSyncAll('Auto-Saved Edited Fields', true);
+        }, 1600);
+      }
+    }, true);
+
+    mainEl.addEventListener('change', function (e) {
+      const t = e.target;
+      if (t && (t.tagName === 'SELECT' || t.type === 'checkbox' || t.type === 'color')) {
+        recordFieldEdit(t);
+        clearTimeout(quietTypingTimer);
+        quietTypingTimer = setTimeout(function () {
+          window.quietCollectAndSyncAll('Updated Option', true);
+        }, 500);
+      }
+    }, true);
+  }
+
+  /* 7. Inject "🧈 Apple 120Hz Smooth Motion & Animation Studio" in Tab 1 (Home) */
+  function injectSmoothMotionStudioCard() {
+    const panelHome = document.getElementById('panel-home');
+    if (!panelHome || document.getElementById('apple-smooth-motion-card')) return;
+
+    const mCard = document.createElement('div');
+    mCard.id = 'apple-smooth-motion-card';
+    mCard.className = 'admin-card rounded-3xl p-6 space-y-4 border border-emerald-500/40';
+    mCard.innerHTML = `
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#242429] pb-3">
+        <div>
+          <span class="text-[10px] font-extrabold uppercase tracking-widest text-emerald-400">Apple 120Hz Butter-Smooth Motion Engine</span>
+          <h3 class="text-base font-bold text-white">🧈 Frontend Animation Smoothness & Speed Controller</h3>
+          <p class="text-xs text-zinc-400">Frontend refresh aur page switch ke animation ko makkhan jaisa smooth banayein aur uski speed yahan se control karein.</p>
+        </div>
+        <button type="button" onclick="window.quietCollectAndSyncAll('Updated Animation Smoothness', true)" class="px-4 py-2 rounded-xl bg-emerald-500 text-zinc-950 font-extrabold text-xs shadow-lg">
+          ✓ Apply Smoothness
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-center">
+        <div>
+          <label class="text-xs font-bold text-emerald-400 block mb-1">Animation Physics Preset</label>
+          <select id="sm-anim-preset" class="w-full px-3 py-2.5 rounded-xl adm-input text-xs font-bold">
+            <option value="apple_spring">🍎 Apple iOS 120Hz Spring (Makkhan Smooth)</option>
+            <option value="vision_glide">🥽 VisionOS Spatial Float Glide</option>
+            <option value="butter_fade">🥂 Silk Liquid Blur-to-Sharp</option>
+            <option value="ultra_fast">⚡ Zero-Latency Instant Snap</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-zinc-300 block mb-1">Transition Speed (<span id="sm-dur-lbl">650</span>ms)</label>
+          <input type="range" id="sm-anim-dur" min="300" max="1200" step="50" value="650" oninput="document.getElementById('sm-dur-lbl').innerText=this.value" class="w-full accent-emerald-400 mt-1" />
+        </div>
+        <div>
+          <label class="text-xs font-bold text-zinc-300 block mb-1">Card Cascade Delay (<span id="sm-stg-lbl">45</span>ms)</label>
+          <input type="range" id="sm-anim-stagger" min="0" max="120" step="15" value="45" oninput="document.getElementById('sm-stg-lbl').innerText=this.value" class="w-full accent-indigo-400 mt-1" />
+        </div>
+        <label class="flex items-center gap-2 text-xs font-extrabold text-amber-300 cursor-pointer pt-2">
+          <input type="checkbox" id="sm-gpu-boost" class="w-4 h-4 accent-amber-400" checked />
+          🚀 3D GPU Hardware Acceleration
+        </label>
+      </div>
+    `;
+    panelHome.insertBefore(mCard, panelHome.children[2]);
+
+    const cfg = db?.smoothMotionConfig || {};
+    if (cfg.preset) document.getElementById('sm-anim-preset').value = cfg.preset;
+    if (cfg.durationMs) {
+      document.getElementById('sm-anim-dur').value = cfg.durationMs;
+      document.getElementById('sm-dur-lbl').innerText = cfg.durationMs;
+    }
+    if (cfg.staggerMs !== undefined) {
+      document.getElementById('sm-anim-stagger').value = cfg.staggerMs;
+      document.getElementById('sm-stg-lbl').innerText = cfg.staggerMs;
+    }
+    document.getElementById('sm-gpu-boost').checked = cfg.gpuBoost !== false;
+  }
+
+  setTimeout(injectSmoothMotionStudioCard, 500);
+})();
+</script>
+<!-- ==================== ADMIN.HTML : ZERO-ALERT & LIQUID-GLASS SUMMARY PATCH COMPLETE ==================== -->
