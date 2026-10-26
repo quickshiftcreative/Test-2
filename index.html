@@ -5083,3 +5083,554 @@
   })();
 </script>
 <!-- ==================== ADMIN.HTML : UNBREAKABLE MENU & LOADER CLOUD SAVE FIX COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : DEDICATED HAMBURGER ICON DESIGNER & LIVE PREVIEW STUDIO (PASTE AT VERY BOTTOM) ==================== -->
+<script id="admin-hamburger-icon-designer-v14">
+  (function () {
+    const DEFAULT_HB_ICON = {
+      iconStyle: 'three_line',
+      visibilityMode: 'all_devices',
+      btnLabel: '',
+      labelPos: 'left',
+      boxSize: 42,
+      cornerRadius: 12,
+      lineWidth: 18,
+      lineThick: 2,
+      lineGap: 4.5,
+      lineColor: '#ffffff',
+      accentColor: '#10b981',
+      bgColor: '#18181b',
+      bgOpacity: 65,
+      borderColor: '#ffffff',
+      borderOpacity: 22,
+      glowEnabled: true,
+      openMorph: 'morph_x',
+      customBtnImg: '',
+      customCloseImg: ''
+    };
+
+    const ICON_STYLES_LIST = [
+      { id: 'three_line',      name: '1. Classic 3-Line',       badge: '☰' },
+      { id: 'two_line',        name: '2. Apple 2-Line Minimal', badge: '＝' },
+      { id: 'staggered_right', name: '3. Luxury Right Stagger', badge: '≣' },
+      { id: 'staggered_left',  name: '4. Editorial Left Stagger', badge: '≡' },
+      { id: 'center_diamond',  name: '5. Diamond Center Stack', badge: '❖' },
+      { id: 'bento_dots',      name: '6. 9-Dots Bento Grid',    badge: '⠿' },
+      { id: 'four_dots',       name: '7. 4-Dots Cyber Grid',    badge: '∷' },
+      { id: 'plus_cross',      name: '8. Minimalist Plus (+)',  badge: '＋' },
+      { id: 'pill_text',       name: '9. MENU + Bars Pill',     badge: 'MENU ☰' },
+      { id: 'custom_image',    name: '10. Custom Uploaded Image', badge: '🖼️' }
+    ];
+
+    /* Staged Draft State (Allows Full Live Preview Before Saving to Frontend!) */
+    let draftHb = null;
+    let previewIsOpenState = false;
+    let hasUnsavedHbChanges = false;
+
+    function hexToRgba(hex, alphaPct) {
+      let c = (hex || '#ffffff').replace('#', '').trim();
+      if (c.length === 3) c = c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
+      const num = parseInt(c, 16);
+      const r = (num >> 16) & 255;
+      const g = (num >> 8) & 255;
+      const b = num & 255;
+      return `rgba(${r}, ${g}, ${b}, ${(Number(alphaPct ?? 50) / 100).toFixed(2)})`;
+    }
+
+    function initDraftFromDB() {
+      if (!window.db) return;
+      const saved = db.hamburgerIconConfig || {};
+      const legacy = db.navMenuConfig || {};
+      draftHb = {
+        ...DEFAULT_HB_ICON,
+        iconStyle: saved.iconStyle || legacy.iconStyle || 'three_line',
+        btnLabel: saved.btnLabel !== undefined ? saved.btnLabel : (legacy.btnLabel || ''),
+        boxSize: Number(saved.boxSize ?? legacy.btnSize ?? 42),
+        customBtnImg: saved.customBtnImg !== undefined ? saved.customBtnImg : (legacy.customBtnImg || ''),
+        customCloseImg: saved.customCloseImg !== undefined ? saved.customCloseImg : (legacy.customCloseImg || ''),
+        ...saved
+      };
+    }
+
+    /* 1. Inject Dedicated Hamburger Icon Designer Section inside "🍔 Menu Studio" (#panel-menu) */
+    window.mountDedicatedHamburgerIconStudio = function () {
+      const panelMenu = document.getElementById('panel-menu');
+      if (!panelMenu) return;
+
+      /* Hide the old basic Step 1 card so there is no confusion */
+      const oldStep1 = document.getElementById('ms-icon-style')?.closest('.admin-card');
+      if (oldStep1) oldStep1.classList.add('hidden');
+
+      if (document.getElementById('hb-dedicated-icon-studio-card')) return;
+
+      const card = document.createElement('div');
+      card.id = 'hb-dedicated-icon-studio-card';
+      card.className = 'admin-card rounded-3xl p-6 space-y-6 border-2 border-emerald-500/50 shadow-2xl';
+
+      /* Stop global auto-save from firing while user is previewing inside this card! */
+      card.addEventListener('input', function (e) { e.stopPropagation(); });
+      card.addEventListener('change', function (e) { e.stopPropagation(); });
+
+      card.innerHTML = `
+        <!-- Header with Unsaved Preview Badge & Explicit Save Button -->
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-[#242429] pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-extrabold uppercase tracking-wider">Dedicated Hamburger Icon Studio</span>
+              <span id="hb14-unsaved-badge" class="hidden px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[10px] font-extrabold animate-pulse">● Previewing Changes (Click Save to Publish)</span>
+            </div>
+            <h3 class="text-lg font-extrabold text-white mt-1">🍔 Hamburger Button Icon Designer (Preview First → Then Save)</h3>
+            <p class="text-xs text-zinc-400">Yahan aap Hamburger Icon ka style, lines ki motai/lambai, color, custom image aur animation edit karke pehle Live Preview mein dekhein, phir Save dabayein.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="window.resetHamburgerIconDraft()" class="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-bold text-zinc-300">↺ Reset Default Icon</button>
+            <button type="button" id="hb14-save-publish-btn" onclick="window.saveAndPublishHamburgerIconNow()" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs shadow-xl transition">
+              💾 Save & Publish Hamburger Icon to Website
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <!-- LEFT 7 COLS: ALL HAMBURGER ICON CONTROLS -->
+          <div class="lg:col-span-7 space-y-5">
+            <!-- A. 10 Clickable Icon Style Cards -->
+            <div>
+              <label class="text-xs font-extrabold uppercase text-emerald-400 block mb-2">1. Choose Hamburger Icon Style (Click Any Style to Preview):</label>
+              <div id="hb14-style-cards-grid" class="grid grid-cols-2 sm:grid-cols-5 gap-2"></div>
+            </div>
+
+            <!-- B. Device Visibility, Morph Animation & Text Label -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 p-4 rounded-2xl bg-[#09090b] border border-[#242429]">
+              <div>
+                <label class="text-[11px] font-bold text-amber-300 block mb-1">📱 Show Hamburger Icon On</label>
+                <select id="hb14-vis-mode" onchange="window.updateHamburgerDraftFromInputs()" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold">
+                  <option value="all_devices">💻+📱 All Devices (PC, Tablet & Phone)</option>
+                  <option value="mobile_tablet">📱 Phone & Tablet Only</option>
+                  <option value="mobile_only">📱 Phone Only (< 768px)</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-indigo-300 block mb-1">✨ Click / Open Animation</label>
+                <select id="hb14-open-morph" onchange="window.updateHamburgerDraftFromInputs(true)" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold">
+                  <option value="morph_x">Smooth Morph to ✕</option>
+                  <option value="spin_180">180° Spin + Morph ✕</option>
+                  <option value="spin_360">360° Cyber Spin ✕</option>
+                  <option value="pulse_scale">Elastic Scale Pop</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-zinc-300 block mb-1">🏷️ Text Next to Icon (Optional)</label>
+                <div class="flex gap-1.5">
+                  <input type="text" id="hb14-btn-label" oninput="window.updateHamburgerDraftFromInputs()" placeholder="e.g. MENU" maxlength="8" class="w-full px-2.5 py-2 rounded-xl adm-input text-xs font-bold uppercase" />
+                  <select id="hb14-label-pos" onchange="window.updateHamburgerDraftFromInputs()" class="px-2 py-2 rounded-xl adm-input text-[11px] font-bold">
+                    <option value="left">Left</option>
+                    <option value="right">Right</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- C. Sliders: Box Size, Corner Radius, Bar Width, Bar Thickness & Gap -->
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 p-4 rounded-2xl bg-[#09090b] border border-[#242429]">
+              <div>
+                <label class="text-[11px] font-bold text-zinc-300 block">Box Size: <span id="lbl-hb14-box" class="text-emerald-400">42</span>px</label>
+                <input type="range" id="hb14-box-size" min="34" max="58" value="42" oninput="window.updateHamburgerDraftFromInputs()" class="w-full accent-emerald-400 mt-1.5" />
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-zinc-300 block">Roundness: <span id="lbl-hb14-rad" class="text-emerald-400">12</span>px</label>
+                <input type="range" id="hb14-corner-rad" min="0" max="28" value="12" oninput="window.updateHamburgerDraftFromInputs()" class="w-full accent-emerald-400 mt-1.5" />
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-zinc-300 block">Bar Width: <span id="lbl-hb14-w" class="text-indigo-400">18</span>px</label>
+                <input type="range" id="hb14-line-w" min="12" max="28" value="18" oninput="window.updateHamburgerDraftFromInputs()" class="w-full accent-indigo-400 mt-1.5" />
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-zinc-300 block">Thickness: <span id="lbl-hb14-t" class="text-indigo-400">2</span>px</label>
+                <input type="range" id="hb14-line-t" min="1.5" max="4.5" step="0.5" value="2" oninput="window.updateHamburgerDraftFromInputs()" class="w-full accent-indigo-400 mt-1.5" />
+              </div>
+              <div class="col-span-2 sm:col-span-1">
+                <label class="text-[11px] font-bold text-zinc-300 block">Bar Gap: <span id="lbl-hb14-g" class="text-amber-400">4.5</span>px</label>
+                <input type="range" id="hb14-line-g" min="2.5" max="8" step="0.5" value="4.5" oninput="window.updateHamburgerDraftFromInputs()" class="w-full accent-amber-400 mt-1.5" />
+              </div>
+            </div>
+
+            <!-- D. Color Studio: Line Color, Middle Accent Color, Button BG Color + Opacity, Border + Glow -->
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 p-4 rounded-2xl bg-[#09090b] border border-[#242429] items-center">
+              <div>
+                <label class="text-[11px] font-bold text-zinc-300 block mb-1">Primary Bar Color</label>
+                <input type="color" id="hb14-col-line" value="#ffffff" oninput="window.updateHamburgerDraftFromInputs()" class="w-full h-9 rounded-lg cursor-pointer bg-transparent border border-white/20" />
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-emerald-400 block mb-1">Middle Bar / Accent</label>
+                <input type="color" id="hb14-col-accent" value="#10b981" oninput="window.updateHamburgerDraftFromInputs()" class="w-full h-9 rounded-lg cursor-pointer bg-transparent border border-white/20" />
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-zinc-300 block mb-1">Button Background</label>
+                <input type="color" id="hb14-col-bg" value="#18181b" oninput="window.updateHamburgerDraftFromInputs()" class="w-full h-9 rounded-lg cursor-pointer bg-transparent border border-white/20" />
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-zinc-300 block">BG Opacity (<span id="lbl-hb14-bgop">65</span>%)</label>
+                <input type="range" id="hb14-bg-op" min="0" max="100" value="65" oninput="window.updateHamburgerDraftFromInputs()" class="w-full accent-emerald-400 mt-1.5" />
+              </div>
+              <label class="flex items-center gap-2 text-xs font-extrabold text-amber-300 cursor-pointer pt-2">
+                <input type="checkbox" id="hb14-glow-chk" onchange="window.updateHamburgerDraftFromInputs()" class="w-4 h-4 accent-amber-400" checked />
+                ✨ Outer Glow
+              </label>
+            </div>
+
+            <!-- E. Custom Image / Icon Upload for Hamburger Button -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 p-4 rounded-2xl bg-[#09090b] border border-indigo-500/30">
+              <div class="space-y-1.5">
+                <label class="text-[11px] font-extrabold text-indigo-300 block">🖼️ Upload Custom Hamburger Icon Image (PNG / SVG / GIF)</label>
+                <div class="flex gap-1.5">
+                  <input type="text" id="hb14-custom-img" oninput="document.getElementById('hb14-custom-img').dataset.manual='1'; window.selectHb14IconStyle('custom_image');" placeholder="Paste Image URL or Upload..." class="flex-1 px-2.5 py-1.5 rounded-xl adm-input text-xs" />
+                  <label class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold cursor-pointer shrink-0">
+                    📁 Upload
+                    <input type="file" accept="image/*" onchange="uploadDirectCallback(this, false, function(u){ document.getElementById('hb14-custom-img').value=u; window.selectHb14IconStyle('custom_image'); })" class="hidden" />
+                  </label>
+                  <button type="button" onclick="document.getElementById('hb14-custom-img').value=''; window.updateHamburgerDraftFromInputs();" class="px-2 py-1.5 rounded-xl bg-rose-500/20 text-rose-300 text-xs font-bold">✕</button>
+                </div>
+              </div>
+              <div class="space-y-1.5">
+                <label class="text-[11px] font-bold text-zinc-400 block">✕ Custom "Close (Open State)" Icon Image (Optional)</label>
+                <div class="flex gap-1.5">
+                  <input type="text" id="hb14-close-img" oninput="window.updateHamburgerDraftFromInputs()" placeholder="Optional Close Image URL..." class="flex-1 px-2.5 py-1.5 rounded-xl adm-input text-xs" />
+                  <label class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold cursor-pointer shrink-0">
+                    📁 Upload
+                    <input type="file" accept="image/*" onchange="uploadDirectCallback(this, false, function(u){ document.getElementById('hb14-close-img').value=u; window.updateHamburgerDraftFromInputs(); })" class="hidden" />
+                  </label>
+                  <button type="button" onclick="document.getElementById('hb14-close-img').value=''; window.updateHamburgerDraftFromInputs();" class="px-2 py-1.5 rounded-xl bg-rose-500/20 text-rose-300 text-xs font-bold">✕</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT 5 COLS: INTERACTIVE REAL-TIME NAVBAR & HAMBURGER PREVIEW STAGE -->
+          <div class="lg:col-span-5 space-y-4">
+            <div class="p-5 rounded-3xl border border-white/15 space-y-5 relative overflow-hidden" style="background: radial-gradient(circle at 80% 20%, rgba(99,102,241,0.28) 0%, transparent 50%), radial-gradient(circle at 20% 80%, rgba(16,185,129,0.22) 0%, #09090b 75%);">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-extrabold uppercase tracking-widest text-emerald-400">👁️ Live Interactive Preview (Before Save)</span>
+                <button type="button" onclick="window.toggleHb14PreviewState()" class="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-extrabold text-amber-300 border border-white/15">
+                  🔄 Click to Test Open / Close Morph
+                </button>
+              </div>
+
+              <!-- Simulated Website Navbar Header -->
+              <div class="p-3.5 rounded-2xl bg-black/65 backdrop-blur-xl border border-white/15 flex items-center justify-between gap-2 shadow-2xl">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-xs font-black text-white">BP</div>
+                  <span class="text-xs font-extrabold text-white tracking-tight">THE BLANK PAGE</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="px-3 py-2 rounded-xl bg-indigo-600 text-white text-[11px] font-extrabold flex items-center gap-1">
+                    <span>🛒</span><span>0</span>
+                  </div>
+                  <!-- Interactive Live Hamburger Button Inside Simulated Navbar -->
+                  <button type="button" id="hb14-live-sim-btn" onclick="window.toggleHb14PreviewState()" title="Click me to test Open/Close animation!"></button>
+                </div>
+              </div>
+
+              <!-- Side-by-Side State Comparison (Closed vs Opened) -->
+              <div class="grid grid-cols-2 gap-3 pt-1">
+                <div onclick="previewIsOpenState=false; window.renderHb14LivePreview();" class="p-3.5 rounded-2xl bg-black/50 border border-white/10 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-white/30">
+                  <span class="text-[10px] font-bold uppercase text-zinc-400">1. Normal (Closed)</span>
+                  <div id="hb14-closed-static-prev" class="flex items-center justify-center"></div>
+                </div>
+                <div onclick="previewIsOpenState=true; window.renderHb14LivePreview();" class="p-3.5 rounded-2xl bg-black/50 border border-white/10 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-white/30">
+                  <span class="text-[10px] font-bold uppercase text-emerald-400">2. Clicked (Open ✕)</span>
+                  <div id="hb14-open-static-prev" class="flex items-center justify-center"></div>
+                </div>
+              </div>
+
+              <p class="text-[11px] text-zinc-300 text-center leading-relaxed">
+                👆 Upar diye gaye Preview Hamburger Button par click karke dekhein! Jab pasand aa jaye, toh niche <strong>Save & Publish</strong> dabayein.
+              </p>
+
+              <button type="button" onclick="window.saveAndPublishHamburgerIconNow()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 text-zinc-950 font-black text-xs tracking-wide shadow-xl hover:opacity-95 transition">
+                💾 Save & Show This Hamburger Icon on Frontend Now →
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      panelMenu.insertBefore(card, panelMenu.children[1]);
+    };
+
+    /* 2. Build Exact Button Style & Inner HTML for Admin Preview */
+    function buildPreviewButtonStyleString(ic) {
+      const bg = hexToRgba(ic.bgColor || '#18181b', ic.bgOpacity ?? 65);
+      const brd = hexToRgba(ic.borderColor || '#ffffff', ic.borderOpacity ?? 22);
+      const shd = ic.glowEnabled !== false ? `0 8px 24px -6px ${hexToRgba(ic.accentColor || '#10b981', 50)}` : 'none';
+      return `min-width:${ic.boxSize || 42}px;height:${ic.boxSize || 42}px;border-radius:${ic.cornerRadius ?? 12}px;background:${bg};border:1px solid ${brd};box-shadow:${shd};padding:0 11px;display:flex;align-items:center;justify-content:center;gap:7px;transition:all 0.28s cubic-bezier(0.16,1,0.3,1);`;
+    }
+
+    function buildPreviewButtonInner(ic, isOpen) {
+      const style = ic.iconStyle || 'three_line';
+      const w = Number(ic.lineWidth || 18);
+      const t = Number(ic.lineThick || 2);
+      const g = Number(ic.lineGap || 4.5);
+      const col1 = ic.lineColor || '#ffffff';
+      const col2 = ic.accentColor || '#10b981';
+
+      const lblText = (ic.btnLabel || '').trim();
+      const lblHTML = lblText ? `<span style="color:${col1};font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;">${lblText}</span>` : '';
+
+      let graphic = '';
+      if (style === 'custom_image' && ic.customBtnImg) {
+        if (isOpen && ic.customCloseImg) {
+          graphic = `<img src="${ic.customCloseImg}" style="width:${w + 6}px;height:${w + 6}px;object-fit:contain;border-radius:4px;" />`;
+        } else if (isOpen) {
+          graphic = `<span style="color:${col2};font-size:${w}px;font-weight:900;line-height:1;">✕</span>`;
+        } else {
+          graphic = `<img src="${ic.customBtnImg}" style="width:${w + 6}px;height:${w + 6}px;object-fit:contain;border-radius:4px;" />`;
+        }
+      } else if (style === 'bento_dots') {
+        if (isOpen) {
+          graphic = `<span style="color:${col2};font-size:${w}px;font-weight:900;line-height:1;">✕</span>`;
+        } else {
+          const d = Math.max(3, Math.round(t * 1.6));
+          graphic = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:${Math.max(2, Math.round(g * 0.7))}px;">
+            <span style="width:${d}px;height:${d}px;border-radius:99px;background:${col1};"></span>
+            <span style="width:${d}px;height:${d}px;border-radius:99px;background:${col2};"></span>
+            <span style="width:${d}px;height:${d}px;border-radius:99px;background:${col1};"></span>
+            <span style="width:${d}px;height:${d}px;border-radius:99px;background:${col1};"></span>
+            <span style="width:${d}px;height:${d}px;border-radius:99px;background:${col2};"></span>
+            <span style="width:${d}px;height:${d}px;border-radius:99px;background:${col1};"></span>
+            <span style="width:${d}px;height:${d}px;border-radius:99px;background:${col1};"></span>
+            <span style="width:${d}px;height:${d}px;border-radius:99px;background:${col2};"></span>
+            <span style="width:${d}px;height:${d}px;border-radius:99px;background:${col1};"></span>
+          </div>`;
+        }
+      } else if (style === 'four_dots') {
+        if (isOpen) {
+          graphic = `<span style="color:${col2};font-size:${w}px;font-weight:900;line-height:1;">✕</span>`;
+        } else {
+          const d = Math.max(4, Math.round(t * 2.1));
+          graphic = `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:${Math.max(3, Math.round(g))}px;">
+            <span style="width:${d}px;height:${d}px;border-radius:99px;background:${col1};"></span>
+            <span style="width:${d}px;height:${d}px;border-radius:99px;background:${col2};"></span>
+            <span style="width:${d}px;height:${d}px;border-radius:99px;background:${col2};"></span>
+            <span style="width:${d}px;height:${d}px;border-radius:99px;background:${col1};"></span>
+          </div>`;
+        }
+      } else if (style === 'plus_cross') {
+        graphic = `<span style="display:inline-block;color:${isOpen ? col2 : col1};font-size:${w + 4}px;font-weight:800;line-height:1;transition:transform 0.3s;transform:rotate(${isOpen ? '45deg' : '0deg'});">＋</span>`;
+      } else if (isOpen) {
+        const rot = ic.openMorph === 'spin_180' ? 'rotate(180deg)' : ic.openMorph === 'spin_360' ? 'rotate(360deg)' : 'rotate(0deg)';
+        graphic = `
+          <div style="position:relative;width:${w}px;height:${w}px;display:flex;align-items:center;justify-content:center;transition:transform 0.32s;transform:${rot};">
+            <span style="position:absolute;width:${w}px;height:${t}px;background:${col1};border-radius:99px;transform:rotate(45deg);"></span>
+            <span style="position:absolute;width:${w}px;height:${t}px;background:${col2};border-radius:99px;transform:rotate(-45deg);"></span>
+          </div>
+        `;
+      } else if (style === 'two_line') {
+        graphic = `<div style="display:flex;flex-direction:column;gap:${g}px;align-items:center;">
+          <span style="width:${w}px;height:${t}px;background:${col1};border-radius:99px;"></span>
+          <span style="width:${w}px;height:${t}px;background:${col2};border-radius:99px;"></span>
+        </div>`;
+      } else if (style === 'staggered_right' || style === 'staggered') {
+        graphic = `<div style="display:flex;flex-direction:column;gap:${g}px;align-items:flex-end;">
+          <span style="width:${w}px;height:${t}px;background:${col1};border-radius:99px;"></span>
+          <span style="width:${Math.round(w * 0.68)}px;height:${t}px;background:${col2};border-radius:99px;"></span>
+          <span style="width:${Math.round(w * 0.85)}px;height:${t}px;background:${col1};border-radius:99px;"></span>
+        </div>`;
+      } else if (style === 'staggered_left') {
+        graphic = `<div style="display:flex;flex-direction:column;gap:${g}px;align-items:flex-start;">
+          <span style="width:${Math.round(w * 0.68)}px;height:${t}px;background:${col1};border-radius:99px;"></span>
+          <span style="width:${w}px;height:${t}px;background:${col2};border-radius:99px;"></span>
+          <span style="width:${Math.round(w * 0.82)}px;height:${t}px;background:${col1};border-radius:99px;"></span>
+        </div>`;
+      } else if (style === 'center_diamond') {
+        graphic = `<div style="display:flex;flex-direction:column;gap:${g}px;align-items:center;">
+          <span style="width:${Math.round(w * 0.68)}px;height:${t}px;background:${col1};border-radius:99px;"></span>
+          <span style="width:${w + 2}px;height:${t}px;background:${col2};border-radius:99px;"></span>
+          <span style="width:${Math.round(w * 0.68)}px;height:${t}px;background:${col1};border-radius:99px;"></span>
+        </div>`;
+      } else {
+        graphic = `<div style="display:flex;flex-direction:column;gap:${g}px;align-items:center;">
+          <span style="width:${w}px;height:${t}px;background:${col1};border-radius:99px;"></span>
+          <span style="width:${w}px;height:${t}px;background:${col2};border-radius:99px;"></span>
+          <span style="width:${w}px;height:${t}px;background:${col1};border-radius:99px;"></span>
+        </div>`;
+      }
+
+      if (style === 'pill_text' && !lblText) {
+        const autoPill = `<span style="color:${col1};font-size:11px;font-weight:800;letter-spacing:0.06em;">MENU</span>`;
+        return ic.labelPos === 'right' ? `${graphic}${autoPill}` : `${autoPill}${graphic}`;
+      }
+      return ic.labelPos === 'right' ? `${graphic}${lblHTML}` : `${lblHTML}${graphic}`;
+    }
+
+    /* 3. Render Style Cards & Both Live Preview Boxes */
+    window.renderHb14LivePreview = function () {
+      if (!draftHb) initDraftFromDB();
+      if (!draftHb) return;
+
+      const grid = document.getElementById('hb14-style-cards-grid');
+      if (grid) {
+        grid.innerHTML = ICON_STYLES_LIST.map(function (st) {
+          const isAct = draftHb.iconStyle === st.id;
+          return `
+            <button type="button" onclick="window.selectHb14IconStyle('${st.id}')" class="p-2.5 rounded-xl text-left border transition flex flex-col justify-between gap-1 ${isAct ? 'bg-emerald-500/20 border-emerald-400 text-white shadow-lg' : 'bg-[#09090b] border-[#242429] text-zinc-300 hover:border-white/30'}">
+              <div class="flex items-center justify-between w-full">
+                <span class="text-sm font-black text-emerald-400">${st.badge}</span>
+                ${isAct ? '<span class="w-2 h-2 rounded-full bg-emerald-400"></span>' : ''}
+              </div>
+              <span class="text-[10px] font-extrabold leading-tight">${st.name}</span>
+            </button>
+          `;
+        }).join('');
+      }
+
+      const styleStr = buildPreviewButtonStyleString(draftHb);
+      const liveBtn = document.getElementById('hb14-live-sim-btn');
+      if (liveBtn) {
+        liveBtn.setAttribute('style', styleStr);
+        liveBtn.innerHTML = buildPreviewButtonInner(draftHb, previewIsOpenState);
+      }
+
+      const closedBox = document.getElementById('hb14-closed-static-prev');
+      if (closedBox) {
+        closedBox.innerHTML = `<div style="${styleStr}">${buildPreviewButtonInner(draftHb, false)}</div>`;
+      }
+
+      const openBox = document.getElementById('hb14-open-static-prev');
+      if (openBox) {
+        openBox.innerHTML = `<div style="${styleStr}">${buildPreviewButtonInner(draftHb, true)}</div>`;
+      }
+
+      const badge = document.getElementById('hb14-unsaved-badge');
+      if (badge) badge.classList.toggle('hidden', !hasUnsavedHbChanges);
+    };
+
+    window.populateHb14InputsFromDraft = function () {
+      if (!draftHb) initDraftFromDB();
+      if (!draftHb) return;
+      const setV = function (id, val) { const el = document.getElementById(id); if (el) el.value = val ?? ''; };
+      const setT = function (id, val) { const el = document.getElementById(id); if (el) el.innerText = val ?? ''; };
+
+      setV('hb14-vis-mode', draftHb.visibilityMode || 'all_devices');
+      setV('hb14-open-morph', draftHb.openMorph || 'morph_x');
+      setV('hb14-btn-label', draftHb.btnLabel || '');
+      setV('hb14-label-pos', draftHb.labelPos || 'left');
+      setV('hb14-box-size', draftHb.boxSize || 42); setT('lbl-hb14-box', draftHb.boxSize || 42);
+      setV('hb14-corner-rad', draftHb.cornerRadius ?? 12); setT('lbl-hb14-rad', draftHb.cornerRadius ?? 12);
+      setV('hb14-line-w', draftHb.lineWidth || 18); setT('lbl-hb14-w', draftHb.lineWidth || 18);
+      setV('hb14-line-t', draftHb.lineThick || 2); setT('lbl-hb14-t', draftHb.lineThick || 2);
+      setV('hb14-line-g', draftHb.lineGap ?? 4.5); setT('lbl-hb14-g', draftHb.lineGap ?? 4.5);
+      setV('hb14-col-line', draftHb.lineColor || '#ffffff');
+      setV('hb14-col-accent', draftHb.accentColor || '#10b981');
+      setV('hb14-col-bg', draftHb.bgColor || '#18181b');
+      setV('hb14-bg-op', draftHb.bgOpacity ?? 65); setT('lbl-hb14-bgop', draftHb.bgOpacity ?? 65);
+      setV('hb14-custom-img', draftHb.customBtnImg || '');
+      setV('hb14-close-img', draftHb.customCloseImg || '');
+
+      const gChk = document.getElementById('hb14-glow-chk');
+      if (gChk) gChk.checked = draftHb.glowEnabled !== false;
+
+      window.renderHb14LivePreview();
+    };
+
+    /* 4. Update Draft on Any Input Change (Updates Live Preview Immediately WITHOUT Auto-Saving Yet) */
+    window.updateHamburgerDraftFromInputs = function (testOpenState) {
+      if (!draftHb) initDraftFromDB();
+      const getV = function (id, fb) { const el = document.getElementById(id); return el ? el.value : fb; };
+
+      draftHb.visibilityMode = getV('hb14-vis-mode', 'all_devices');
+      draftHb.openMorph = getV('hb14-open-morph', 'morph_x');
+      draftHb.btnLabel = getV('hb14-btn-label', '');
+      draftHb.labelPos = getV('hb14-label-pos', 'left');
+      draftHb.boxSize = Number(getV('hb14-box-size', 42));
+      draftHb.cornerRadius = Number(getV('hb14-corner-rad', 12));
+      draftHb.lineWidth = Number(getV('hb14-line-w', 18));
+      draftHb.lineThick = Number(getV('hb14-line-t', 2));
+      draftHb.lineGap = Number(getV('hb14-line-g', 4.5));
+      draftHb.lineColor = getV('hb14-col-line', '#ffffff');
+      draftHb.accentColor = getV('hb14-col-accent', '#10b981');
+      draftHb.bgColor = getV('hb14-col-bg', '#18181b');
+      draftHb.bgOpacity = Number(getV('hb14-bg-op', 65));
+      draftHb.glowEnabled = Boolean(document.getElementById('hb14-glow-chk')?.checked);
+      draftHb.customBtnImg = getV('hb14-custom-img', '');
+      draftHb.customCloseImg = getV('hb14-close-img', '');
+
+      document.getElementById('lbl-hb14-box').innerText = draftHb.boxSize;
+      document.getElementById('lbl-hb14-rad').innerText = draftHb.cornerRadius;
+      document.getElementById('lbl-hb14-w').innerText = draftHb.lineWidth;
+      document.getElementById('lbl-hb14-t').innerText = draftHb.lineThick;
+      document.getElementById('lbl-hb14-g').innerText = draftHb.lineGap;
+      document.getElementById('lbl-hb14-bgop').innerText = draftHb.bgOpacity;
+
+      if (testOpenState) previewIsOpenState = true;
+      hasUnsavedHbChanges = true;
+      window.renderHb14LivePreview();
+    };
+
+    window.selectHb14IconStyle = function (styleId) {
+      if (!draftHb) initDraftFromDB();
+      draftHb.iconStyle = styleId;
+      previewIsOpenState = false;
+      hasUnsavedHbChanges = true;
+      window.updateHamburgerDraftFromInputs(false);
+    };
+
+    window.toggleHb14PreviewState = function () {
+      previewIsOpenState = !previewIsOpenState;
+      window.renderHb14LivePreview();
+    };
+
+    window.resetHamburgerIconDraft = function () {
+      draftHb = JSON.parse(JSON.stringify(DEFAULT_HB_ICON));
+      previewIsOpenState = false;
+      hasUnsavedHbChanges = true;
+      window.populateHb14InputsFromDraft();
+    };
+
+    /* 5. Explicit Save & Publish Function (Pushes Draft to DB, LocalStorage, Broadcast & Firebase Cloud) */
+    window.commitHamburgerDraftToDB = function () {
+      if (!window.db) return;
+      if (!draftHb) initDraftFromDB();
+      if (document.getElementById('hb14-vis-mode')) {
+        window.updateHamburgerDraftFromInputs(false);
+      }
+      db.hamburgerIconConfig = JSON.parse(JSON.stringify(draftHb));
+      db.navMenuConfig = db.navMenuConfig || {};
+      db.navMenuConfig.iconStyle = draftHb.iconStyle;
+      db.navMenuConfig.btnLabel = draftHb.btnLabel;
+      db.navMenuConfig.btnSize = draftHb.boxSize;
+      db.navMenuConfig.customBtnImg = draftHb.customBtnImg;
+      db.navMenuConfig.customCloseImg = draftHb.customCloseImg;
+      hasUnsavedHbChanges = false;
+      window.renderHb14LivePreview();
+    };
+
+    window.saveAndPublishHamburgerIconNow = async function () {
+      window.commitHamburgerDraftToDB();
+      await window.directPushMenuAndDB('Published Custom Hamburger Icon to Frontend');
+      if (typeof window.showAdminToast === 'function') {
+        window.showAdminToast('🍔 Hamburger Icon Saved & Live on Frontend!');
+      }
+    };
+
+    /* Hook into Master Save & Populate */
+    const prevCollectMenu = window.collectMenuStudioDataIntoDB;
+    window.collectMenuStudioDataIntoDB = function () {
+      if (typeof prevCollectMenu === 'function') prevCollectMenu();
+      window.commitHamburgerDraftToDB();
+    };
+
+    const prevRenderMenuStudio = window.renderDedicatedMenuStudio;
+    window.renderDedicatedMenuStudio = function () {
+      if (typeof prevRenderMenuStudio === 'function') prevRenderMenuStudio();
+      window.mountDedicatedHamburgerIconStudio();
+      initDraftFromDB();
+      window.populateHb14InputsFromDraft();
+    };
+
+    setTimeout(function () {
+      window.mountDedicatedHamburgerIconStudio();
+      initDraftFromDB();
+      window.populateHb14InputsFromDraft();
+    }, 650);
+  })();
+</script>
+<!-- ==================== ADMIN.HTML : DEDICATED HAMBURGER ICON DESIGNER COMPLETE ==================== -->
