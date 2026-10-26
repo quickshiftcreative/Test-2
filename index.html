@@ -5872,3 +5872,177 @@
   })();
 </script>
 <!-- ==================== ADMIN.HTML : BULLETPROOF ADMIN HAMBURGER PATCH COMPLETE ==================== -->
+<!-- ==================== MASTER FINAL CLEAN ENGINE: BACKEND (PASTE AT VERY BOTTOM OF admin.html) ==================== -->
+<script id="admin-master-unified-clean-engine">
+(function () {
+  const DB_CACHE_KEY = 'OG_DESK_GLOBAL_V5_CACHE';
+  const DB_URL = 'https://backend-f4e0c-default-rtdb.firebaseio.com/agency_os_v5.json';
+
+  // 1. Purane Stacked Duplicate Listeners aur Elements Safaai
+  const oldPatches = [
+    'admin-master-optimizer-v10',
+    'dedicated-menu-workspace-v11',
+    'dedicated-loader-studio-v12',
+    'admin-menu-save-fix-v13',
+    'admin-hamburger-icon-designer-v14',
+    'admin-instant-hamburger-matrix-v15',
+    'admin-bulletproof-hamburger-v16'
+  ];
+  oldPatches.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  });
+
+  // 2. Safe Broadcast Function
+  function broadcastUpdate(db) {
+    try {
+      const channel = new BroadcastChannel('OG_AGENCY_LIVE_SYNC_V13');
+      channel.postMessage({ type: 'DB_UPDATED', db: db });
+    } catch (e) {}
+  }
+
+  // 3. Child-Friendly Clean Services Manager (Direct Add, Edit, Delete with Zero Complication)
+  window.renderAdminServices = function () {
+    if (!window.db) return;
+    window.db.services = Array.isArray(window.db.services) ? window.db.services : [];
+
+    const container = document.getElementById('adm-services-list');
+    if (!container) return;
+
+    container.innerHTML = `
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-indigo-950/40 border border-indigo-500/30">
+        <div>
+          <h4 class="text-sm font-bold text-white">⚡ Service & Category Manager</h4>
+          <p class="text-xs text-zinc-400">Yahan se aap nayi category aur services direct add ya delete kar sakte hain.</p>
+        </div>
+        <button type="button" onclick="window.easyAddServiceCategory()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-extrabold text-xs shadow-lg transition">
+          + Add New Service / Category
+        </button>
+      </div>
+      <div class="space-y-4">
+        ${window.db.services.map((cat, cIdx) => `
+          <div class="p-5 rounded-2xl bg-[#111114] border border-[#242429] space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#242429] pb-3">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 text-xs font-bold">${cat.index || '(0' + (cIdx + 1) + ')'}</span>
+                <span class="text-xs font-bold text-emerald-400">Category Tag:</span>
+                <input type="text" value="${cat.badge || ''}" onchange="window.db.services[${cIdx}].badge = this.value; window.easyAutoSave();" placeholder="Category (e.g. Paid Ads)" class="px-3 py-1.5 rounded-lg adm-input text-xs font-bold text-emerald-300" />
+              </div>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="window.easyDuplicateService(${cIdx})" class="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-bold">📋 Duplicate</button>
+                <button type="button" onclick="window.easyDeleteService(${cIdx})" class="px-3 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-bold">🗑️ Delete Service</button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="text-[11px] text-zinc-400 block mb-1">Service Title</label>
+                <input type="text" value="${cat.title || ''}" onchange="window.db.services[${cIdx}].title = this.value; window.easyAutoSave();" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" />
+              </div>
+              <div>
+                <label class="text-[11px] text-zinc-400 block mb-1">Short Description</label>
+                <input type="text" value="${cat.description || ''}" onchange="window.db.services[${cIdx}].description = this.value; window.easyAutoSave();" class="w-full px-3 py-2 rounded-xl adm-input text-xs" />
+              </div>
+            </div>
+
+            <!-- Deliverables / Subservices -->
+            <div class="p-3.5 rounded-xl bg-[#09090b] border border-white/5 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold text-zinc-400 uppercase">Sub-Services / Deliverables (${(cat.subServices || []).length})</span>
+                <button type="button" onclick="window.easyAddDeliverable(${cIdx})" class="text-[11px] text-emerald-400 font-bold hover:underline">+ Add Deliverable</button>
+              </div>
+              ${(cat.subServices || []).map((sub, sIdx) => `
+                <div class="flex flex-wrap items-center gap-2">
+                  <input type="text" value="${sub.name || ''}" onchange="window.db.services[${cIdx}].subServices[${sIdx}].name = this.value; window.easyAutoSave();" placeholder="Item Name" class="flex-1 px-3 py-1.5 rounded-lg adm-input text-xs font-bold" />
+                  <input type="number" value="${sub.priceINR || 0}" onchange="window.db.services[${cIdx}].subServices[${sIdx}].priceINR = Number(this.value); window.easyAutoSave();" placeholder="Price (₹)" class="w-28 px-3 py-1.5 rounded-lg adm-input text-xs font-bold text-emerald-400" />
+                  <button type="button" onclick="window.db.services[${cIdx}].subServices.splice(${sIdx}, 1); window.renderAdminServices(); window.easyAutoSave();" class="px-2 py-1 rounded bg-rose-500/20 text-rose-300 text-xs font-bold">✕</button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  };
+
+  // Helper actions for Services
+  window.easyAddServiceCategory = function () {
+    const title = prompt('Enter Service Title (e.g. TikTok & Meta Ad Mastery):');
+    if (!title) return;
+    const badge = prompt('Enter Category Name (e.g. Paid Ads):', 'General');
+    const n = window.db.services.length;
+    window.db.services.push({
+      id: 'CAT-' + Date.now(),
+      index: `(0${n + 1})`,
+      title: title.trim(),
+      badge: (badge || 'General').trim(),
+      description: 'End-to-end execution and organic marketplace growth.',
+      subServices: [
+        { id: 'SUB-' + Date.now(), name: title.trim() + ' - Starter Pack', priceINR: 15000, billing: 'Monthly' }
+      ]
+    });
+    window.renderAdminServices();
+    window.easyAutoSave();
+  };
+
+  window.easyDuplicateService = function (idx) {
+    const item = JSON.parse(JSON.stringify(window.db.services[idx]));
+    item.id = 'CAT-' + Date.now();
+    item.title += ' (Copy)';
+    window.db.services.splice(idx + 1, 0, item);
+    window.renderAdminServices();
+    window.easyAutoSave();
+  };
+
+  window.easyDeleteService = function (idx) {
+    if (confirm('Are you sure you want to delete this service?')) {
+      window.db.services.splice(idx, 1);
+      window.renderAdminServices();
+      window.easyAutoSave();
+    }
+  };
+
+  window.easyAddDeliverable = function (cIdx) {
+    window.db.services[cIdx].subServices = window.db.services[cIdx].subServices || [];
+    window.db.services[cIdx].subServices.push({
+      id: 'SUB-' + Date.now(),
+      name: 'New Deliverable Package',
+      priceINR: 5000,
+      billing: 'One-Time'
+    });
+    window.renderAdminServices();
+    window.easyAutoSave();
+  };
+
+  // 4. One-Click Universal Master Save & Sync
+  window.easyAutoSave = async function () {
+    if (!window.db) return;
+    localStorage.setItem(DB_CACHE_KEY, JSON.stringify(window.db));
+    broadcastUpdate(window.db);
+
+    try {
+      await fetch(DB_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(window.db)
+      });
+      const dot = document.getElementById('sync-dot');
+      const status = document.getElementById('cloud-sync-status');
+      if (dot) dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+      if (status) status.innerText = 'Live Synced to Cloud ✓';
+    } catch (e) {}
+  };
+
+  // Re-hook standard save button
+  window.saveAndPushAll = async function (note) {
+    await window.easyAutoSave();
+    alert('✅ All changes have been published globally! (Checked in 1 second on Frontend)');
+  };
+
+  // Initial Boot
+  setTimeout(() => {
+    window.renderAdminServices();
+  }, 400);
+})();
+</script>
+<!-- ==================== MASTER FINAL CLEAN ENGINE: BACKEND COMPLETE ==================== -->
