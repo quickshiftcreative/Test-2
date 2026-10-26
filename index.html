@@ -5634,3 +5634,181 @@
   })();
 </script>
 <!-- ==================== ADMIN.HTML : DEDICATED HAMBURGER ICON DESIGNER COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : 16 INTERNET HAMBURGER STYLES, PC/TABLET ON-OFF MATRIX & INSTANT SYNC PATCH (PASTE AT VERY BOTTOM) ==================== -->
+<script id="admin-instant-hamburger-matrix-v15">
+  (function () {
+    const ALL_16_STYLES = [
+      { id: 'three_line',      name: '1. Classic 3-Line',       badge: '☰' },
+      { id: 'two_line',        name: '2. iOS 2-Line Minimal',   badge: '＝' },
+      { id: 'staggered_right', name: '3. Luxury Right Stagger', badge: '≣' },
+      { id: 'staggered_left',  name: '4. Editorial Left Stagger', badge: '≡' },
+      { id: 'center_diamond',  name: '5. Diamond Center Stack', badge: '❖' },
+      { id: 'bento_dots',      name: '6. 9-Dots Bento Grid',    badge: '⠿' },
+      { id: 'ten_dots',        name: '7. 10-Dots Cyber Matrix', badge: '⁙' },
+      { id: 'four_dots',       name: '8. 4-Dots iOS App Grid',  badge: '∷' },
+      { id: 'dots_vertical',   name: '9. 3-Dots Vertical',      badge: '⋮' },
+      { id: 'dots_horizontal', name: '10. 3-Dots Horizontal',   badge: '⋯' },
+      { id: 'ios_sliders',     name: '11. iOS Control Sliders', badge: '🎚️' },
+      { id: 'plus_cross',      name: '12. Minimal Plus (+)',    badge: '＋' },
+      { id: 'circle_ring',     name: '13. Halo Circle Ring',    badge: '◎' },
+      { id: 'pill_text',       name: '14. MENU + Icon Pill',    badge: 'MENU ☰' },
+      { id: 'custom_emoji',    name: '15. Custom Symbol/Emoji', badge: '✦' },
+      { id: 'custom_image',    name: '16. Custom Image/PNG',    badge: '🖼️' }
+    ];
+
+    let liveSyncTimer = null;
+
+    function upgradeHamburgerStudioToV15() {
+      const card = document.getElementById('hb-dedicated-icon-studio-card');
+      if (!card || document.getElementById('hb15-device-matrix-box')) return;
+
+      /* 1. Inject PC, Tablet & Mobile ON/OFF Switch Matrix Right at the Top of Hamburger Studio */
+      const visSelectWrap = document.getElementById('hb14-vis-mode')?.parentElement;
+      if (visSelectWrap) {
+        visSelectWrap.innerHTML = `
+          <label class="text-[11px] font-bold text-amber-300 block mb-1">✨ Custom Emoji / Symbol (For Style #15)</label>
+          <input type="text" id="hb15-custom-emoji" value="✦" maxlength="3" oninput="window.instantSyncHbV15()" placeholder="e.g. ✦, ⚡, 👑" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold text-center" />
+        `;
+      }
+
+      const matrixBox = document.createElement('div');
+      matrixBox.id = 'hb15-device-matrix-box';
+      matrixBox.className = 'p-4 rounded-2xl bg-[#09090b] border border-emerald-500/40 space-y-3';
+      matrixBox.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span class="text-xs font-extrabold uppercase text-emerald-400">📱📲💻 Device Menu Visibility Matrix (Instant ON / OFF Control)</span>
+          <span class="text-[11px] font-bold text-zinc-400">Mobile Hamburger is Always Mandatory ON • Toggle Tablet & PC Below:</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <!-- Mobile Column -->
+          <div class="p-3 rounded-xl bg-black/70 border border-emerald-500/30 space-y-2">
+            <div class="flex items-center justify-between">
+              <strong class="text-white">📱 Mobile Phone (< 768px)</strong>
+              <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-black">MANDATORY</span>
+            </div>
+            <p class="text-[11px] text-zinc-400">✓ Hamburger Icon: <strong class="text-emerald-400">Always ON</strong> (Next to Cart)<br/>✕ Top Swipe Bar: <strong class="text-zinc-500">Auto-Hidden (No Overlap)</strong></p>
+          </div>
+
+          <!-- Tablet Column -->
+          <div class="p-3 rounded-xl bg-black/70 border border-indigo-500/30 space-y-2">
+            <div class="flex items-center justify-between">
+              <strong class="text-white">📲 Tablet / iPad (768px–1023px)</strong>
+              <span class="text-[10px] font-bold text-indigo-300">Swipe Friendly</span>
+            </div>
+            <label class="flex items-center justify-between cursor-pointer pt-1">
+              <span class="text-zinc-300 font-bold">Top Swipeable Menu Bar:</span>
+              <input type="checkbox" id="hb15-tab-topbar" onchange="window.instantSyncHbV15()" class="w-4 h-4 accent-emerald-500" checked />
+            </label>
+            <label class="flex items-center justify-between cursor-pointer">
+              <span class="text-zinc-300 font-bold">Show Hamburger Icon:</span>
+              <input type="checkbox" id="hb15-tab-hb" onchange="window.instantSyncHbV15()" class="w-4 h-4 accent-indigo-500" />
+            </label>
+          </div>
+
+          <!-- PC / Desktop Column -->
+          <div class="p-3 rounded-xl bg-black/70 border border-amber-500/30 space-y-2">
+            <div class="flex items-center justify-between">
+              <strong class="text-white">💻 PC / Laptop (1024px+)</strong>
+              <span class="text-[10px] font-bold text-amber-300">Full Control</span>
+            </div>
+            <label class="flex items-center justify-between cursor-pointer pt-1">
+              <span class="text-zinc-300 font-bold">Top Horizontal Menu Bar:</span>
+              <input type="checkbox" id="hb15-pc-topbar" onchange="window.instantSyncHbV15()" class="w-4 h-4 accent-emerald-500" checked />
+            </label>
+            <label class="flex items-center justify-between cursor-pointer">
+              <span class="text-zinc-300 font-bold">Show Hamburger Icon:</span>
+              <input type="checkbox" id="hb15-pc-hb" onchange="window.instantSyncHbV15()" class="w-4 h-4 accent-amber-400" />
+            </label>
+          </div>
+        </div>
+      `;
+
+      const leftCol = card.querySelector('.lg\\:col-span-7');
+      if (leftCol) {
+        leftCol.prepend(matrixBox);
+      }
+
+      /* Populate Checkboxes from DB */
+      const ic = db?.hamburgerIconConfig || {};
+      const setC = (id, v) => { const el = document.getElementById(id); if (el) el.checked = Boolean(v); };
+      setC('hb15-pc-topbar', ic.pcShowTopBar !== false);
+      setC('hb15-pc-hb', Boolean(ic.pcShowHamburger));
+      setC('hb15-tab-topbar', ic.tabletShowTopBar !== false);
+      setC('hb15-tab-hb', Boolean(ic.tabletShowHamburger));
+      const emEl = document.getElementById('hb15-custom-emoji');
+      if (emEl) emEl.value = ic.customEmoji || '✦';
+    }
+
+    /* 2. Upgrade Style Grid to Show All 16 Internet Styles & Auto-Save Immediately on Click */
+    const origRenderPrev = window.renderHb14LivePreview;
+    window.renderHb14LivePreview = function () {
+      if (typeof origRenderPrev === 'function') origRenderPrev();
+      upgradeHamburgerStudioToV15();
+
+      const grid = document.getElementById('hb14-style-cards-grid');
+      if (!grid || !window.db) return;
+      const currentStyle = db.hamburgerIconConfig?.iconStyle || 'three_line';
+
+      grid.className = 'grid grid-cols-2 sm:grid-cols-4 gap-2';
+      grid.innerHTML = ALL_16_STYLES.map(function (st) {
+        const isAct = currentStyle === st.id;
+        return `
+          <button type="button" onclick="window.selectHb15StyleInstant('${st.id}')" class="p-2.5 rounded-xl text-left border transition flex flex-col justify-between gap-1 ${isAct ? 'bg-emerald-500/20 border-emerald-400 text-white shadow-lg scale-[1.02]' : 'bg-[#09090b] border-[#242429] text-zinc-300 hover:border-white/30'}">
+            <div class="flex items-center justify-between w-full">
+              <span class="text-sm font-black text-emerald-400">${st.badge}</span>
+              ${isAct ? '<span class="px-1.5 py-0.5 rounded bg-emerald-500 text-zinc-950 text-[8px] font-black">LIVE</span>' : ''}
+            </div>
+            <span class="text-[10px] font-extrabold leading-tight">${st.name}</span>
+          </button>
+        `;
+      }).join('');
+    };
+
+    /* 3. Instant Sync Engine: Every Click or Slider Change Immediately Updates Preview + Frontend + Cloud */
+    window.selectHb15StyleInstant = function (styleId) {
+      if (typeof window.selectHb14IconStyle === 'function') {
+        window.selectHb14IconStyle(styleId);
+      }
+      window.instantSyncHbV15('Switched Hamburger Style to ' + styleId);
+    };
+
+    window.instantSyncHbV15 = function (note) {
+      if (!window.db) return;
+      if (typeof window.commitHamburgerDraftToDB === 'function') {
+        window.commitHamburgerDraftToDB();
+      }
+      db.hamburgerIconConfig = db.hamburgerIconConfig || {};
+      db.hamburgerIconConfig.pcShowTopBar = document.getElementById('hb15-pc-topbar') ? document.getElementById('hb15-pc-topbar').checked : true;
+      db.hamburgerIconConfig.pcShowHamburger = document.getElementById('hb15-pc-hb') ? document.getElementById('hb15-pc-hb').checked : false;
+      db.hamburgerIconConfig.tabletShowTopBar = document.getElementById('hb15-tab-topbar') ? document.getElementById('hb15-tab-topbar').checked : true;
+      db.hamburgerIconConfig.tabletShowHamburger = document.getElementById('hb15-tab-hb') ? document.getElementById('hb15-tab-hb').checked : false;
+      db.hamburgerIconConfig.customEmoji = document.getElementById('hb15-custom-emoji')?.value || '✦';
+
+      /* Save to LocalStorage in 0ms so Frontend Updates Immediately */
+      localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(window.db));
+      window.renderHb14LivePreview();
+
+      /* Debounced Cloud Push */
+      clearTimeout(liveSyncTimer);
+      liveSyncTimer = setTimeout(function () {
+        if (typeof window.directPushMenuAndDB === 'function') {
+          window.directPushMenuAndDB(note || 'Instant Synced Hamburger & Device Menu');
+        }
+      }, 220);
+    };
+
+    /* Hook into updateHamburgerDraftFromInputs so Sliders/Colors Also Sync Live Immediately */
+    const origUpdateDraft = window.updateHamburgerDraftFromInputs;
+    window.updateHamburgerDraftFromInputs = function (testOpen) {
+      if (typeof origUpdateDraft === 'function') origUpdateDraft(testOpen);
+      window.instantSyncHbV15('Updated Hamburger Icon Appearance');
+    };
+
+    setTimeout(function () {
+      upgradeHamburgerStudioToV15();
+      window.renderHb14LivePreview();
+    }, 800);
+  })();
+</script>
+<!-- ==================== ADMIN.HTML : 16 HAMBURGER STYLES & INSTANT SYNC PATCH COMPLETE ==================== -->
