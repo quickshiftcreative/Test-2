@@ -8016,3 +8016,501 @@
 })();
 </script>
 <!-- ==================== ADMIN.HTML : PHONE-STYLE iOS TOGGLE SWITCHBOARD COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : UNIVERSAL PHONE TOGGLES, BUTTON SHAPE/COLOR/TEXT STUDIO & MENU/LOADER UPGRADE (PASTE AT VERY BOTTOM OF admin.html) ==================== -->
+<style id="universal-phone-toggles-and-button-studio-v22">
+  /* 1. Convert ALL ON/OFF Checkboxes Across Entire Admin Panel into Sleek Phone-Style (iOS) Sliding Toggles */
+  input[type="checkbox"]:not(.phone-toggle-input) {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    width: 44px !important;
+    height: 24px !important;
+    background-color: #27272a !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border-radius: 9999px !important;
+    position: relative !important;
+    cursor: pointer !important;
+    outline: none !important;
+    transition: background-color 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, box-shadow 0.25s ease !important;
+    vertical-align: middle !important;
+    flex-shrink: 0 !important;
+    display: inline-block !important;
+  }
+  input[type="checkbox"]:not(.phone-toggle-input)::after {
+    content: '' !important;
+    position: absolute !important;
+    top: 2px !important;
+    left: 2px !important;
+    width: 18px !important;
+    height: 18px !important;
+    background-color: #a1a1aa !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5) !important;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.25s ease !important;
+  }
+  input[type="checkbox"]:not(.phone-toggle-input):checked {
+    background-color: #10b981 !important;
+    border-color: #34d399 !important;
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.4) !important;
+  }
+  input[type="checkbox"]:not(.phone-toggle-input):checked::after {
+    transform: translateX(20px) !important;
+    background-color: #ffffff !important;
+  }
+</style>
+
+<!-- Inline Modal for Editing Individual Button Text, Shape & Color -->
+<div id="btn-micro-editor-modal" class="fixed inset-0 z-[99999] bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+  <div class="liquid-bar rounded-3xl max-w-md w-full p-6 space-y-4 border border-emerald-500/40 shadow-2xl">
+    <div class="flex items-center justify-between border-b border-white/15 pb-3">
+      <div>
+        <span class="text-[10px] font-extrabold uppercase text-emerald-400">Button Customizer</span>
+        <h3 id="bme-modal-title" class="text-base font-bold text-white">Edit Button Style, Color & Text</h3>
+      </div>
+      <button type="button" onclick="window.closeBtnMicroEditor()" class="w-8 h-8 rounded-xl bg-white/10 text-white font-bold">✕</button>
+    </div>
+
+    <input type="hidden" id="bme-target-key" />
+
+    <div class="space-y-3 text-xs">
+      <div>
+        <label class="font-bold text-zinc-300 block mb-1">Button Display Text / Label (Leave blank for default)</label>
+        <input type="text" id="bme-inp-text" placeholder="e.g. Inspect & Add ↗" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs font-bold" />
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="font-bold text-zinc-300 block mb-1">Button Shape</label>
+          <select id="bme-inp-shape" class="w-full px-3 py-2.5 rounded-xl adm-input text-xs font-bold">
+            <option value="default">Use Global Shape</option>
+            <option value="rounded">Rounded Squircle (14px)</option>
+            <option value="pill">Full Capsule Pill (999px)</option>
+            <option value="square">Sharp Modern Square (4px)</option>
+          </select>
+        </div>
+        <div>
+          <label class="font-bold text-zinc-300 block mb-1">Visual Style</label>
+          <select id="bme-inp-style" class="w-full px-3 py-2.5 rounded-xl adm-input text-xs font-bold">
+            <option value="custom">Custom Colors Below</option>
+            <option value="glass">Liquid Semi-Glass</option>
+            <option value="gold">Metallic Gold Luxury</option>
+            <option value="emerald">Emerald Neon</option>
+            <option value="white">Apple Pure White</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="font-bold text-zinc-300 block mb-1">Background Color</label>
+          <div class="flex items-center gap-2">
+            <input type="color" id="bme-inp-bg" value="#6366f1" class="w-10 h-9 rounded-lg bg-transparent border border-white/20 cursor-pointer" />
+            <input type="text" id="bme-inp-bg-hex" oninput="document.getElementById('bme-inp-bg').value=this.value" placeholder="#6366f1 or default" class="flex-1 px-2.5 py-2 rounded-lg adm-input text-[11px] font-mono" />
+          </div>
+        </div>
+        <div>
+          <label class="font-bold text-zinc-300 block mb-1">Text Color</label>
+          <div class="flex items-center gap-2">
+            <input type="color" id="bme-inp-txtcol" value="#ffffff" class="w-10 h-9 rounded-lg bg-transparent border border-white/20 cursor-pointer" />
+            <input type="text" id="bme-inp-txtcol-hex" oninput="document.getElementById('bme-inp-txtcol').value=this.value" placeholder="#ffffff or default" class="flex-1 px-2.5 py-2 rounded-lg adm-input text-[11px] font-mono" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pt-3 border-t border-white/15 flex items-center justify-between gap-2">
+      <button type="button" onclick="window.resetSingleButtonStyle()" class="px-3.5 py-2.5 rounded-xl bg-rose-500/20 text-rose-300 text-xs font-bold">↺ Reset Default</button>
+      <button type="button" onclick="window.saveSingleButtonMicroEdit()" class="px-5 py-2.5 rounded-xl bg-emerald-500 text-zinc-950 font-black text-xs shadow-lg">✓ Save Button Style</button>
+    </div>
+  </div>
+</div>
+
+<script id="admin-buttons-menu-loader-master-v22">
+(function () {
+  /* 1. Bridge `let db` and `window.db` */
+  try {
+    Object.defineProperty(window, 'db', {
+      get: function () { return typeof db !== 'undefined' ? db : null; },
+      set: function (val) { if (typeof db !== 'undefined') db = val; },
+      configurable: true
+    });
+  } catch (e) {}
+
+  /* Sync Color Picker Inputs inside Micro Modal */
+  document.getElementById('bme-inp-bg')?.addEventListener('input', function () {
+    document.getElementById('bme-inp-bg-hex').value = this.value;
+  });
+  document.getElementById('bme-inp-txtcol')?.addEventListener('input', function () {
+    document.getElementById('bme-inp-txtcol-hex').value = this.value;
+  });
+
+  /* 2. Catalog of All 18 Action Buttons Across Services, Home, Quotation, Portfolio, Tracker & Reviews */
+  const ACTION_BUTTONS_CATALOG = [
+    { key: 'btn_srv_inspect',     icon: '↗',  title: 'Service Card "Inspect & Add ↗" Button',      desc: 'Button inside every Service card on Home & Services page', defText: 'Inspect & Add ↗', editTab: 'services' },
+    { key: 'btn_srv_open_cart',   icon: '🛒', title: 'Services Page "Open Quotation Cart" Button', desc: 'Top-right green cart button on Services page', defText: '', editTab: 'services' },
+    { key: 'btn_srv_filter_bar',  icon: '🏷️', title: 'Services Category Filter Pills Bar',         desc: 'ALL, Marketplaces, Paid Ads category filter buttons', defText: '', editTab: 'services' },
+    { key: 'btn_srv_search_box',  icon: '🔍', title: 'Services Live Search Input Bar',             desc: 'Search any service input box on Services page', defText: '', editTab: 'services' },
+    { key: 'btn_srv_custom_req',  icon: '✨', title: 'Services "+ Add Custom Requirement" Button', desc: 'Custom requirement button next to search bar', defText: '✨ + Add Custom Requirement', editTab: 'services' },
+    { key: 'btn_smodal_sel_all',  icon: '✅', title: 'Service Popup "+ Select All" Button',        desc: 'Select all sub-services button inside Service popup', defText: '+ Select All', editTab: 'services' },
+    { key: 'btn_smodal_proceed',  icon: '➡️', title: 'Service Popup "Proceed to Cart →" Button',   desc: 'Bottom-right button inside Service popup modal', defText: 'Proceed to Quotation Cart →', editTab: 'services' },
+    { key: 'btn_home_explore_srv',icon: '⚡', title: 'Home "Explore All Services ↗" Link Button',  desc: 'Header link button in Home Services section', defText: 'Explore All Services ↗', editTab: 'home' },
+    { key: 'btn_hero_primary',    icon: '🚀', title: 'Hero Primary CTA Button',                    desc: '"Explore Services & Build Quote ↗" main button', defText: 'Explore Services & Build Quote ↗', editTab: 'home' },
+    { key: 'btn_hero_secondary',  icon: '🔐', title: 'Hero Secondary CTA Button',                  desc: '"VIP Client Portal Login" second hero button', defText: 'VIP Client Portal Login', editTab: 'home' },
+    { key: 'btn_hero_pills',      icon: '💊', title: 'Hero Service Tag Pills',                     desc: 'Small category pills below Hero description', defText: '', editTab: 'home' },
+    { key: 'btn_pf_inspect',      icon: '🎬', title: 'Portfolio "Inspect Before/After ↗" Button',  desc: 'Action label at the bottom of Portfolio cards', defText: 'Inspect Before/After ↗', editTab: 'portfolio' },
+    { key: 'btn_qt_add_more',     icon: '➕', title: 'Quotation "+ Add More Services" Button',     desc: 'Top-right button on Instant Quotation page', defText: '+ Add More Services', editTab: 'quotation' },
+    { key: 'btn_qt_pdf_download', icon: '📥', title: 'Quotation "Download Signed PDF" Button',     desc: 'Main PDF download submit button on Quote page', defText: '📥 Download Signed PDF Proposal', editTab: 'quotation' },
+    { key: 'btn_qt_wa_send',      icon: '💬', title: 'Quotation "Send Quote on WhatsApp" Button',  desc: 'Green WhatsApp quote button on Quote page', defText: '💬 Send Quote on WhatsApp Now', editTab: 'quotation' },
+    { key: 'btn_tr_demo_login',   icon: '✨', title: 'Tracker "1-Click Public Demo Login" Button', desc: 'Demo login button on VIP Client Tracker page', defText: '✨ 1-Click Public Demo Login', editTab: 'tracker' },
+    { key: 'btn_rev_write',       icon: '★',  title: 'Reviews "★ Write a Client Review" Button',   desc: 'Top-right review button on Reviews page', defText: '★ Write a Client Review', editTab: 'reviews' },
+    { key: 'btn_cnt_quick_links', icon: '🔗', title: 'Contact Page Quick-Connect Buttons Bar',     desc: 'Chat on WhatsApp & Email buttons on Contact page', defText: '', editTab: 'contact' }
+  ];
+
+  function ensureButtonStudioConfig() {
+    if (!window.db) return;
+    db.masterSwitchboard = db.masterSwitchboard || {};
+    db.buttonStudioConfig = db.buttonStudioConfig || {
+      globalShape: 'default', // 'default', 'rounded', 'pill', 'square'
+      globalTheme: 'default', // 'default', 'emerald', 'gold', 'indigo', 'white', 'glass'
+      primaryBg: '',
+      primaryText: '',
+      cardBtnBg: '',
+      cardBtnText: '',
+      hoverEffect: 'lift_glow', // 'lift_glow', 'scale_pop', 'gold_border'
+      perButton: {}
+    };
+    db.buttonStudioConfig.perButton = db.buttonStudioConfig.perButton || {};
+    ACTION_BUTTONS_CATALOG.forEach(function (b) {
+      if (db.masterSwitchboard[b.key] === undefined) {
+        db.masterSwitchboard[b.key] = true;
+      }
+    });
+  }
+
+  /* 3. Inject Global Button Shape/Color Studio + 18 Individual Button ON/OFF Cards into `#panel-switchboard` */
+  window.renderButtonStudioInsideSwitchboard = function () {
+    const sbPanel = document.getElementById('panel-switchboard');
+    if (!sbPanel || !window.db) return;
+    ensureButtonStudioConfig();
+
+    let btnSection = document.getElementById('sb-all-buttons-studio-section');
+    if (!btnSection) {
+      btnSection = document.createElement('div');
+      btnSection.id = 'sb-all-buttons-studio-section';
+      btnSection.className = 'space-y-6';
+      /* Insert right after the top banner inside #panel-switchboard */
+      sbPanel.insertBefore(btnSection, sbPanel.children[1]);
+    }
+
+    const bCfg = db.buttonStudioConfig;
+    const sb = db.masterSwitchboard;
+    const query = (document.getElementById('sb-quick-filter-inp')?.value || '').trim().toLowerCase();
+
+    const filteredBtns = ACTION_BUTTONS_CATALOG.filter(function (b) {
+      if (!query) return true;
+      return `${b.title} ${b.desc} ${b.key}`.toLowerCase().includes(query);
+    });
+
+    const allBtnsOn = ACTION_BUTTONS_CATALOG.every(function (b) { return sb[b.key] !== false; });
+
+    btnSection.innerHTML = `
+      <!-- GLOBAL BUTTON SHAPE, COLOR & HOVER DESIGNER CARD -->
+      <div class="admin-card rounded-3xl p-6 space-y-5 border-2 border-indigo-500/40 bg-[#111114]">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#242429] pb-3.5">
+          <div>
+            <span class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] font-black uppercase tracking-wider">Global Button Shape & Color Studio</span>
+            <h3 class="text-base font-extrabold text-white mt-1">🎨 Customize Website Button Shape, Colors & Hover Style</h3>
+            <p class="text-xs text-zinc-400">Yahan se poori website ke buttons ka shape (Pill, Rounded, Square), background color aur text color 1-click mein badlein, ya niche kisi bhi single button ko ON/OFF aur Edit karein.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="window.resetGlobalButtonStyles()" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-zinc-300 text-xs font-bold">↺ Reset Default Colors</button>
+            <button type="button" onclick="window.saveGlobalButtonStudioNow()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs shadow-lg">✓ Apply Button Style</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 items-end">
+          <div>
+            <label class="text-[11px] font-bold text-emerald-400 block mb-1">1. Global Button Shape</label>
+            <select id="gbs-shape" onchange="window.saveGlobalButtonStudioNow()" class="w-full px-3 py-2.5 rounded-xl adm-input text-xs font-bold">
+              <option value="default" ${bCfg.globalShape==='default'?'selected':''}>Default Luxury Rounded (14px)</option>
+              <option value="pill" ${bCfg.globalShape==='pill'?'selected':''}>💊 Full Capsule Pill (999px)</option>
+              <option value="rounded" ${bCfg.globalShape==='rounded'?'selected':''}>▢ Soft Apple Squircle (12px)</option>
+              <option value="square" ${bCfg.globalShape==='square'?'selected':''}>⬛ Sharp Modern Square (4px)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-[11px] font-bold text-indigo-300 block mb-1">2. Instant Button Color Theme</label>
+            <select id="gbs-theme" onchange="window.applyGlobalButtonThemePreset(this.value)" class="w-full px-3 py-2.5 rounded-xl adm-input text-xs font-bold">
+              <option value="default" ${bCfg.globalTheme==='default'?'selected':''}>Default Studio Theme</option>
+              <option value="emerald" ${bCfg.globalTheme==='emerald'?'selected':''}>💎 Emerald Matrix Neon</option>
+              <option value="gold" ${bCfg.globalTheme==='gold'?'selected':''}>👑 Metallic Gold Luxury</option>
+              <option value="indigo" ${bCfg.globalTheme==='indigo'?'selected':''}>🌌 Cyber Royal Indigo</option>
+              <option value="white" ${bCfg.globalTheme==='white'?'selected':''}>🍎 Apple Pure White & Black</option>
+              <option value="glass" ${bCfg.globalTheme==='glass'?'selected':''}>🥂 Frosted Liquid Glass</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-[11px] font-bold text-zinc-300 block mb-1">3. Main CTA Button BG Color</label>
+            <div class="flex items-center gap-1.5">
+              <input type="color" id="gbs-pri-bg-picker" value="${bCfg.primaryBg || '#6366f1'}" oninput="document.getElementById('gbs-pri-bg').value=this.value; window.saveGlobalButtonStudioNow();" class="w-9 h-9 rounded-lg bg-transparent border border-white/20 cursor-pointer shrink-0" />
+              <input type="text" id="gbs-pri-bg" value="${bCfg.primaryBg || ''}" oninput="window.saveGlobalButtonStudioNow()" placeholder="Auto / #hex" class="w-full px-2.5 py-2 rounded-xl adm-input text-xs font-mono" />
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[11px] font-bold text-zinc-300 block mb-1">4. Service "Inspect" Button BG</label>
+            <div class="flex items-center gap-1.5">
+              <input type="color" id="gbs-card-bg-picker" value="${bCfg.cardBtnBg || '#10b981'}" oninput="document.getElementById('gbs-card-bg').value=this.value; window.saveGlobalButtonStudioNow();" class="w-9 h-9 rounded-lg bg-transparent border border-white/20 cursor-pointer shrink-0" />
+              <input type="text" id="gbs-card-bg" value="${bCfg.cardBtnBg || ''}" oninput="window.saveGlobalButtonStudioNow()" placeholder="Auto / #hex" class="w-full px-2.5 py-2 rounded-xl adm-input text-xs font-mono" />
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[11px] font-bold text-amber-300 block mb-1">5. Button Hover Animation</label>
+            <select id="gbs-hover" onchange="window.saveGlobalButtonStudioNow()" class="w-full px-3 py-2.5 rounded-xl adm-input text-xs font-bold">
+              <option value="lift_glow" ${bCfg.hoverEffect==='lift_glow'?'selected':''}>✨ Smooth Lift & Glow</option>
+              <option value="scale_pop" ${bCfg.hoverEffect==='scale_pop'?'selected':''}>🎯 iOS Spring Scale Pop</option>
+              <option value="gold_border" ${bCfg.hoverEffect==='gold_border'?'selected':''}>👑 Metallic Gold Shimmer</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- ALL 18 INDIVIDUAL WEBSITE BUTTONS (ON/OFF PHONE TOGGLE + INLINE SHAPE/COLOR/TEXT EDIT) -->
+        <div class="pt-4 border-t border-[#242429] space-y-3.5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h4 class="text-sm font-extrabold text-white">🔘 All Services & Website Action Buttons (ON/OFF Toggle + Text/Color Edit)</h4>
+              <p class="text-[11px] text-zinc-400">Kisi bhi button ko website se chhupane ke liye uska switch <strong>OFF</strong> karein, ya uska Naam, Shape aur Color badalne ke liye <strong>✏️ Edit Button</strong> dabayein.</p>
+            </div>
+            <div class="flex items-center gap-3 px-3.5 py-1.5 rounded-2xl bg-[#09090b] border border-white/10">
+              <span class="text-xs font-bold text-zinc-300">All Buttons:</span>
+              <label class="phone-toggle-label">
+                <input type="checkbox" class="phone-toggle-input" ${allBtnsOn ? 'checked' : ''} onchange="window.toggleAllActionButtonsV22(this.checked)" />
+                <span class="phone-toggle-track"><span class="phone-toggle-knob"></span></span>
+                <span class="phone-toggle-status ${allBtnsOn ? 'text-emerald-400' : 'text-zinc-500'}">${allBtnsOn ? 'ON' : 'OFF'}</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            ${filteredBtns.map(function (b) {
+              const isOn = sb[b.key] !== false;
+              const custom = bCfg.perButton?.[b.key] || {};
+              const hasCustom = Boolean(custom.text || custom.bg || custom.shape);
+              const safeTitle = b.title.replace(/'/g, "\\'");
+
+              return `
+                <div class="p-3.5 rounded-2xl bg-[#09090b] border ${isOn ? 'border-indigo-500/40' : 'border-zinc-800 opacity-60'} flex flex-col justify-between gap-3 transition">
+                  <div class="flex items-start gap-2.5">
+                    <span class="w-8 h-8 rounded-xl ${isOn ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-zinc-900 text-zinc-500'} flex items-center justify-center text-sm font-bold shrink-0">${b.icon}</span>
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-1.5">
+                        <h5 class="text-xs font-extrabold text-white truncate">${b.title}</h5>
+                        ${hasCustom ? `<span class="px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 text-[9px] font-black">CUSTOM</span>` : ''}
+                      </div>
+                      <p class="text-[11px] text-zinc-400 mt-0.5 leading-snug">${b.desc}</p>
+                      ${custom.text ? `<span class="inline-block mt-1 text-[10px] font-mono text-emerald-400">Text: "${custom.text}"</span>` : ''}
+                    </div>
+                  </div>
+
+                  <div class="pt-2 border-t border-white/10 flex items-center justify-between gap-2">
+                    <button type="button" onclick="window.openBtnMicroEditor('${b.key}', '${safeTitle}', '${(b.defText || '').replace(/'/g, "\\'")}')" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[11px] font-extrabold flex items-center gap-1 transition">
+                      🎨✏️ Edit Style/Text
+                    </button>
+
+                    <label class="phone-toggle-label">
+                      <input type="checkbox" class="phone-toggle-input" ${isOn ? 'checked' : ''} onchange="window.setSwitchboardItemState('${b.key}', this.checked, '${safeTitle}')" />
+                      <span class="phone-toggle-track"><span class="phone-toggle-knob"></span></span>
+                      <span class="phone-toggle-status ${isOn ? 'text-emerald-400' : 'text-rose-400'}">${isOn ? 'ON' : 'OFF'}</span>
+                    </label>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  /* 4. Global & Micro Button Editor Functions */
+  window.applyGlobalButtonThemePreset = function (themeKey) {
+    ensureButtonStudioConfig();
+    const presets = {
+      default: { bg: '', cardBg: '' },
+      emerald: { bg: '#10b981', cardBg: '#059669' },
+      gold:    { bg: '#f59e0b', cardBg: '#d97706' },
+      indigo:  { bg: '#6366f1', cardBg: '#4f46e5' },
+      white:   { bg: '#ffffff', cardBg: '#f4f4f5' },
+      glass:   { bg: 'rgba(255,255,255,0.14)', cardBg: 'rgba(255,255,255,0.12)' }
+    };
+    const p = presets[themeKey] || presets.default;
+    document.getElementById('gbs-pri-bg').value = p.bg;
+    document.getElementById('gbs-card-bg').value = p.cardBg;
+    window.saveGlobalButtonStudioNow();
+  };
+
+  window.saveGlobalButtonStudioNow = async function () {
+    ensureButtonStudioConfig();
+    const bCfg = db.buttonStudioConfig;
+    bCfg.globalShape = document.getElementById('gbs-shape')?.value || 'default';
+    bCfg.globalTheme = document.getElementById('gbs-theme')?.value || 'default';
+    bCfg.primaryBg = (document.getElementById('gbs-pri-bg')?.value || '').trim();
+    bCfg.cardBtnBg = (document.getElementById('gbs-card-bg')?.value || '').trim();
+    bCfg.hoverEffect = document.getElementById('gbs-hover')?.value || 'lift_glow';
+
+    if (typeof window.pushSwitchboardStateNow === 'function') {
+      await window.pushSwitchboardStateNow('Updated Global Button Shape & Colors');
+    }
+  };
+
+  window.resetGlobalButtonStyles = async function () {
+    ensureButtonStudioConfig();
+    db.buttonStudioConfig.globalShape = 'default';
+    db.buttonStudioConfig.globalTheme = 'default';
+    db.buttonStudioConfig.primaryBg = '';
+    db.buttonStudioConfig.cardBtnBg = '';
+    db.buttonStudioConfig.hoverEffect = 'lift_glow';
+    window.renderButtonStudioInsideSwitchboard();
+    if (typeof window.pushSwitchboardStateNow === 'function') {
+      await window.pushSwitchboardStateNow('Reset Global Button Styles');
+    }
+  };
+
+  window.toggleAllActionButtonsV22 = async function (stateBool) {
+    ensureButtonStudioConfig();
+    ACTION_BUTTONS_CATALOG.forEach(function (b) {
+      db.masterSwitchboard[b.key] = Boolean(stateBool);
+    });
+    window.renderButtonStudioInsideSwitchboard();
+    if (typeof window.pushSwitchboardStateNow === 'function') {
+      await window.pushSwitchboardStateNow(`All Action Buttons → ${stateBool ? 'ON' : 'OFF'}`);
+    }
+  };
+
+  window.openBtnMicroEditor = function (btnKey, btnTitle, defText) {
+    ensureButtonStudioConfig();
+    const cur = db.buttonStudioConfig.perButton[btnKey] || {};
+    document.getElementById('bme-target-key').value = btnKey;
+    document.getElementById('bme-modal-title').innerText = 'Edit: ' + btnTitle;
+    document.getElementById('bme-inp-text').value = cur.text !== undefined ? cur.text : defText;
+    document.getElementById('bme-inp-shape').value = cur.shape || 'default';
+    document.getElementById('bme-inp-style').value = cur.style || 'custom';
+    document.getElementById('bme-inp-bg-hex').value = cur.bg || '';
+    document.getElementById('bme-inp-txtcol-hex').value = cur.textColor || '';
+    if (cur.bg && cur.bg.startsWith('#')) document.getElementById('bme-inp-bg').value = cur.bg;
+    if (cur.textColor && cur.textColor.startsWith('#')) document.getElementById('bme-inp-txtcol').value = cur.textColor;
+
+    const modal = document.getElementById('btn-micro-editor-modal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  };
+
+  window.closeBtnMicroEditor = function () {
+    const modal = document.getElementById('btn-micro-editor-modal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  };
+
+  window.saveSingleButtonMicroEdit = async function () {
+    ensureButtonStudioConfig();
+    const key = document.getElementById('bme-target-key').value;
+    if (!key) return;
+    const stylePreset = document.getElementById('bme-inp-style').value;
+    let bg = document.getElementById('bme-inp-bg-hex').value.trim();
+    let txtCol = document.getElementById('bme-inp-txtcol-hex').value.trim();
+
+    if (stylePreset === 'gold') { bg = '#f59e0b'; txtCol = '#09090b'; }
+    else if (stylePreset === 'emerald') { bg = '#10b981'; txtCol = '#09090b'; }
+    else if (stylePreset === 'white') { bg = '#ffffff'; txtCol = '#09090b'; }
+    else if (stylePreset === 'glass') { bg = 'rgba(255,255,255,0.12)'; txtCol = '#ffffff'; }
+
+    db.buttonStudioConfig.perButton[key] = {
+      text: document.getElementById('bme-inp-text').value.trim(),
+      shape: document.getElementById('bme-inp-shape').value,
+      style: stylePreset,
+      bg: bg,
+      textColor: txtCol
+    };
+
+    window.closeBtnMicroEditor();
+    window.renderButtonStudioInsideSwitchboard();
+    if (typeof window.pushSwitchboardStateNow === 'function') {
+      await window.pushSwitchboardStateNow('Updated Button Style: ' + key);
+    }
+  };
+
+  window.resetSingleButtonStyle = async function () {
+    ensureButtonStudioConfig();
+    const key = document.getElementById('bme-target-key').value;
+    if (key && db.buttonStudioConfig.perButton) {
+      delete db.buttonStudioConfig.perButton[key];
+    }
+    window.closeBtnMicroEditor();
+    window.renderButtonStudioInsideSwitchboard();
+    if (typeof window.pushSwitchboardStateNow === 'function') {
+      await window.pushSwitchboardStateNow('Reset Button to Default: ' + key);
+    }
+  };
+
+  /* 5. Upgrade Menu Studio with Extra Menu Styles + Explicit PC/Tablet Hamburger OFF-by-Default Toggles */
+  function upgradeMenuAndLoaderStudiosV22() {
+    const dStyleSel = document.getElementById('ms-desktop-style');
+    if (dStyleSel && !dStyleSel.querySelector('option[value="macos_dock"]')) {
+      dStyleSel.innerHTML = `
+        <option value="pill">1. Floating Liquid-Glass Pill Bar</option>
+        <option value="island">2. iOS Dynamic Island Compact Capsule</option>
+        <option value="macos_dock">3. 🍎 macOS Floating Glass Dock Bar (NEW)</option>
+        <option value="vision_bar">4. 🥽 Apple VisionOS Spatial Glass Bar (NEW)</option>
+        <option value="cyber_neon">5. ⚡ Cyberpunk Neon Border Bar (NEW)</option>
+        <option value="minimal">6. Minimal Clean Editorial Bar</option>
+        <option value="hamburger">7. Universal Hamburger Only Mode</option>
+      `;
+    }
+
+    const drwLayoutSel = document.getElementById('ms-drawer-layout');
+    if (drwLayoutSel && !drwLayoutSel.querySelector('option[value="compact_card"]')) {
+      drwLayoutSel.innerHTML = `
+        <option value="single_dropdown">1. Single-Column Liquid-Glass Dropdown</option>
+        <option value="compact_card">2. 🍎 iOS Floating Compact Glass Card (NEW)</option>
+        <option value="split_deck">3. 🎛️ Split Dual-Deck Studio Menu (NEW)</option>
+        <option value="fullscreen_glass">4. Full-Screen Luxury Takeover</option>
+        <option value="right_drawer">5. Right-Side Slide Sheet</option>
+        <option value="left_drawer">6. Left-Side App Drawer</option>
+        <option value="bottom_sheet">7. iOS Bottom Sheet Menu</option>
+        <option value="bento_grid">8. 2-Column Bento Touch Grid</option>
+      `;
+    }
+
+    /* Ensure PC & Tablet Hamburger Checkboxes Default to FALSE (Hidden on Big Screens) unless explicitly turned ON */
+    if (window.db) {
+      db.hamburgerIconConfig = db.hamburgerIconConfig || {};
+      if (db.hamburgerIconConfig._bigScreenDefaultAppliedV22 !== true) {
+        db.hamburgerIconConfig.pcShowHamburger = false;
+        db.hamburgerIconConfig.tabletShowHamburger = false;
+        db.hamburgerIconConfig.pcShowTopBar = true;
+        db.hamburgerIconConfig.tabletShowTopBar = true;
+        db.hamburgerIconConfig._bigScreenDefaultAppliedV22 = true;
+      }
+      const pcHbChk = document.getElementById('hb15-pc-hb');
+      const tabHbChk = document.getElementById('hb15-tab-hb');
+      if (pcHbChk) pcHbChk.checked = Boolean(db.hamburgerIconConfig.pcShowHamburger);
+      if (tabHbChk) tabHbChk.checked = Boolean(db.hamburgerIconConfig.tabletShowHamburger);
+    }
+  }
+
+  /* Hook into Switchboard Render */
+  const origRenderSb = window.renderSwitchboardCards;
+  window.renderSwitchboardCards = function () {
+    if (typeof origRenderSb === 'function') origRenderSb();
+    window.renderButtonStudioInsideSwitchboard();
+  };
+
+  setTimeout(function () {
+    upgradeMenuAndLoaderStudiosV22();
+    window.renderButtonStudioInsideSwitchboard();
+  }, 600);
+})();
+</script>
+<!-- ==================== ADMIN.HTML : UNIVERSAL PHONE TOGGLES & BUTTON STUDIO COMPLETE ==================== -->
