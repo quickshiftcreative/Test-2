@@ -9410,3 +9410,837 @@
 })();
 </script>
 <!-- ==================== ADMIN.HTML : ULTIMATE PHOTO STUDIO PATCH COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : FINAL LAUNCH-READY COMPACT UI, ALL-DROPDOWNS, 1-WORD ROLES & UNDO/REDO/LOCK ENGINE (PASTE AT VERY BOTTOM OF admin.html) ==================== -->
+<style id="admin-compact-liquid-ux-v25">
+  /* 1. Semi-Transparent Tinted Liquid-Glass Action Buttons */
+  .lg-btn {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
+    backdrop-filter: blur(18px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.28) !important;
+    color: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 6px 12px !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    cursor: pointer !important;
+    transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1) !important;
+    user-select: none !important;
+  }
+  .lg-btn:hover {
+    transform: translateY(-1px) scale(1.02) !important;
+    border-color: rgba(255, 255, 255, 0.45) !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.09) 100%) !important;
+  }
+  .lg-btn-edit {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.28) 0%, rgba(16, 185, 129, 0.10) 100%) !important;
+    border-color: rgba(16, 185, 129, 0.5) !important;
+    color: #6ee7b7 !important;
+  }
+  .lg-btn-done {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 150, 105, 0.9) 100%) !important;
+    border-color: #34d399 !important;
+    color: #09090b !important;
+  }
+  .lg-btn-undo {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.26) 0%, rgba(99, 102, 241, 0.08) 100%) !important;
+    border-color: rgba(99, 102, 241, 0.45) !important;
+    color: #c7d2fe !important;
+  }
+  .lg-btn-lock {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.26) 0%, rgba(245, 158, 11, 0.08) 100%) !important;
+    border-color: rgba(245, 158, 11, 0.45) !important;
+    color: #fde68a !important;
+  }
+  .lg-btn-del {
+    background: linear-gradient(135deg, rgba(244, 63, 94, 0.25) 0%, rgba(244, 63, 94, 0.08) 100%) !important;
+    border-color: rgba(244, 63, 94, 0.4) !important;
+    color: #fda4af !important;
+  }
+
+  /* 2. Collapsible Section Folder Styling */
+  .adm-folder-bar {
+    background: linear-gradient(145deg, rgba(24, 24, 30, 0.92) 0%, rgba(14, 14, 18, 0.96) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    padding: 14px 18px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transition: all 0.25s ease;
+  }
+  .adm-folder-bar:hover {
+    border-color: rgba(255, 255, 255, 0.26);
+  }
+  .adm-folder-bar.folder-is-open {
+    border-color: rgba(16, 185, 129, 0.55);
+    box-shadow: 0 12px 30px -10px rgba(16, 185, 129, 0.2);
+    margin-bottom: 8px;
+  }
+  .adm-folder-body-closed {
+    display: none !important;
+  }
+</style>
+
+<script id="admin-master-organizer-undo-dropdowns-v25">
+(function () {
+  /* 1. Bridge `let db` and `window.db` */
+  try {
+    Object.defineProperty(window, 'db', {
+      get: function () { return typeof db !== 'undefined' ? db : null; },
+      set: function (val) { if (typeof db !== 'undefined') db = val; },
+      configurable: true
+    });
+  } catch (e) {}
+
+  /* ============================================================================
+     2. 50-STEP TIME-MACHINE UNDO / REDO & RECYCLE BIN ENGINE
+     ============================================================================ */
+  window.undoStackV25 = [];
+  window.redoStackV25 = [];
+  window.trashBinV25 = [];
+  let isRestoringHistory = false;
+  let lastSnapshotStr = '';
+
+  window.pushHistorySnapshot = function (label) {
+    if (isRestoringHistory || !window.db) return;
+    try {
+      const clone = JSON.parse(JSON.stringify(window.db));
+      delete clone.auditLogs;
+      const sig = JSON.stringify(clone);
+      if (sig === lastSnapshotStr) return;
+      if (lastSnapshotStr) {
+        window.undoStackV25.push({ label: label || 'Edit', data: lastSnapshotStr });
+        if (window.undoStackV25.length > 50) window.undoStackV25.shift();
+        window.redoStackV25 = [];
+      }
+      lastSnapshotStr = sig;
+      window.updateUndoRedoHeaderUI();
+    } catch (e) {}
+  };
+
+  window.triggerAdminUndo = async function () {
+    if (window.undoStackV25.length === 0) {
+      if (typeof window.showLiquidSavePopup === 'function') window.showLiquidSavePopup('Nothing more to Undo!');
+      return;
+    }
+    isRestoringHistory = true;
+    try {
+      const currClone = JSON.parse(JSON.stringify(window.db));
+      delete currClone.auditLogs;
+      window.redoStackV25.push({ label: 'Redo Step', data: JSON.stringify(currClone) });
+
+      const prev = window.undoStackV25.pop();
+      const restored = JSON.parse(prev.data);
+      restored.auditLogs = window.db.auditLogs || [];
+      window.db = restored;
+      lastSnapshotStr = prev.data;
+
+      window.refreshAllAdminViewsV25();
+      if (typeof window.quietCollectAndSyncAll === 'function') {
+        await window.quietCollectAndSyncAll('↩️ Undid Last Change', true);
+      }
+    } finally {
+      isRestoringHistory = false;
+      window.updateUndoRedoHeaderUI();
+    }
+  };
+
+  window.triggerAdminRedo = async function () {
+    if (window.redoStackV25.length === 0) {
+      if (typeof window.showLiquidSavePopup === 'function') window.showLiquidSavePopup('Nothing more to Redo!');
+      return;
+    }
+    isRestoringHistory = true;
+    try {
+      const currClone = JSON.parse(JSON.stringify(window.db));
+      delete currClone.auditLogs;
+      window.undoStackV25.push({ label: 'Undo Step', data: JSON.stringify(currClone) });
+
+      const next = window.redoStackV25.pop();
+      const restored = JSON.parse(next.data);
+      restored.auditLogs = window.db.auditLogs || [];
+      window.db = restored;
+      lastSnapshotStr = next.data;
+
+      window.refreshAllAdminViewsV25();
+      if (typeof window.quietCollectAndSyncAll === 'function') {
+        await window.quietCollectAndSyncAll('↪️ Redid Change', true);
+      }
+    } finally {
+      isRestoringHistory = false;
+      window.updateUndoRedoHeaderUI();
+    }
+  };
+
+  window.restoreLastDeletedFromTrash = async function () {
+    if (window.trashBinV25.length === 0) {
+      if (typeof window.showLiquidSavePopup === 'function') window.showLiquidSavePopup('Trash Bin is Empty!');
+      return;
+    }
+    const item = window.trashBinV25.pop();
+    window.pushHistorySnapshot('Before Trash Restore');
+    if (item.type === 'team') {
+      db.team = db.team || [];
+      db.team.splice(item.index, 0, item.data);
+      if (typeof window.renderGranularAboutStudio === 'function') window.renderGranularAboutStudio();
+    } else if (item.type === 'service') {
+      db.services = db.services || [];
+      db.services.splice(item.index, 0, item.data);
+      if (typeof window.renderAdminServices === 'function') window.renderAdminServices();
+    } else if (item.type === 'portfolio') {
+      db.portfolio = db.portfolio || [];
+      db.portfolio.splice(item.index, 0, item.data);
+      if (typeof window.renderAdminPortfolio === 'function') window.renderAdminPortfolio();
+    }
+    window.updateUndoRedoHeaderUI();
+    if (typeof window.quietCollectAndSyncAll === 'function') {
+      await window.quietCollectAndSyncAll(`♻️ Restored: ${item.title || 'Item'}`, true);
+    }
+  };
+
+  window.updateUndoRedoHeaderUI = function () {
+    const uBtn = document.getElementById('top-lg-undo-btn');
+    const rBtn = document.getElementById('top-lg-redo-btn');
+    const tBtn = document.getElementById('top-lg-trash-btn');
+    if (uBtn) uBtn.innerHTML = `↩️ Undo (${window.undoStackV25.length})`;
+    if (rBtn) rBtn.innerHTML = `↪️ Redo (${window.redoStackV25.length})`;
+    if (tBtn) {
+      tBtn.innerHTML = `♻️ Restore (${window.trashBinV25.length})`;
+      tBtn.classList.toggle('hidden', window.trashBinV25.length === 0);
+    }
+  };
+
+  /* Inject Global Undo, Redo, Trash Restore & Collapse All Buttons in Sticky Top Header */
+  function injectTopHeaderUndoRedoBar() {
+    const topRow = document.querySelector('header .flex.flex-wrap.items-center.gap-2');
+    if (!topRow || document.getElementById('top-lg-undo-btn')) return;
+
+    const bar = document.createElement('div');
+    bar.className = 'flex flex-wrap items-center gap-1.5';
+    bar.innerHTML = `
+      <button type="button" id="top-lg-undo-btn" onclick="window.triggerAdminUndo()" title="Undo Last Edit (Ctrl+Z)" class="lg-btn lg-btn-undo">↩️ Undo (0)</button>
+      <button type="button" id="top-lg-redo-btn" onclick="window.triggerAdminRedo()" title="Redo (Ctrl+Y)" class="lg-btn lg-btn-undo">↪️ Redo (0)</button>
+      <button type="button" id="top-lg-trash-btn" onclick="window.restoreLastDeletedFromTrash()" title="Restore Recently Deleted Item" class="lg-btn lg-btn-lock hidden">♻️ Restore (0)</button>
+      <button type="button" onclick="window.collapseAllOpenSectionsV25()" title="Close All Open Cards & Sections" class="lg-btn">📁 Close All Open Cards</button>
+    `;
+    topRow.prepend(bar);
+  }
+
+  /* Keyboard Ctrl+Z / Ctrl+Y Support */
+  window.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+      e.preventDefault();
+      window.triggerAdminUndo();
+    } else if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) {
+      e.preventDefault();
+      window.triggerAdminRedo();
+    }
+  });
+
+  /* Capture DB snapshot before any input/change inside <main> */
+  document.querySelector('main')?.addEventListener('focusin', function (e) {
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT')) {
+      window.pushHistorySnapshot('Before Field Edit');
+    }
+  }, true);
+
+  /* ============================================================================
+     3. SIMPLIFIED 1-WORD TIERS & SHORT DESIGNATIONS (NO COMPLICATED LONG PHRASES)
+     ============================================================================ */
+  window.TEAM_TIERS_16 = [
+    { id: 'Founder',     label: '👑 Founder',      heading: 'Founders',           sub: 'Vision & Leadership' },
+    { id: 'Co-Founder',  label: '🌟 Co-Founder',   heading: 'Co-Founders',        sub: 'Executive Leadership' },
+    { id: 'Partner',     label: '🤝 Partner',      heading: 'Partners',           sub: 'Strategic & Managing Partners' },
+    { id: 'Director',    label: '🎬 Director',     heading: 'Directors',          sub: 'Creative & Operations Directors' },
+    { id: 'Advisor',     label: '🧠 Advisor',      heading: 'Advisors',           sub: 'Advisory Board' },
+    { id: 'Head',        label: '🚀 Head',         heading: 'Department Heads',   sub: 'Vertical Leads' },
+    { id: 'Manager',     label: '📊 Manager',      heading: 'Managers',           sub: 'Account & Project Managers' },
+    { id: 'Core Team',   label: '⚡ Core Team',    heading: 'Core Team',          sub: 'Execution Specialists' },
+    { id: 'Specialist',  label: '🎯 Specialist',   heading: 'Specialists',        sub: 'Domain Experts' },
+    { id: 'Consultant',  label: '💼 Consultant',   heading: 'Consultants',        sub: 'Growth Consultants' },
+    { id: 'Designer',    label: '🎨 Designer',     heading: 'Designers',          sub: '3D, Brand & Graphic Design' },
+    { id: 'Developer',   label: '💻 Developer',    heading: 'Developers',         sub: 'Web & UI Engineering' },
+    { id: 'Editor',      label: '🎞️ Editor',       heading: 'Editors',            sub: 'Video & Post-Production' },
+    { id: 'Operations',  label: '📦 Operations',   heading: 'Operations',         sub: 'Marketplace & Quick-Commerce Ops' },
+    { id: 'Marketing',   label: '📈 Marketing',    heading: 'Marketing',          sub: 'Performance & Paid Media' },
+    { id: 'Legal',       label: '⚖️ Legal',        heading: 'Legal & Compliance', sub: 'Trademarks & GS1 Licensing' }
+  ];
+
+  window.AGENCY_DESIGNATIONS_26 = [
+    'Founder',
+    'Co-Founder',
+    'Partner',
+    'Managing Partner',
+    'CEO',
+    'COO',
+    'CCO',
+    'CTO',
+    'Director',
+    'Creative Director',
+    'Growth Consultant',
+    'Brand Strategist',
+    'Account Manager',
+    'Operations Lead',
+    'Marketplace Lead',
+    'Quick-Commerce Lead',
+    'Ads Specialist',
+    'SEO Specialist',
+    '3D Artist',
+    'Graphic Designer',
+    'Packaging Designer',
+    'Video Editor',
+    'Photographer',
+    'Web Developer',
+    'Legal Advisor',
+    'Client Success',
+    'CUSTOM_ROLE'
+  ];
+
+  /* ============================================================================
+     4. COMPACT BRIEF VIEW FOR TEAM MEMBERS (CLOSED BY DEFAULT + LIQUID-GLASS BUTTONS)
+     ============================================================================ */
+  window.openTeamMemberIdsV25 = new Set(); // Empty by default = All profiles closed!
+  window.openServiceIdsV25 = new Set();    // Empty by default = All services closed!
+
+  window.toggleMemberEditCardV25 = function (memberId) {
+    if (window.openTeamMemberIdsV25.has(memberId)) {
+      window.openTeamMemberIdsV25.delete(memberId);
+    } else {
+      window.openTeamMemberIdsV25.add(memberId);
+    }
+    window.renderGranularAboutStudio();
+  };
+
+  window.toggleMemberLockV25 = function (idx) {
+    if (!window.db || !db.team[idx]) return;
+    window.pushHistorySnapshot('Toggled Member Lock');
+    db.team[idx].locked = !db.team[idx].locked;
+    if (db.team[idx].locked) {
+      window.openTeamMemberIdsV25.delete(db.team[idx].id);
+    }
+    window.renderGranularAboutStudio();
+    window.quietSyncAboutDB(db.team[idx].locked ? '🔒 Locked Profile' : '🔓 Unlocked Profile', true);
+  };
+
+  window.deleteGranularMember = function (idx) {
+    if (!window.db || !db.team[idx]) return;
+    const m = db.team[idx];
+    if (m.locked) {
+      alert('🔒 This profile is Locked! Click "🔒 Locked" button to unlock before removing.');
+      return;
+    }
+    if (!confirm(`Remove "${m.name || 'Member'}"? (You can restore from ♻️ Restore button at top)`)) return;
+    window.pushHistorySnapshot('Before Deleting Member');
+    window.trashBinV25.push({ type: 'team', index: idx, title: m.name, data: JSON.parse(JSON.stringify(m)) });
+    db.team.splice(idx, 1);
+    window.updateUndoRedoHeaderUI();
+    window.renderGranularAboutStudio();
+    window.quietSyncAboutDB('Removed Member: ' + (m.name || ''), true);
+  };
+
+  /* Override `buildMemberCardEditorHTML` to show COMPACT BRIEF CARD when closed, and Full Editor ONLY when `✏️ Edit` is clicked */
+  const fullMemberEditorBuilder = window.buildMemberCardEditorHTML;
+  window.buildMemberCardEditorHTML = function (m) {
+    const idx = m.origIdx;
+    const mId = m.id || ('TM-' + idx);
+    m.id = mId;
+    const isEditing = window.openTeamMemberIdsV25.has(mId) && !m.locked;
+    const avatar = m.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name || 'Member')}&background=6366f1&color=fff&size=128`;
+    const whatTheyDo = m.cardBrief || m.bio || 'Growth & Creative Execution.';
+
+    /* COMPACT BRIEF VIEW (DEFAULT CLOSED STATE) */
+    if (!isEditing) {
+      return `
+        <div class="p-4 rounded-2xl bg-[#09090b] border ${m.locked ? 'border-amber-500/40' : 'border-[#27272a] hover:border-white/25'} flex flex-wrap items-center justify-between gap-3 transition shadow-lg">
+          <!-- Left: Compact Photo + Name + 1-Word Role + What They Do -->
+          <div class="flex items-center gap-3.5 min-w-0 flex-1">
+            <img src="${avatar}" class="w-12 h-12 rounded-2xl object-cover border border-amber-400/50 shrink-0" />
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-1.5">
+                <strong class="text-sm font-extrabold text-white truncate">${m.name || 'Unnamed'}</strong>
+                <span class="px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-300 text-[10px] font-black uppercase">${m.type || 'Founder'}</span>
+                <span class="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 text-[10px] font-bold">${m.role || 'Founder'}</span>
+                ${m.locked ? `<span class="text-[10px] text-amber-400 font-bold">🔒 Locked</span>` : ''}
+              </div>
+              <p class="text-[11px] text-zinc-400 truncate mt-0.5">${whatTheyDo}</p>
+            </div>
+          </div>
+
+          <!-- Right: Semi-Transparent Liquid-Glass Action Buttons -->
+          <div class="flex flex-wrap items-center gap-1.5 shrink-0">
+            <button type="button" onclick="if(${Boolean(m.locked)}){alert('🔒 Profile is Locked! Click Unlock first.');}else{window.toggleMemberEditCardV25('${mId}');}" class="lg-btn lg-btn-edit">
+              ✏️ Edit
+            </button>
+            <button type="button" onclick="window.triggerAdminUndo()" title="Undo Last Edit" class="lg-btn lg-btn-undo">
+              ↩️ Undo
+            </button>
+            <button type="button" onclick="window.triggerAdminRedo()" title="Redo" class="lg-btn lg-btn-undo">
+              ↪️ Redo
+            </button>
+            <button type="button" onclick="window.toggleMemberLockV25(${idx})" title="Lock / Unlock Profile" class="lg-btn lg-btn-lock">
+              ${m.locked ? '🔒 Locked' : '🔓 Lock'}
+            </button>
+            <button type="button" onclick="window.deleteGranularMember(${idx})" title="Remove Profile" class="lg-btn lg-btn-del">
+              🗑️ Remove
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    /* EXPANDED EDITOR STATE (Only when user clicked `✏️ Edit`) */
+    const fullHTML = typeof fullMemberEditorBuilder === 'function' ? fullMemberEditorBuilder(m) : '';
+    return `
+      <div class="col-span-full p-5 rounded-3xl bg-[#0d0d12] border-2 border-emerald-500/60 space-y-4 shadow-2xl">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/15 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+            <strong class="text-sm font-black text-white">Editing Profile: ${m.name || 'Member'} (${m.type || 'Founder'})</strong>
+          </div>
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button type="button" onclick="window.triggerAdminUndo()" class="lg-btn lg-btn-undo">↩️ Undo</button>
+            <button type="button" onclick="window.triggerAdminRedo()" class="lg-btn lg-btn-undo">↪️ Redo</button>
+            <button type="button" onclick="window.toggleMemberLockV25(${idx})" class="lg-btn lg-btn-lock">🔒 Lock & Close</button>
+            <button type="button" onclick="window.toggleMemberEditCardV25('${mId}')" class="lg-btn lg-btn-done">✓ Done / Close Card</button>
+          </div>
+        </div>
+        ${fullHTML}
+        <div class="pt-2 flex justify-end">
+          <button type="button" onclick="window.toggleMemberEditCardV25('${mId}')" class="lg-btn lg-btn-done">✓ Save & Close Profile Card</button>
+        </div>
+      </div>
+    `;
+  };
+
+  /* When adding a new member, automatically open ONLY that new member's card for editing */
+  window.addNewGranularMember = function (tierType) {
+    window.pushHistorySnapshot('Before Adding Member');
+    const newId = 'TM-' + Date.now();
+    db.team = db.team || [];
+    db.team.unshift({
+      id: newId,
+      name: 'New ' + (tierType || 'Founder'),
+      role: tierType || 'Founder',
+      type: tierType || 'Founder',
+      photo: '',
+      placement: 'center',
+      photoSize: tierType === 'Founder' ? 185 : 140,
+      cropShape: 's01_circle',
+      borderFrame: 'b01_gold_halo',
+      borderColor: '#f59e0b',
+      borderWidth: 3,
+      cardBrief: 'Scaling brands across global marketplaces.',
+      detailedBio: 'Hands-on operator specializing in organic brand scaling.',
+      skills: ['E-Commerce', 'Brand Strategy'],
+      socials: {}
+    });
+    window.openTeamMemberIdsV25.clear();
+    window.openTeamMemberIdsV25.add(newId);
+    window.renderGranularAboutStudio();
+    window.quietSyncAboutDB('Added ' + tierType, true);
+  };
+
+  /* ============================================================================
+     5. COMPACT BRIEF VIEW FOR SERVICES (`#panel-services`) WITH EDIT/UNDO/REMOVE
+     ============================================================================ */
+  const rawRenderServices = window.renderAdminServices;
+  window.renderAdminServices = function () {
+    if (typeof window.ensureFrontendServicesSynced === 'function') window.ensureFrontendServicesSynced();
+    if (!window.db) return;
+    db.services = Array.isArray(db.services) ? db.services : [];
+
+    const container = document.getElementById('adm-services-list');
+    if (!container) return;
+
+    const uniqueCats = [...new Set(db.services.map(s => (s.badge || 'General').trim()).filter(Boolean))];
+
+    const headerHTML = `
+      <div class="admin-card rounded-3xl p-5 space-y-3 border border-emerald-500/40 bg-[#111114] mb-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 class="text-base font-extrabold text-white">⚡ Services & Categories (${db.services.length} Services)</h3>
+            <p class="text-xs text-zinc-400">Har service compact card mein band hai. Edit karne ke liye <strong>✏️ Edit</strong> dabayein.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="window.triggerAdminUndo()" class="lg-btn lg-btn-undo">↩️ Undo</button>
+            <button type="button" onclick="window.triggerAdminRedo()" class="lg-btn lg-btn-undo">↪️ Redo</button>
+            <button type="button" onclick="window.addNewServiceCompactV25()" class="lg-btn lg-btn-done">+ Add Service</button>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-white/10 text-xs">
+          <span class="text-zinc-400 font-bold">Categories:</span>
+          ${uniqueCats.map(c => `<span class="px-2.5 py-1 rounded-lg bg-black border border-white/10 text-emerald-300 font-bold">${c}</span>`).join('')}
+        </div>
+      </div>
+    `;
+
+    const listHTML = db.services.map(function (cat, cIdx) {
+      const sId = cat.id || ('CAT-' + cIdx);
+      cat.id = sId;
+      const isOpen = window.openServiceIdsV25.has(sId);
+      const subs = Array.isArray(cat.subServices) ? cat.subServices : [];
+      const minPrice = subs.length > 0 ? Math.min(...subs.map(x => Number(x.priceINR || 0))) : 0;
+
+      if (!isOpen) {
+        return `
+          <div class="p-4 rounded-2xl bg-[#111114] border border-[#27272a] hover:border-white/25 flex flex-wrap items-center justify-between gap-3 mb-3 transition">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <span class="px-2.5 py-1 rounded-xl bg-indigo-500/20 text-indigo-300 text-xs font-black shrink-0">${cat.index || '(0' + (cIdx + 1) + ')'}</span>
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <strong class="text-sm font-extrabold text-white truncate">${cat.title || 'Untitled Service'}</strong>
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">${cat.badge || 'General'}</span>
+                  <span class="text-[11px] text-zinc-400">${subs.length} Deliverables • Starts ₹${minPrice.toLocaleString('en-IN')}</span>
+                </div>
+                <p class="text-[11px] text-zinc-400 truncate mt-0.5">${cat.description || ''}</p>
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-1.5 shrink-0">
+              <button type="button" onclick="window.toggleServiceOpenV25('${sId}')" class="lg-btn lg-btn-edit">✏️ Edit</button>
+              <button type="button" onclick="window.triggerAdminUndo()" class="lg-btn lg-btn-undo">↩️ Undo</button>
+              <button type="button" onclick="window.duplicateServiceV17(${cIdx})" class="lg-btn">📋 Copy</button>
+              <button type="button" onclick="window.deleteServiceWithTrashV25(${cIdx})" class="lg-btn lg-btn-del">🗑️ Remove</button>
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="p-5 rounded-3xl bg-[#111114] border-2 border-emerald-500/50 space-y-4 mb-4 shadow-2xl">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/15 pb-3">
+            <strong class="text-sm font-black text-emerald-400">Editing Service: ${cat.title || ''}</strong>
+            <div class="flex items-center gap-1.5">
+              <button type="button" onclick="window.triggerAdminUndo()" class="lg-btn lg-btn-undo">↩️ Undo</button>
+              <button type="button" onclick="window.triggerAdminRedo()" class="lg-btn lg-btn-undo">↪️ Redo</button>
+              <button type="button" onclick="window.toggleServiceOpenV25('${sId}')" class="lg-btn lg-btn-done">✓ Done / Close</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+            <div class="sm:col-span-2">
+              <label class="text-[10px] text-zinc-400 block mb-1">Index</label>
+              <input type="text" value="${(cat.index || '').replace(/"/g, '&quot;')}" oninput="db.services[${cIdx}].index=this.value; window.instantSyncServicesAndDB('Edited Index');" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" />
+            </div>
+            <div class="sm:col-span-3">
+              <label class="text-[10px] text-emerald-400 font-bold block mb-1">Category Name</label>
+              <input type="text" value="${(cat.badge || '').replace(/"/g, '&quot;')}" oninput="db.services[${cIdx}].badge=this.value; window.instantSyncServicesAndDB('Edited Category');" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold text-emerald-300" />
+            </div>
+            <div class="sm:col-span-7">
+              <label class="text-[10px] text-white font-bold block mb-1">Service Title</label>
+              <input type="text" value="${(cat.title || '').replace(/"/g, '&quot;')}" oninput="db.services[${cIdx}].title=this.value; window.instantSyncServicesAndDB('Edited Service Title');" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-extrabold text-white" />
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[10px] text-zinc-400 block mb-1">Description</label>
+            <textarea rows="2" oninput="db.services[${cIdx}].description=this.value; window.instantSyncServicesAndDB('Edited Service Desc');" class="w-full px-3 py-2 rounded-xl adm-input text-xs">${cat.description || ''}</textarea>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-[#09090b] border border-white/10 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-emerald-400">Deliverables (${subs.length})</span>
+              <button type="button" onclick="window.addDeliverableV17(${cIdx})" class="lg-btn lg-btn-edit">+ Add Deliverable</button>
+            </div>
+            ${subs.map((sub, sIdx) => `
+              <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+                <input type="text" value="${(sub.name || '').replace(/"/g, '&quot;')}" oninput="db.services[${cIdx}].subServices[${sIdx}].name=this.value; window.instantSyncServicesAndDB('Edited Deliverable');" class="sm:col-span-6 px-3 py-1.5 rounded-lg adm-input text-xs font-bold" />
+                <input type="number" value="${Number(sub.priceINR || 0)}" oninput="db.services[${cIdx}].subServices[${sIdx}].priceINR=Number(this.value||0); window.instantSyncServicesAndDB('Edited Price');" class="sm:col-span-3 px-3 py-1.5 rounded-lg adm-input text-xs font-bold text-emerald-400" />
+                <select onchange="db.services[${cIdx}].subServices[${sIdx}].billing=this.value; window.instantSyncServicesAndDB('Edited Billing', true);" class="sm:col-span-2 px-2 py-1.5 rounded-lg adm-input text-xs">
+                  <option value="One-Time" ${sub.billing==='One-Time'?'selected':''}>One-Time</option>
+                  <option value="Monthly" ${sub.billing==='Monthly'?'selected':''}>Monthly</option>
+                  <option value="Quarterly" ${sub.billing==='Quarterly'?'selected':''}>Quarterly</option>
+                </select>
+                <button type="button" onclick="window.deleteDeliverableV17(${cIdx}, ${sIdx})" class="sm:col-span-1 lg-btn lg-btn-del justify-center">✕</button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    container.innerHTML = headerHTML + listHTML;
+  };
+
+  window.toggleServiceOpenV25 = function (sId) {
+    if (window.openServiceIdsV25.has(sId)) window.openServiceIdsV25.delete(sId);
+    else window.openServiceIdsV25.add(sId);
+    window.renderAdminServices();
+  };
+
+  window.addNewServiceCompactV25 = function () {
+    window.pushHistorySnapshot('Before Adding Service');
+    const newId = 'CAT-' + Date.now();
+    db.services = db.services || [];
+    db.services.push({
+      id: newId,
+      index: `(0${db.services.length + 1})`,
+      title: 'New Service Package',
+      badge: 'Growth',
+      mediaUrl: '',
+      description: 'End-to-end execution and growth support.',
+      subServices: [{ id: 'SUB-' + Date.now(), name: 'Core Deliverable', priceINR: 12000, billing: 'One-Time' }]
+    });
+    window.openServiceIdsV25.clear();
+    window.openServiceIdsV25.add(newId);
+    window.renderAdminServices();
+    window.instantSyncServicesAndDB('Added New Service', true);
+  };
+
+  window.deleteServiceWithTrashV25 = function (cIdx) {
+    const s = db.services[cIdx];
+    if (!s) return;
+    if (!confirm(`Remove service "${s.title}"?`)) return;
+    window.pushHistorySnapshot('Before Removing Service');
+    window.trashBinV25.push({ type: 'service', index: cIdx, title: s.title, data: JSON.parse(JSON.stringify(s)) });
+    db.services.splice(cIdx, 1);
+    window.updateUndoRedoHeaderUI();
+    window.renderAdminServices();
+    window.instantSyncServicesAndDB('Removed Service', true);
+  };
+
+  /* ============================================================================
+     6. CONVERT SPREAD-OUT OPTION GRIDS INTO CLEAN DROPDOWN MENUS (`<select>`)
+     ============================================================================ */
+  window.convertSpreadGridsToDropdownsV25 = function () {
+    if (!window.db) return;
+
+    /* A. Convert 16 Hamburger Icon Cards Grid (#hb14-style-cards-grid) -> Clean Dropdown */
+    const hbGrid = document.getElementById('hb14-style-cards-grid');
+    if (hbGrid) {
+      const curHbStyle = db.hamburgerIconConfig?.iconStyle || 'three_line';
+      const styles16 = [
+        { id: 'three_line',      name: '1. ☰ Classic 3-Line Hamburger' },
+        { id: 'two_line',        name: '2. ＝ iOS 2-Line Minimal' },
+        { id: 'staggered_right', name: '3. ≣ Luxury Right Stagger' },
+        { id: 'staggered_left',  name: '4. ≡ Editorial Left Stagger' },
+        { id: 'center_diamond',  name: '5. ❖ Diamond Center Stack' },
+        { id: 'bento_dots',      name: '6. ⠿ 9-Dots Bento Grid' },
+        { id: 'ten_dots',        name: '7. ⁙ 10-Dots Cyber Matrix' },
+        { id: 'four_dots',       name: '8. ∷ 4-Dots iOS App Grid' },
+        { id: 'dots_vertical',   name: '9. ⋮ 3-Dots Vertical' },
+        { id: 'dots_horizontal', name: '10. ⋯ 3-Dots Horizontal' },
+        { id: 'ios_sliders',     name: '11. 🎚️ iOS Control Sliders' },
+        { id: 'plus_cross',      name: '12. ＋ Minimal Plus (+)' },
+        { id: 'circle_ring',     name: '13. ◎ Halo Circle Ring' },
+        { id: 'pill_text',       name: '14. 💊 MENU + Icon Pill' },
+        { id: 'custom_emoji',    name: '15. ✦ Custom Symbol / Emoji' },
+        { id: 'custom_image',    name: '16. 🖼️ Custom Uploaded Image / PNG' }
+      ];
+      hbGrid.className = 'block w-full';
+      hbGrid.innerHTML = `
+        <select onchange="window.selectHb15StyleInstant(this.value)" class="w-full px-4 py-3 rounded-xl adm-input text-xs font-extrabold text-emerald-300">
+          ${styles16.map(s => `<option value="${s.id}" ${curHbStyle === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}
+        </select>
+      `;
+    }
+
+    /* B. Convert 4 Menu Drawer Animation Cards (#ms-anim-cards) -> Clean Dropdown */
+    const msAnimGrid = document.getElementById('ms-anim-cards');
+    if (msAnimGrid) {
+      const curAnim = db.navMenuConfig?.animStyle || 'slide_scale';
+      msAnimGrid.className = 'block w-full';
+      msAnimGrid.innerHTML = `
+        <label class="text-xs font-bold text-indigo-300 block mb-1">Menu Opening Animation Style</label>
+        <select onchange="window.selectMenuStudioAnim(this.value)" class="w-full px-4 py-2.5 rounded-xl adm-input text-xs font-bold text-white">
+          <option value="slide_scale" ${curAnim==='slide_scale'?'selected':''}>1. Apple Liquid Slide & Zoom</option>
+          <option value="flip_3d" ${curAnim==='flip_3d'?'selected':''}>2. 3D Perspective Spatial Flip</option>
+          <option value="elastic" ${curAnim==='elastic'?'selected':''}>3. iOS Elastic Spring Bounce</option>
+          <option value="blur_dissolve" ${curAnim==='blur_dissolve'?'selected':''}>4. Frosted Blur-to-Sharp Fade</option>
+        </select>
+      `;
+    }
+
+    /* C. Convert 6 Loader Exit Cards (#ldr-exit-cards-grid) -> Clean Dropdown */
+    const ldrExitGrid = document.getElementById('ldr-exit-cards-grid');
+    if (ldrExitGrid) {
+      const curExit = db.loaderConfig?.exitAnim || 'zoom_portal';
+      ldrExitGrid.className = 'block w-full';
+      ldrExitGrid.innerHTML = `
+        <label class="text-xs font-bold text-amber-300 block mb-1">Select 100% Completion Exit Animation</label>
+        <select onchange="window.selectLoaderExitAnim(this.value)" class="w-full px-4 py-3 rounded-xl adm-input text-xs font-extrabold text-amber-300">
+          <option value="zoom_portal" ${curExit==='zoom_portal'?'selected':''}>🚀 1. 3D Logo Fly-Through Zoom (Apple Keynote)</option>
+          <option value="flip_3d_burst" ${curExit==='flip_3d_burst'?'selected':''}>🌀 2. 3D 360° Flip & Burst</option>
+          <option value="curtain_split" ${curExit==='curtain_split'?'selected':''}>🎭 3. Cinema Split Curtain Reveal</option>
+          <option value="iris_portal" ${curExit==='iris_portal'?'selected':''}>⭕ 4. VisionOS Circular Iris Portal</option>
+          <option value="glass_melt" ${curExit==='glass_melt'?'selected':''}>🥂 5. Liquid Glass Blur Dissolve</option>
+          <option value="shutter_up" ${curExit==='shutter_up'?'selected':''}>⚡ 6. High-Speed Vertical Shutter Lift</option>
+        </select>
+      `;
+    }
+
+    /* D. Convert 4 Home Entrance Cards (#ldr-home-entrance-grid) -> Clean Dropdown */
+    const ldrHomeGrid = document.getElementById('ldr-home-entrance-grid');
+    if (ldrHomeGrid) {
+      const curHomeEnt = db.loaderConfig?.homeEntrance || 'cascade';
+      ldrHomeGrid.className = 'block w-full';
+      ldrHomeGrid.innerHTML = `
+        <label class="text-xs font-bold text-indigo-300 block mb-1">Select Home Page Entrance Animation</label>
+        <select onchange="window.selectHomeEntranceAnim(this.value)" class="w-full px-4 py-3 rounded-xl adm-input text-xs font-extrabold text-indigo-300">
+          <option value="cascade" ${curHomeEnt==='cascade'?'selected':''}>🌊 1. Apple Staggered Upward Cascade</option>
+          <option value="zoom_3d" ${curHomeEnt==='zoom_3d'?'selected':''}>🕶️ 2. 3D Spatial Depth Zoom</option>
+          <option value="blur_focus" ${curHomeEnt==='blur_focus'?'selected':''}>✨ 3. Cinema Optical Blur-to-Sharp</option>
+          <option value="elastic" ${curHomeEnt==='elastic'?'selected':''}>🎯 4. iOS Tactile Spring Bounce</option>
+        </select>
+      `;
+    }
+  };
+
+  /* ============================================================================
+     7. SECTION-WISE COLLAPSIBLE FOLDERS ACROSS ALL ADMIN TABS (CLOSED BY DEFAULT)
+     ============================================================================ */
+  window.openSectionFoldersV25 = new Set();
+
+  window.wrapAdminCardsIntoFoldersV25 = function () {
+    document.querySelectorAll('.adm-panel').forEach(function (panel) {
+      const panelId = panel.id || 'panel';
+      const cards = Array.from(panel.querySelectorAll(':scope > .admin-card, :scope > div > .admin-card'));
+
+      cards.forEach(function (card, idx) {
+        if (card.dataset.folderWrapped === '1') return;
+        /* Skip small top summary banners */
+        const hEl = card.querySelector('h2, h3, h4');
+        if (!hEl) return;
+
+        const folderKey = `${panelId}_sec_${idx}`;
+        card.dataset.folderWrapped = '1';
+        card.dataset.folderKey = folderKey;
+
+        const rawTitle = hEl.innerText.trim() || `Section #${idx + 1}`;
+        const folderBar = document.createElement('div');
+        folderBar.id = 'fbar-' + folderKey;
+        folderBar.className = 'adm-folder-bar mb-3';
+        folderBar.innerHTML = `
+          <div class="flex items-center gap-3 min-w-0 flex-1 cursor-pointer" onclick="window.toggleSectionFolderV25('${folderKey}')">
+            <span class="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-xs font-black text-emerald-400 shrink-0">${idx + 1}</span>
+            <div class="min-w-0 flex-1">
+              <h4 class="text-sm font-extrabold text-white truncate">${rawTitle}</h4>
+              <span class="text-[10px] text-zinc-400">Click "✏️ Edit Section" to expand & customize</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button type="button" id="fbtn-${folderKey}" onclick="window.toggleSectionFolderV25('${folderKey}')" class="lg-btn lg-btn-edit">
+              ✏️ Edit Section
+            </button>
+            <button type="button" onclick="window.triggerAdminUndo()" class="lg-btn lg-btn-undo" title="Undo">
+              ↩️ Undo
+            </button>
+            <button type="button" onclick="window.triggerAdminRedo()" class="lg-btn lg-btn-undo" title="Redo">
+              ↪️ Redo
+            </button>
+          </div>
+        `;
+
+        card.parentNode.insertBefore(folderBar, card);
+        if (!window.openSectionFoldersV25.has(folderKey)) {
+          card.classList.add('adm-folder-body-closed');
+        } else {
+          folderBar.classList.add('folder-is-open');
+          const btn = document.getElementById('fbtn-' + folderKey);
+          if (btn) {
+            btn.className = 'lg-btn lg-btn-done';
+            btn.innerHTML = '✓ Close Section';
+          }
+        }
+      });
+    });
+  };
+
+  window.toggleSectionFolderV25 = function (folderKey) {
+    const card = document.querySelector(`[data-folder-key="${folderKey}"]`);
+    const bar = document.getElementById('fbar-' + folderKey);
+    const btn = document.getElementById('fbtn-' + folderKey);
+    if (!card) return;
+
+    const willOpen = card.classList.contains('adm-folder-body-closed');
+    if (willOpen) {
+      window.openSectionFoldersV25.add(folderKey);
+      card.classList.remove('adm-folder-body-closed');
+      if (bar) bar.classList.add('folder-is-open');
+      if (btn) {
+        btn.className = 'lg-btn lg-btn-done';
+        btn.innerHTML = '✓ Close Section';
+      }
+      window.convertSpreadGridsToDropdownsV25();
+    } else {
+      window.openSectionFoldersV25.delete(folderKey);
+      card.classList.add('adm-folder-body-closed');
+      if (bar) bar.classList.remove('folder-is-open');
+      if (btn) {
+        btn.className = 'lg-btn lg-btn-edit';
+        btn.innerHTML = '✏️ Edit Section';
+      }
+    }
+  };
+
+  window.collapseAllOpenSectionsV25 = function () {
+    window.openTeamMemberIdsV25.clear();
+    window.openServiceIdsV25.clear();
+    window.openSectionFoldersV25.clear();
+    document.querySelectorAll('[data-folder-key]').forEach(function (card) {
+      const k = card.dataset.folderKey;
+      card.classList.add('adm-folder-body-closed');
+      document.getElementById('fbar-' + k)?.classList.remove('folder-is-open');
+      const btn = document.getElementById('fbtn-' + k);
+      if (btn) {
+        btn.className = 'lg-btn lg-btn-edit';
+        btn.innerHTML = '✏️ Edit Section';
+      }
+    });
+    if (typeof window.renderGranularAboutStudio === 'function') window.renderGranularAboutStudio();
+    if (typeof window.renderAdminServices === 'function') window.renderAdminServices();
+    window.wrapAdminCardsIntoFoldersV25();
+    if (typeof window.showLiquidSavePopup === 'function') {
+      window.showLiquidSavePopup('📁 All Open Cards & Sections Collapsed Cleanly!');
+    }
+  };
+
+  window.refreshAllAdminViewsV25 = function () {
+    if (typeof window.populateAllInputsFromDB === 'function') window.populateAllInputsFromDB();
+    if (typeof window.renderGranularAboutStudio === 'function') window.renderGranularAboutStudio();
+    if (typeof window.renderAdminServices === 'function') window.renderAdminServices();
+    if (typeof window.renderContactPageStudio === 'function') window.renderContactPageStudio();
+    if (typeof window.renderSwitchboardCards === 'function') window.renderSwitchboardCards();
+    setTimeout(function () {
+      window.convertSpreadGridsToDropdownsV25();
+      window.wrapAdminCardsIntoFoldersV25();
+    }, 80);
+  };
+
+  /* Hook into Tab Switch & Renderers */
+  const origSwitch = window.switchAdminTab;
+  window.switchAdminTab = function (tabName) {
+    if (typeof origSwitch === 'function') origSwitch(tabName);
+    setTimeout(function () {
+      window.convertSpreadGridsToDropdownsV25();
+      window.wrapAdminCardsIntoFoldersV25();
+    }, 60);
+  };
+
+  const origAboutRender = window.renderGranularAboutStudio;
+  window.renderGranularAboutStudio = function () {
+    if (typeof origAboutRender === 'function') origAboutRender();
+    setTimeout(function () {
+      window.wrapAdminCardsIntoFoldersV25();
+    }, 40);
+  };
+
+  setTimeout(function () {
+    injectTopHeaderUndoRedoBar();
+    window.pushHistorySnapshot('Initial State');
+    window.renderAdminServices();
+    window.renderGranularAboutStudio();
+    window.convertSpreadGridsToDropdownsV25();
+    window.wrapAdminCardsIntoFoldersV25();
+  }, 750);
+})();
+</script>
+<!-- ==================== ADMIN.HTML : FINAL LAUNCH-READY COMPACT UX & UNDO/REDO COMPLETE ==================== -->
