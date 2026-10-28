@@ -8909,3 +8909,504 @@
 })();
 </script>
 <!-- ==================== ADMIN.HTML : GRANULAR ABOUT & 3-TIER TEAM STUDIO COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : ULTIMATE PHOTO STUDIO (30 SHAPES, 30 BORDERS, PLACEMENT, GIANT SIZE, 16 TIERS & 26 ROLES) PATCH (PASTE AT VERY BOTTOM OF admin.html) ==================== -->
+<script id="admin-ultimate-about-photo-studio-v24">
+(function () {
+  /* 1. Bridge `let db` and `window.db` Safely */
+  try {
+    Object.defineProperty(window, 'db', {
+      get: function () { return typeof db !== 'undefined' ? db : null; },
+      set: function (val) { if (typeof db !== 'undefined') db = val; },
+      configurable: true
+    });
+  } catch (e) {}
+
+  /* 2. 30 Photo Crop Shapes Catalog */
+  window.PHOTO_SHAPES_30 = [
+    { id: 's01_circle',         name: '01. Classic Perfect Circle' },
+    { id: 's02_squircle',       name: '02. Apple iOS Squircle (26%)' },
+    { id: 's03_round_soft',     name: '03. Soft Rounded Square (16px)' },
+    { id: 's04_round_deep',     name: '04. Deep Luxury Rounded (32px)' },
+    { id: 's05_sharp_square',   name: '05. Sharp Editorial Square (0px)' },
+    { id: 's06_capsule_pill',   name: '06. Vertical Capsule Pill' },
+    { id: 's07_roman_arch',     name: '07. Roman Gallery Arch (Top Round)' },
+    { id: 's08_cathedral_arch', name: '08. Gothic Pointed Arch' },
+    { id: 's09_inverted_arch',  name: '09. Inverted U-Dome' },
+    { id: 's10_hexagon',        name: '10. Classic Hexagon (6-Sided)' },
+    { id: 's11_hex_vertical',   name: '11. Vertical Standing Hexagon' },
+    { id: 's12_octagon',        name: '12. Royal Octagon (8-Sided)' },
+    { id: 's13_diamond',        name: '13. Precision Diamond Cut' },
+    { id: 's14_soft_diamond',   name: '14. Soft Polygon Rhombus' },
+    { id: 's15_pentagon',       name: '15. Pentagon Crest (5-Sided)' },
+    { id: 's16_heptagon',       name: '16. Heptagon Gem (7-Sided)' },
+    { id: 's17_decagon',        name: '17. Decagon Star Ring (10-Sided)' },
+    { id: 's18_royal_shield',   name: '18. Executive Crest Shield' },
+    { id: 's19_teardrop_left',  name: '19. Luxury Teardrop (Top-Left)' },
+    { id: 's20_teardrop_right', name: '20. Luxury Teardrop (Top-Right)' },
+    { id: 's21_botanical_leaf', name: '21. Organic Botanical Leaf' },
+    { id: 's22_cyber_bevel_4',  name: '22. Cyber 4-Corner Chamfer Cut' },
+    { id: 's23_cyber_cut_trbl', name: '23. Diagonal Cut (Top-Right / Bot-Left)' },
+    { id: 's24_cyber_cut_tlbr', name: '24. Diagonal Cut (Top-Left / Bot-Right)' },
+    { id: 's25_ticket_notch',   name: '25. Cinema VIP Ticket Notch' },
+    { id: 's26_parallelogram',  name: '26. Dynamic Parallelogram Slant' },
+    { id: 's27_trapezoid',      name: '27. Editorial Monument Trapezoid' },
+    { id: 's28_starburst_12',   name: '28. 12-Point Emblem Seal' },
+    { id: 's29_modern_pebble',  name: '29. Asymmetric Luxury Pebble' },
+    { id: 's30_full_portrait',  name: '30. Full Portrait Frame (4:5 Ratio)' }
+  ];
+
+  /* 3. 30 Photo Border & Frame Designs Catalog */
+  window.BORDER_FRAMES_30 = [
+    { id: 'b01_gold_halo',       name: '01. 👑 Metallic Gold Double Halo' },
+    { id: 'b02_gold_spin_orbit', name: '02. 🌀 Spinning 3D Gold Orbit Ring' },
+    { id: 'b03_apple_titanium',  name: '03. 🍎 Apple Brushed Titanium Rim' },
+    { id: 'b04_liquid_glass',    name: '04. 🥂 Frosted Liquid-Glass Double Rim' },
+    { id: 'b05_emerald_neon',    name: '05. 💎 Cyber Emerald Neon Glow' },
+    { id: 'b06_indigo_electric', name: '06. 🌌 Royal Indigo Electric Aura' },
+    { id: 'b07_sunset_grad',     name: '07. 🌅 Sunset Gold-to-Rose Gradient' },
+    { id: 'b08_hologram_prism',  name: '08. 🌈 Prismatic Hologram Aura' },
+    { id: 'b09_dashed_radar',    name: '09. 🎯 Dashed Tech Radar Ring' },
+    { id: 'b10_dotted_matrix',   name: '10. ••• Dotted Matrix Orbit Ring' },
+    { id: 'b11_double_offset',   name: '11. ⭕ Double Offset Luxury Ring' },
+    { id: 'b12_triple_halo',     name: '12.  concentric Triple Halo Rings' },
+    { id: 'b13_silver_chrome',   name: '13. 💿 Silver Chrome Metallic Bevel' },
+    { id: 'b14_rose_gold',       name: '14. 🌸 Rose Gold Luxury Rim' },
+    { id: 'b15_crimson_velvet',  name: '15. 🌹 Royal Crimson Velvet Glow' },
+    { id: 'b16_cyan_laser',      name: '16. ⚡ Cyan Laser Pulse Rim' },
+    { id: 'b17_amber_solar',     name: '17. 🔥 Amber Solar Flare Ring' },
+    { id: 'b18_obsidian_matte',  name: '18. 🌑 Obsidian Matte Stealth Rim' },
+    { id: 'b19_white_gallery',   name: '19. ⬜ Pure White Gallery Mount' },
+    { id: 'b20_museum_gold',     name: '20. 🏛️ Vintage Museum Gold Frame' },
+    { id: 'b21_hud_brackets',    name: '21. ⌜⌟ Corner HUD Tech Brackets' },
+    { id: 'b22_top_bot_arc',     name: '22. 🌙 Top & Bottom Glowing Arcs' },
+    { id: 'b23_left_right_neon', name: '23. ⚡ Left & Right Split Neon Bars' },
+    { id: 'b24_deep_levitate',   name: '24. 🕶️ Floating Deep Shadow Levitation' },
+    { id: 'b25_pearl_lumina',    name: '25. 🐚 Soft Pearl Lumina Glow' },
+    { id: 'b26_gold_emerald',    name: '26. 👑+💎 Gold & Emerald Dual Ring' },
+    { id: 'b27_indigo_pink',     name: '27. 🌌+🌸 Indigo & Pink Cyber Ring' },
+    { id: 'b28_heavy_armor',     name: '28. 🛡️ Heavy Bold Armor Rim (6px)' },
+    { id: 'b29_hairline_minimal',name: '29. 📏 Ultra-Thin Hairline (1px)' },
+    { id: 'b30_frameless_clean', name: '30. ✨ Frameless Clean Zero-Border' }
+  ];
+
+  /* 4. 16 Team Tiers / Groups + Custom Option */
+  window.TEAM_TIERS_16 = [
+    { id: 'Founder',        label: '👑 1. Founders & Visionary Leadership',       heading: 'Founders & Visionary Leadership', sub: 'The strategic architects scaling brands globally.' },
+    { id: 'Co-Founder',     label: '🌟 2. Co-Founders & Executive Board',         heading: 'Co-Founders & Executive Board', sub: 'Driving commercial scale and studio excellence.' },
+    { id: 'Partner',        label: '🤝 3. Managing & Strategic Partners',         heading: 'Managing & Strategic Partners', sub: 'Regional operations heads and strategic growth partners.' },
+    { id: 'Director',       label: '🎬 4. Creative & Operations Directors',       heading: 'Creative & Operations Directors', sub: 'Leading high-craft production and marketplace operations.' },
+    { id: 'Advisory',       label: '🧠 5. Advisory Board & Industry Mentors',     heading: 'Advisory Board & Mentors', sub: 'Global retail veterans and strategic advisors.' },
+    { id: 'Department Head',label: '🚀 6. Vertical & Department Heads',           heading: 'Vertical & Department Heads', sub: 'Dedicated leaders across marketplaces, ads and creative.' },
+    { id: 'Core Team',      label: '⚡ 7. Core Execution Specialists',            heading: 'The Execution Desk & Core Team', sub: 'Full-stack specialists across creative, ads and compliance.' },
+    { id: 'E-Commerce Pod', label: '📦 8. E-Commerce & Quick-Commerce Pod',       heading: 'Marketplace & Quick-Commerce Pod', sub: 'Amazon Global, Flipkart, Blinkit & Zepto growth operators.' },
+    { id: 'Paid Media Pod', label: '📈 9. Performance Marketing & ROAS Pod',      heading: 'Performance Marketing & Paid Ads Pod', sub: 'Meta, Google & TikTok high-ROAS acquisition specialists.' },
+    { id: '3D & CGI Studio',label: '🎨 10. 3D CGI, Packaging & Design Studio',    heading: '3D CGI & Brand Design Studio', sub: 'Exploded-view renders, A+ storylines and packaging architects.' },
+    { id: 'Production Desk',label: '📸 11. Commercial Photography & Video Desk',  heading: 'Commercial Production & Video Desk', sub: 'Studio product shoots and high-converting ad reels.' },
+    { id: 'Tech & Web',     label: '💻 12. Full-Stack Web & UI/UX Engineering',   heading: 'Web & UI/UX Engineering Desk', sub: 'High-speed D2C storefronts and interactive web experiences.' },
+    { id: 'Legal & IP Desk',label: '⚖️ 13. Trademark, GS1 & Compliance Desk',     heading: 'Trademark, GS1 & Compliance Desk', sub: 'Brand registry, GS1 barcodes and regulatory specialists.' },
+    { id: 'Client Success', label: '💬 14. Client Success & VIP Account Managers',heading: 'Client Success & VIP Portal Desk', sub: '24/7 dedicated account managers and milestone trackers.' },
+    { id: 'Global Desk',    label: '🌍 15. International Hub Representatives',    heading: 'Global Regional Representatives', sub: 'Operating across India, UAE, USA and UK markets.' }
+  ];
+
+  /* 5. 26 Pre-Built Executive & Agency Designations */
+  window.AGENCY_DESIGNATIONS_26 = [
+    'Founder & Managing Partner',
+    'Founder & E-Commerce Growth Consultant',
+    'Co-Founder & CEO',
+    'Co-Founder & Chief Creative Officer (CCO)',
+    'Managing Partner — Global Operations',
+    'Strategic Partner — MENA & UAE Desk',
+    'Chief Operating Officer (COO)',
+    'Chief Growth & Strategy Officer',
+    'Head of Amazon Global & India Growth',
+    'Head of Flipkart & Marketplace Operations',
+    'Quick-Commerce Onboarding Lead (Blinkit / Zepto / Instamart)',
+    'Head of Performance Marketing (Meta, Google & TikTok Ads)',
+    'Senior Marketplace SEO & A10 Algorithm Strategist',
+    'Creative Director — 3D CGI & Product Visuals',
+    'Senior 3D CGI & Blender Motion Artist',
+    'Head of Commercial Photography & Videography',
+    'Senior Brand Identity & Packaging Die-Line Designer',
+    'A+ Cataloging & Conversion Copywriting Lead',
+    'Lead Full-Stack Web & UI/UX Engineer',
+    'Shopify Plus & D2C Storefront Architect',
+    'Social Media Growth & Viral Reels Strategist',
+    'Senior Video Editor & Commercial Colorist',
+    'Head of Legal, Trademarks & GS1 Barcode Compliance',
+    'Trademark & Brand Registry Specialist',
+    'VP of Client Success & VIP Key Accounts',
+    'Dedicated Brand Account Manager',
+    'CUSTOM_ROLE'
+  ];
+
+  /* 6. Upgrade Member Defaults & Global Photo Studio Defaults */
+  function upgradeTeamAndPhotoStudioV24() {
+    if (!window.db) return;
+    db.aboutPhotoStudio = {
+      placement: 'center', // 'center', 'left', 'right', 'full_banner', 'split_magazine', 'floating_overlap'
+      sizePx: 140,
+      founderSizePx: 185,
+      shape: 's02_squircle',
+      borderFrame: 'b01_gold_halo',
+      borderColor: '#f59e0b',
+      borderWidth: 3,
+      columnsFounder: 2,
+      columnsPartner: 3,
+      columnsTeam: 3,
+      ...(db.aboutPhotoStudio || {})
+    };
+
+    db.team = Array.isArray(db.team) ? db.team : [];
+    db.team.forEach(function (m, idx) {
+      if (!m.type || m.type === 'Staff') m.type = idx === 0 ? 'Founder' : 'Core Team';
+      /* Set Founder photo centered & larger by default as requested by user */
+      if (!m.placement) m.placement = m.type === 'Founder' ? 'center' : (db.aboutPhotoStudio.placement || 'center');
+      if (!m.photoSize) m.photoSize = m.type === 'Founder' ? 185 : 135;
+      if (!m.cropShape) m.cropShape = m.type === 'Founder' ? 's01_circle' : 's02_squircle';
+      if (!m.borderFrame) m.borderFrame = m.type === 'Founder' ? 'b01_gold_halo' : 'b04_liquid_glass';
+      if (!m.borderColor) m.borderColor = m.type === 'Founder' ? '#f59e0b' : '#6366f1';
+      if (m.borderWidth === undefined) m.borderWidth = 3;
+      if (!m.photoZoom) m.photoZoom = 100;
+      if (m.photoPosY === undefined) m.photoPosY = 20;
+      if (m.verifiedBadge === undefined) m.verifiedBadge = true;
+      if (!m.locationBadge) m.locationBadge = m.type === 'Founder' ? '🇮🇳 India • Global Desk' : '⚡ Verified Specialist';
+      if (!m.ctaText) m.ctaText = 'View Full Profile & Socials ↗';
+    });
+  }
+
+  /* 7. Override `buildMemberCardEditorHTML` to Give Full Photo Placement, Size, 30 Shapes, 30 Borders & 26 Designations */
+  window.buildMemberCardEditorHTML = function (m) {
+    const idx = m.origIdx;
+    const avatar = m.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name || 'Member')}&background=6366f1&color=fff&size=256`;
+    const soc = m.socials || {};
+    const isKnownTier = window.TEAM_TIERS_16.some(t => t.id === m.type);
+    const isKnownRole = window.AGENCY_DESIGNATIONS_26.includes(m.role);
+
+    return `
+      <div class="p-5 rounded-3xl bg-[#09090b] border-2 border-[#27272a] hover:border-amber-500/40 space-y-4 text-xs transition shadow-xl">
+        <!-- Header Bar: Order, Duplicate, Delete & Verified Toggle -->
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#242429] pb-3">
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-1 rounded-lg bg-amber-400/20 text-amber-300 font-black text-[11px]">#${idx + 1} • ${m.type || 'Member'}</span>
+            <label class="flex items-center gap-1.5 text-[11px] font-bold text-emerald-400 cursor-pointer ml-2">
+              <input type="checkbox" ${m.verifiedBadge !== false ? 'checked' : ''} onchange="db.team[${idx}].verifiedBadge=this.checked; window.quietSyncAboutDB('Toggled Verified Badge', true);" />
+              <span>✓ Verified Tick</span>
+            </label>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button type="button" title="Move Up" onclick="window.moveTeamMemberV24(${idx}, -1)" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold">↑</button>
+            <button type="button" title="Move Down" onclick="window.moveTeamMemberV24(${idx}, 1)" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold">↓</button>
+            <button type="button" title="Duplicate Member" onclick="window.duplicateTeamMemberV24(${idx})" class="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 font-bold">📋 Copy</button>
+            <button type="button" title="Delete Member" onclick="window.deleteGranularMember(${idx})" class="px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-300 font-bold">🗑️</button>
+          </div>
+        </div>
+
+        <!-- Photo Upload + URL + Live Placement/Size Summary -->
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center p-3.5 rounded-2xl bg-[#111114] border border-white/10">
+          <div class="sm:col-span-4 flex flex-col items-center justify-center gap-2">
+            <div class="relative overflow-hidden flex items-center justify-center bg-black" style="width:86px;height:86px;border-radius:18px;border:${m.borderWidth ?? 3}px solid ${m.borderColor || '#f59e0b'};">
+              <img src="${avatar}" style="width:100%;height:100%;object-fit:cover;object-position:50% ${m.photoPosY ?? 20}%;transform:scale(${(m.photoZoom || 100)/100});" />
+            </div>
+            <div class="flex gap-1.5 w-full">
+              <label class="flex-1 text-center py-1.5 px-2 rounded-lg bg-amber-400 hover:bg-amber-300 text-zinc-950 font-black text-[10px] cursor-pointer">
+                📷 Upload Photo
+                <input type="file" accept="image/*" onchange="uploadDirectCallback(this, false, function(u){ db.team[${idx}].photo=u; window.renderGranularAboutStudio(); window.quietSyncAboutDB('Uploaded Member Photo', true); })" class="hidden" />
+              </label>
+              ${m.photo ? `<button type="button" onclick="db.team[${idx}].photo=''; window.renderGranularAboutStudio(); window.quietSyncAboutDB('Cleared Photo', true);" class="px-2 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 text-[10px] font-bold">✕</button>` : ''}
+            </div>
+          </div>
+
+          <div class="sm:col-span-8 space-y-2.5">
+            <div>
+              <label class="text-[10px] font-bold text-zinc-400 block mb-0.5">Full Name *</label>
+              <input type="text" value="${(m.name || '').replace(/"/g, '&quot;')}" oninput="db.team[${idx}].name=this.value; window.quietSyncAboutDB('Edited Member Name');" placeholder="e.g. Jenish Kamli" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-black text-white" />
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-zinc-400 block mb-0.5">Or Paste Direct HD Photo URL</label>
+              <input type="text" value="${(m.photo && !m.photo.startsWith('data:') ? m.photo : '').replace(/"/g, '&quot;')}" oninput="db.team[${idx}].photo=this.value; window.quietSyncAboutDB('Edited Photo URL');" placeholder="https://..." class="w-full px-3 py-1.5 rounded-xl adm-input text-[11px] font-mono" />
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-[10px] font-bold text-emerald-400 block mb-0.5">Location / Experience Tag</label>
+                <input type="text" value="${(m.locationBadge || '').replace(/"/g, '&quot;')}" oninput="db.team[${idx}].locationBadge=this.value; window.quietSyncAboutDB('Edited Location Badge');" placeholder="🇮🇳 India • Global Desk" class="w-full px-2.5 py-1.5 rounded-lg adm-input text-[11px] font-bold text-emerald-300" />
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-amber-300 block mb-0.5">Card Action Button Text</label>
+                <input type="text" value="${(m.ctaText || 'View Full Profile ↗').replace(/"/g, '&quot;')}" oninput="db.team[${idx}].ctaText=this.value; window.quietSyncAboutDB('Edited Card Button Text');" class="w-full px-2.5 py-1.5 rounded-lg adm-input text-[11px] font-bold text-amber-300" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP A: 16 TIERS + CUSTOM TIER & 26 DESIGNATIONS + CUSTOM DESIGNATION -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-2xl bg-[#111114] border border-indigo-500/30">
+          <div class="space-y-1.5">
+            <label class="text-[10px] font-extrabold uppercase text-amber-400 block">1. Select Tier / Group (16 Options + Custom)</label>
+            <select onchange="if(this.value==='__CUSTOM_TIER__'){ document.getElementById('cust-tier-inp-${idx}').classList.remove('hidden'); } else { document.getElementById('cust-tier-inp-${idx}').classList.add('hidden'); db.team[${idx}].type=this.value; window.renderGranularAboutStudio(); window.quietSyncAboutDB('Changed Member Tier', true); }" class="w-full px-2.5 py-2 rounded-xl adm-input text-[11px] font-bold text-amber-300">
+              ${window.TEAM_TIERS_16.map(t => `<option value="${t.id}" ${m.type === t.id ? 'selected' : ''}>${t.label}</option>`).join('')}
+              <option value="__CUSTOM_TIER__" ${!isKnownTier ? 'selected' : ''}>✍️ + Type Custom Tier / Group Name...</option>
+            </select>
+            <input type="text" id="cust-tier-inp-${idx}" value="${(m.type || '').replace(/"/g, '&quot;')}" onchange="db.team[${idx}].type=this.value.trim()||'Founder'; window.renderGranularAboutStudio(); window.quietSyncAboutDB('Set Custom Tier', true);" placeholder="Type Custom Group (e.g. Board of Advisors)..." class="${!isKnownTier ? '' : 'hidden'} w-full px-2.5 py-1.5 rounded-lg adm-input text-xs font-bold border-amber-400" />
+          </div>
+
+          <div class="space-y-1.5">
+            <label class="text-[10px] font-extrabold uppercase text-indigo-300 block">2. Select Role Designation (26 Roles + Custom)</label>
+            <select onchange="if(this.value!=='CUSTOM_ROLE'){ db.team[${idx}].role=this.value; document.getElementById('role-txt-inp-${idx}').value=this.value; window.quietSyncAboutDB('Selected Role Designation', true); } else { document.getElementById('role-txt-inp-${idx}').focus(); }" class="w-full px-2.5 py-2 rounded-xl adm-input text-[11px] font-bold text-indigo-300">
+              ${window.AGENCY_DESIGNATIONS_26.map(r => `<option value="${r}" ${(isKnownRole && m.role === r) || (!isKnownRole && r === 'CUSTOM_ROLE') ? 'selected' : ''}>${r === 'CUSTOM_ROLE' ? '✍️ + Type Any Custom Designation Below...' : r}</option>`).join('')}
+            </select>
+            <input type="text" id="role-txt-inp-${idx}" value="${(m.role || '').replace(/"/g, '&quot;')}" oninput="db.team[${idx}].role=this.value; window.quietSyncAboutDB('Edited Custom Role');" placeholder="Type exact designation here..." class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs font-bold text-white" />
+          </div>
+        </div>
+
+        <!-- STEP B: PHOTO PLACEMENT (CENTER / LEFT / RIGHT / FULL BANNER) & GIANT PHOTO SIZE SLIDER -->
+        <div class="p-3.5 rounded-2xl bg-[#111114] border border-emerald-500/35 space-y-3">
+          <span class="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">📐 Photo Placement (Center / Left / Right / Full Maximize) & Size Control</span>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="text-[10px] font-bold text-white block mb-1">Photo Placement on Card</label>
+              <select onchange="db.team[${idx}].placement=this.value; window.quietSyncAboutDB('Changed Photo Placement', true);" class="w-full px-2.5 py-2 rounded-xl adm-input text-[11px] font-extrabold text-emerald-300">
+                <option value="center" ${m.placement==='center'?'selected':''}>🎯 1. Center Spotlight (Photo Centered Top)</option>
+                <option value="full_banner" ${m.placement==='full_banner'?'selected':''}>🖼️ 2. Full-Width Giant Cover Banner (Maximized)</option>
+                <option value="split_magazine" ${m.placement==='split_magazine'?'selected':''}>📰 3. 50/50 Magazine Editorial Split</option>
+                <option value="left" ${m.placement==='left'?'selected':''}>⬅️ 4. Left Photo + Right Details</option>
+                <option value="right" ${m.placement==='right'?'selected':''}>➡️ 5. Right Photo + Left Details</option>
+                <option value="floating_overlap" ${m.placement==='floating_overlap'?'selected':''}>✨ 6. Floating Center Emblem</option>
+              </select>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-[10px] font-bold mb-1">
+                <span class="text-zinc-300">Photo Size (Px / Height):</span>
+                <span id="mbr-sz-lbl-${idx}" class="text-amber-400 font-black">${m.photoSize || 160}px</span>
+              </div>
+              <input type="range" min="64" max="420" step="4" value="${m.photoSize || 160}" oninput="document.getElementById('mbr-sz-lbl-${idx}').innerText=this.value+'px'; db.team[${idx}].photoSize=Number(this.value); window.quietSyncAboutDB('Resized Member Photo');" class="w-full accent-amber-400 cursor-pointer" />
+              <div class="flex justify-between text-[9px] text-zinc-500 mt-0.5">
+                <button type="button" onclick="db.team[${idx}].photoSize=96; window.renderGranularAboutStudio(); window.quietSyncAboutDB('Set Compact Size', true);" class="hover:text-white">Compact (96px)</button>
+                <button type="button" onclick="db.team[${idx}].photoSize=185; window.renderGranularAboutStudio(); window.quietSyncAboutDB('Set Spotlight Size', true);" class="hover:text-white">Spotlight (185px)</button>
+                <button type="button" onclick="db.team[${idx}].photoSize=320; window.renderGranularAboutStudio(); window.quietSyncAboutDB('Set Giant Size', true);" class="text-amber-400 font-bold hover:underline">🔥 Maximize (320px+)</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inner Face Zoom & Vertical Face Alignment -->
+          <div class="grid grid-cols-2 gap-3 pt-1">
+            <div>
+              <div class="flex justify-between text-[10px] text-zinc-400"><span>Inner Face Zoom:</span><strong id="mbr-zm-lbl-${idx}" class="text-white">${m.photoZoom || 100}%</strong></div>
+              <input type="range" min="100" max="170" value="${m.photoZoom || 100}" oninput="document.getElementById('mbr-zm-lbl-${idx}').innerText=this.value+'%'; db.team[${idx}].photoZoom=Number(this.value); window.quietSyncAboutDB('Adjusted Face Zoom');" class="w-full accent-indigo-400" />
+            </div>
+            <div>
+              <div class="flex justify-between text-[10px] text-zinc-400"><span>Vertical Face Align (Y):</span><strong id="mbr-py-lbl-${idx}" class="text-white">${m.photoPosY ?? 20}%</strong></div>
+              <input type="range" min="0" max="100" value="${m.photoPosY ?? 20}" oninput="document.getElementById('mbr-py-lbl-${idx}').innerText=this.value+'%'; db.team[${idx}].photoPosY=Number(this.value); window.quietSyncAboutDB('Adjusted Face Position');" class="w-full accent-emerald-400" />
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP C: 30 CROP SHAPES + 30 BORDER FRAMES + BORDER COLOR & THICKNESS -->
+        <div class="p-3.5 rounded-2xl bg-[#111114] border border-amber-500/35 space-y-3">
+          <span class="text-[10px] font-black uppercase tracking-wider text-amber-400 block">🎨 30 Photo Crop Shapes & 30 Border Frame Designs</span>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="text-[10px] font-bold text-zinc-300 block mb-1">Choose Photo Crop Shape (30 Shapes)</label>
+              <select onchange="db.team[${idx}].cropShape=this.value; window.quietSyncAboutDB('Changed Photo Crop Shape', true);" class="w-full px-2.5 py-2 rounded-xl adm-input text-[11px] font-bold text-white">
+                ${window.PHOTO_SHAPES_30.map(s => `<option value="${s.id}" ${(m.cropShape || 's01_circle') === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-amber-300 block mb-1">Choose Border Frame Design (30 Frames)</label>
+              <select onchange="db.team[${idx}].borderFrame=this.value; window.quietSyncAboutDB('Changed Border Frame Design', true);" class="w-full px-2.5 py-2 rounded-xl adm-input text-[11px] font-bold text-amber-300">
+                ${window.BORDER_FRAMES_30.map(b => `<option value="${b.id}" ${(m.borderFrame || 'b01_gold_halo') === b.id ? 'selected' : ''}>${b.name}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 items-center pt-1">
+            <div class="flex items-center gap-2">
+              <input type="color" value="${m.borderColor || '#f59e0b'}" oninput="db.team[${idx}].borderColor=this.value; window.quietSyncAboutDB('Changed Frame Border Color');" class="w-9 h-8 rounded cursor-pointer bg-transparent border border-white/20 shrink-0" />
+              <div class="flex-1">
+                <label class="text-[10px] text-zinc-400 block">Custom Border Color</label>
+                <input type="text" value="${m.borderColor || '#f59e0b'}" oninput="db.team[${idx}].borderColor=this.value; window.quietSyncAboutDB('Typed Frame Color');" class="w-full px-2 py-1 rounded adm-input text-[10px] font-mono" />
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-[10px] text-zinc-400"><span>Border Thickness:</span><strong id="mbr-bw-lbl-${idx}" class="text-amber-300">${m.borderWidth ?? 3}px</strong></div>
+              <input type="range" min="0" max="10" step="1" value="${m.borderWidth ?? 3}" oninput="document.getElementById('mbr-bw-lbl-${idx}').innerText=this.value+'px'; db.team[${idx}].borderWidth=Number(this.value); window.quietSyncAboutDB('Changed Border Thickness');" class="w-full accent-amber-400" />
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP D: 1-LINE CARD BRIEF + DETAILED MODAL BIO + SKILL PILLS -->
+        <div class="space-y-2 pt-1">
+          <div>
+            <label class="text-[10px] text-zinc-400 font-bold block mb-0.5">1-Line Clean Brief (Shown on Card Front)</label>
+            <input type="text" value="${(m.cardBrief || m.bio || '').replace(/"/g, '&quot;')}" oninput="db.team[${idx}].cardBrief=this.value; window.quietSyncAboutDB('Edited Card Brief');" placeholder="Specializing in organic marketplace growth, D2C strategy & brand scaling." class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs" />
+          </div>
+          <div>
+            <label class="text-[10px] text-amber-400 font-bold block mb-0.5">Full Detailed Bio (Shown When Visitor Clicks Profile Card)</label>
+            <textarea rows="2" oninput="db.team[${idx}].detailedBio=this.value; window.quietSyncAboutDB('Edited Detailed Bio');" placeholder="Full story, achievements, and leadership experience..." class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs">${m.detailedBio || m.bio || ''}</textarea>
+          </div>
+          <div>
+            <label class="text-[10px] text-emerald-400 font-bold block mb-0.5">Expertise / Skill Tags (Comma Separated)</label>
+            <input type="text" value="${(Array.isArray(m.skills) ? m.skills.join(', ') : (m.skills || ''))}" oninput="db.team[${idx}].skills=this.value.split(',').map(s=>s.trim()).filter(Boolean); window.quietSyncAboutDB('Edited Skills');" placeholder="Amazon Global, Flipkart Growth, 3D CGI, Brand Strategy" class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs font-mono" />
+          </div>
+        </div>
+
+        <!-- STEP E: 8 SOCIAL MEDIA & DIRECT CONTACT LINKS -->
+        <div class="pt-2 border-t border-[#242429] space-y-2">
+          <span class="text-[10px] font-black uppercase text-zinc-400 block">🔗 Social Media & Direct Contact Links (Only Filled Icons Show)</span>
+          <div class="grid grid-cols-2 gap-2">
+            <input type="url" value="${soc.linkedin || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.linkedin=this.value; window.quietSyncAboutDB('Edited LinkedIn');" placeholder="LinkedIn URL" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+            <input type="url" value="${soc.instagram || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.instagram=this.value; window.quietSyncAboutDB('Edited Instagram');" placeholder="Instagram URL" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+            <input type="url" value="${soc.twitter || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.twitter=this.value; window.quietSyncAboutDB('Edited Twitter/X');" placeholder="X / Twitter URL" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+            <input type="url" value="${soc.behance || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.behance=this.value; window.quietSyncAboutDB('Edited Behance');" placeholder="Behance / Portfolio URL" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+            <input type="url" value="${soc.youtube || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.youtube=this.value; window.quietSyncAboutDB('Edited YouTube');" placeholder="YouTube Channel URL" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+            <input type="url" value="${soc.website || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.website=this.value; window.quietSyncAboutDB('Edited Website');" placeholder="Personal Website URL" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+            <input type="tel" value="${soc.whatsapp || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.whatsapp=this.value; window.quietSyncAboutDB('Edited WhatsApp');" placeholder="WhatsApp (919876543210)" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px] text-emerald-300 font-bold" />
+            <input type="email" value="${soc.email || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.email=this.value; window.quietSyncAboutDB('Edited Email');" placeholder="Official Email ID" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  /* 8. Dynamic Multi-Tier Builder (Renders Founders, Partners, Core Team + Any Additional Active Tiers from the 16 Tiers) */
+  const origRenderGranular = window.renderGranularAboutStudio;
+  window.renderGranularAboutStudio = function () {
+    upgradeTeamAndPhotoStudioV24();
+    if (typeof origRenderGranular === 'function') origRenderGranular();
+
+    const panel = document.getElementById('panel-about');
+    if (!panel || !window.db) return;
+
+    /* Inject Global Master Photo Studio Bar right below Top Command Bar */
+    if (!document.getElementById('global-photo-master-bar-v24')) {
+      const ps = db.aboutPhotoStudio || {};
+      const globalBar = document.createElement('div');
+      globalBar.id = 'global-photo-master-bar-v24';
+      globalBar.className = 'admin-card rounded-3xl p-6 space-y-4 border-2 border-emerald-500/40 bg-[#111114]';
+      globalBar.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#242429] pb-3">
+          <div>
+            <span class="text-[10px] font-extrabold uppercase text-emerald-400">Global Quick-Apply Photo Studio</span>
+            <h3 class="text-base font-extrabold text-white">📸 Apply Photo Placement, Shape, Border or Card Layout to ALL Members in 1-Click</h3>
+          </div>
+          <button type="button" onclick="window.applyGlobalPhotoSettingsToAllMembers()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs shadow-lg">
+            ⚡ Apply Below Style to All Members
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 text-xs">
+          <div>
+            <label class="text-[10px] font-bold text-emerald-300 block mb-1">Default Placement</label>
+            <select id="gps-placement" class="w-full px-2.5 py-2 rounded-xl adm-input text-xs font-bold">
+              <option value="center" ${ps.placement==='center'?'selected':''}>🎯 Center Spotlight</option>
+              <option value="full_banner" ${ps.placement==='full_banner'?'selected':''}>🖼️ Full-Width Banner</option>
+              <option value="split_magazine" ${ps.placement==='split_magazine'?'selected':''}>📰 50/50 Magazine Split</option>
+              <option value="left" ${ps.placement==='left'?'selected':''}>⬅️ Left Photo</option>
+              <option value="right" ${ps.placement==='right'?'selected':''}>➡️ Right Photo</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-white block mb-1">Crop Shape (30)</label>
+            <select id="gps-shape" class="w-full px-2.5 py-2 rounded-xl adm-input text-xs font-bold">
+              ${window.PHOTO_SHAPES_30.map(s => `<option value="${s.id}" ${ps.shape===s.id?'selected':''}>${s.name}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-amber-300 block mb-1">Border Frame (30)</label>
+            <select id="gps-border" class="w-full px-2.5 py-2 rounded-xl adm-input text-xs font-bold">
+              ${window.BORDER_FRAMES_30.map(b => `<option value="${b.id}" ${ps.borderFrame===b.id?'selected':''}>${b.name}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-zinc-300 block mb-1">Founder Cards / Row</label>
+            <select id="gps-col-founder" onchange="db.aboutPhotoStudio.columnsFounder=Number(this.value); window.quietSyncAboutDB('Updated Founder Columns', true);" class="w-full px-2.5 py-2 rounded-xl adm-input text-xs font-bold text-amber-300">
+              <option value="1" ${ps.columnsFounder===1?'selected':''}>1 Giant Center Card</option>
+              <option value="2" ${(ps.columnsFounder||2)===2?'selected':''}>2 Balanced Cards</option>
+              <option value="3" ${ps.columnsFounder===3?'selected':''}>3 Cards Grid</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-zinc-300 block mb-1">Partner Cards / Row</label>
+            <select id="gps-col-partner" onchange="db.aboutPhotoStudio.columnsPartner=Number(this.value); window.quietSyncAboutDB('Updated Partner Columns', true);" class="w-full px-2.5 py-2 rounded-xl adm-input text-xs font-bold">
+              <option value="1" ${ps.columnsPartner===1?'selected':''}>1 Giant Card</option>
+              <option value="2" ${ps.columnsPartner===2?'selected':''}>2 Cards per Row</option>
+              <option value="3" ${(ps.columnsPartner||3)===3?'selected':''}>3 Cards per Row</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-zinc-300 block mb-1">Team Cards / Row</label>
+            <select id="gps-col-team" onchange="db.aboutPhotoStudio.columnsTeam=Number(this.value); window.quietSyncAboutDB('Updated Team Columns', true);" class="w-full px-2.5 py-2 rounded-xl adm-input text-xs font-bold">
+              <option value="2" ${ps.columnsTeam===2?'selected':''}>2 Cards per Row</option>
+              <option value="3" ${(ps.columnsTeam||3)===3?'selected':''}>3 Cards per Row</option>
+              <option value="4" ${ps.columnsTeam===4?'selected':''}>4 Cards per Row</option>
+            </select>
+          </div>
+        </div>
+      `;
+      panel.insertBefore(globalBar, panel.children[1]);
+    }
+
+    /* Also render any extra custom/department tiers beyond Founder, Partner, Core Team */
+    const extraTypes = [...new Set((db.team || []).map(m => m.type).filter(t => t && !['Founder', 'Partner', 'Core Team', 'Staff'].includes(t)))];
+    if (extraTypes.length > 0) {
+      const tiersWrap = panel.lastElementChild;
+      extraTypes.forEach(function (tName) {
+        const safeKey = tName.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+        const blockHTML = window.buildTeamTierManagerHTML(tName, `🌟 Tier: ${tName}`, safeKey, 'border-purple-500/40', 'bg-purple-500/20 text-purple-300');
+        const div = document.createElement('div');
+        div.innerHTML = blockHTML;
+        tiersWrap.appendChild(div.firstElementChild);
+      });
+    }
+  };
+
+  window.applyGlobalPhotoSettingsToAllMembers = function () {
+    const pl = document.getElementById('gps-placement')?.value || 'center';
+    const sh = document.getElementById('gps-shape')?.value || 's02_squircle';
+    const br = document.getElementById('gps-border')?.value || 'b01_gold_halo';
+    db.aboutPhotoStudio = db.aboutPhotoStudio || {};
+    db.aboutPhotoStudio.placement = pl;
+    db.aboutPhotoStudio.shape = sh;
+    db.aboutPhotoStudio.borderFrame = br;
+
+    (db.team || []).forEach(function (m) {
+      m.placement = pl;
+      m.cropShape = sh;
+      m.borderFrame = br;
+    });
+    window.renderGranularAboutStudio();
+    window.quietSyncAboutDB('Applied Global Photo Style to All Members', true);
+  };
+
+  window.moveTeamMemberV24 = function (idx, dir) {
+    const target = idx + dir;
+    if (target < 0 || target >= db.team.length) return;
+    const tmp = db.team[idx];
+    db.team[idx] = db.team[target];
+    db.team[target] = tmp;
+    window.renderGranularAboutStudio();
+    window.quietSyncAboutDB('Reordered Team Member', true);
+  };
+
+  window.duplicateTeamMemberV24 = function (idx) {
+    const orig = db.team[idx];
+    if (!orig) return;
+    const copy = JSON.parse(JSON.stringify(orig));
+    copy.id = 'TM-' + Date.now();
+    copy.name = (copy.name || 'Member') + ' (Copy)';
+    db.team.splice(idx + 1, 0, copy);
+    window.renderGranularAboutStudio();
+    window.quietSyncAboutDB('Duplicated Team Member', true);
+  };
+
+  setTimeout(function () {
+    upgradeTeamAndPhotoStudioV24();
+    if (document.getElementById('panel-about') && !document.getElementById('panel-about').classList.contains('hidden')) {
+      window.renderGranularAboutStudio();
+    }
+  }, 600);
+})();
+</script>
+<!-- ==================== ADMIN.HTML : ULTIMATE PHOTO STUDIO PATCH COMPLETE ==================== -->
