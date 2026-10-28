@@ -7174,3 +7174,407 @@
 })();
 </script>
 <!-- ==================== ADMIN.HTML : ZERO-ALERT & LIQUID-GLASS SUMMARY PATCH COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : DEDICATED "👁️ ALL PAGES & FEATURES VISIBILITY" SWITCHBOARD (PASTE AT VERY BOTTOM OF admin.html) ==================== -->
+<script id="admin-master-visibility-switchboard-v20">
+(function () {
+  /* 1. Bridge `let db` and `window.db` Safely */
+  try {
+    Object.defineProperty(window, 'db', {
+      get: function () { return typeof db !== 'undefined' ? db : null; },
+      set: function (val) { if (typeof db !== 'undefined') db = val; },
+      configurable: true
+    });
+  } catch (e) {}
+
+  /* 2. Complete Catalog of All 44 Website Pages, Sections, Tools & Features */
+  const SWITCHBOARD_GROUPS = [
+    {
+      groupTitle: '📄 1. Website Pages (Menu + Page Show/Hide & Direct Edit)',
+      groupDesc: 'Kisi bhi page ko OFF karne par woh Website Menu aur Hamburger se chhup jayega, par aap "✏️ Edit" daba kar use backend mein edit kar sakte hain.',
+      borderCls: 'border-emerald-500/40',
+      items: [
+        { key: 'page_services',  icon: '⚡', title: 'Services Catalog Page',       desc: 'Main Services & Deliverables page', editTab: 'services', def: true },
+        { key: 'page_quotation', icon: '🛒', title: 'Instant Quotation Page',      desc: 'Automated Proposal & PDF Quote Builder page', editTab: 'quotation', def: true },
+        { key: 'page_portfolio', icon: '🎬', title: 'Work / Portfolio Page',       desc: 'Before/After & Case Studies page', editTab: 'portfolio', def: true },
+        { key: 'page_tracker',   icon: '📊', title: 'VIP Client Tracker Page',     desc: '0%–100% Live Client Project Portal page', editTab: 'tracker', def: true },
+        { key: 'page_about',     icon: '👥', title: 'About Us & Team Page',        desc: 'Agency Story, Mission, Vision & Team page', editTab: 'about', def: true },
+        { key: 'page_reviews',   icon: '★',  title: '5-Star Client Reviews Page',  desc: 'Verified Testimonials & Write Review page', editTab: 'reviews', def: true },
+        { key: 'page_contact',   icon: '📞', title: 'Contact & Studios Page',      desc: 'Global Studios & Inquiry Brief page', editTab: 'contact', def: true },
+        { key: 'page_policies',  icon: '⚖️', title: 'Legal Policies Page',         desc: 'Privacy, Terms & Refund Policy page', editTab: 'global', def: true }
+      ]
+    },
+    {
+      groupTitle: '🎙️ 2. Top Bar, Navbar Icons & Voice Command Controls',
+      groupDesc: 'Website ke sabse upar dikhne wale bars, JARVIS mic, currency switcher aur buttons ko ON/OFF karein.',
+      borderCls: 'border-indigo-500/40',
+      items: [
+        { key: 'top_announcement', icon: '🌍', title: 'Top Announcement Bar',          desc: 'Top strip above navbar', editTab: 'home', def: true },
+        { key: 'top_clocks',       icon: '🕒', title: 'World Clocks (IND/UAE/UK/US)', desc: 'Live international timezones in top bar', editTab: 'home', def: true },
+        { key: 'top_scarcity',     icon: '🔥', title: 'Scarcity Onboarding Slots',    desc: '"Only 2 Client Onboarding Slots Left" badge', editTab: 'home', def: true },
+        { key: 'nav_jarvis_mic',   icon: '🎙️', title: 'JARVIS Voice Command Mic',     desc: 'Speak-to-website microphone button in navbar', editTab: 'home', def: true },
+        { key: 'nav_search_btn',   icon: '🔍', title: 'Quick Search (⌘K) Button',     desc: 'Search icon in navbar & hamburger menu', editTab: 'menu', def: true },
+        { key: 'nav_currency',     icon: '💱', title: 'Currency Switcher (₹ / $ / AED)', desc: 'Multi-currency dropdown in navbar', editTab: 'quotation', def: true },
+        { key: 'nav_quote_cart',   icon: '🛒', title: 'Navbar Quote Cart Button',     desc: 'Top Quote Cart button next to Hamburger', editTab: 'quotation', def: true },
+        { key: 'nav_xray_btn',     icon: '👁️', title: 'X-Ray Blueprint Mode Button',  desc: 'Wireframe grid toggle icon on desktop header', editTab: 'home', def: true },
+        { key: 'nav_sound_btn',    icon: '🔊', title: 'Spatial UI Sound Button',      desc: 'Sound effects toggle icon on desktop header', editTab: 'home', def: true }
+      ]
+    },
+    {
+      groupTitle: '🏠 3. Home Page Sections',
+      groupDesc: 'Home page par dikhne wale alag-alag sections ko apni pasand se Show ya Hide karein.',
+      borderCls: 'border-amber-500/40',
+      items: [
+        { key: 'home_3d_stage',  icon: '🕶️', title: 'Hero 3D / Video Stage',        desc: 'Interactive 3D image/video stage in Hero section', editTab: 'home', def: true },
+        { key: 'home_marquee',   icon: '♾️', title: 'Infinite Brand Marquee Strip', desc: 'Scrolling marketplaces & brand names bar', editTab: 'home', def: true },
+        { key: 'home_stats',     icon: '📈', title: '4 Key Metrics Bento Cards',    desc: '50+ Brands, 250+ Projects, 5.0★ & 24/7 cards', editTab: 'home', def: true },
+        { key: 'home_services',  icon: '⚡', title: 'Home Featured Services Grid',  desc: 'Services section shown on the Home page', editTab: 'services', def: true },
+        { key: 'home_work',      icon: '🎬', title: 'Home Selected Works Grid',     desc: 'Case studies section shown on the Home page', editTab: 'portfolio', def: true },
+        { key: 'home_process',   icon: '🛠️', title: '4-Step Execution Process',     desc: 'How We Engineer Growth 4-step cards', editTab: 'reviews', def: true },
+        { key: 'home_awards',    icon: '🏆', title: 'Recognition & Awards Table',   desc: 'Milestones & awards rows on Home page', editTab: 'reviews', def: true },
+        { key: 'srv_faq',        icon: '❓', title: 'FAQ Accordion Section',        desc: 'Frequently Asked Questions on Services page', editTab: 'reviews', def: true }
+      ]
+    },
+    {
+      groupTitle: '🧪 4. Viral AI Tools, Calculators & Mockup Studios (Individual Switches)',
+      groupDesc: 'Home page par lage 6 interactive AI tools aur calculators ko ek-ek karke ON ya OFF karein.',
+      borderCls: 'border-purple-500/40',
+      items: [
+        { key: 'tool_mockup_studio',  icon: '🎨', title: 'Multi-Channel Mockup Studio',        desc: 'See product on Amazon, Blinkit & Instagram Ad frames', editTab: 'home', def: true },
+        { key: 'tool_brand_scanner',  icon: '🔍', title: '10s AI Brand Revenue Leak Scanner',  desc: 'Interactive laser brand diagnostic scanner', editTab: 'home', def: true },
+        { key: 'tool_roi_simulator',  icon: '📊', title: '6-Month Brand ROI Simulator',        desc: 'Interactive revenue slider & GMV calculator', editTab: 'home', def: true },
+        { key: 'tool_3d_box',         icon: '📦', title: 'Live 3D Packaging Box Previewer',    desc: 'Interactive 3D box color & brand name previewer', editTab: 'home', def: true },
+        { key: 'tool_profit_calc',    icon: '🧮', title: 'Organic vs. PPC Profit Calculator',  desc: 'Unit economics & ACOS savings calculator', editTab: 'home', def: true },
+        { key: 'tool_listing_grader', icon: '📋', title: 'Amazon & Flipkart Listing Grader',   desc: 'Product title & A+ conversion health auditor', editTab: 'home', def: true }
+      ]
+    },
+    {
+      groupTitle: '💬 5. Walkie-Talkie Voice, Quotation Extras & Floating Popups/Buttons',
+      groupDesc: 'Walkie-Talkie recorder, FOMO popup, Niche ke floating buttons (Book Call, WhatsApp, VIP Pass) aur Scratch Card ko control karein.',
+      borderCls: 'border-rose-500/40',
+      items: [
+        { key: 'feat_walkie_talkie',  icon: '🎙️', title: 'Walkie-Talkie 30s Voice Recorder',   desc: 'Voice brief recorder on Contact page & Hamburger', editTab: 'contact', def: true },
+        { key: 'float_fomo_pulse',    icon: '🟢', title: 'Bottom-Left FOMO Notification Popup', desc: '"Luxury Grooming Brand • Dubai" live social proof toast', editTab: 'global', def: true },
+        { key: 'float_book_call',     icon: '📅', title: 'Floating "Book 15m Audit Call" Btn', desc: 'Bottom-right strategy call booking button', editTab: 'global', def: true },
+        { key: 'float_vip_pass',      icon: '💳', title: 'Floating "VIP Pass" 3D Card Button', desc: 'Partner referral pass button in dock, menu & footer', editTab: 'menu', def: true },
+        { key: 'float_whatsapp',      icon: '💬', title: 'Floating "WhatsApp Desk" Button',    desc: 'Bottom-right direct WhatsApp chat button', editTab: 'global', def: true },
+        { key: 'float_pip_video',     icon: '📺', title: 'Floating Bottom-Left PiP Video',     desc: 'Circular showreel video bubble', editTab: 'home', def: true },
+        { key: 'feat_scratch_card',   icon: '🎁', title: 'Gold VIP Scratch Card (Quotation)',  desc: 'Interactive discount scratch card on Quote page', editTab: 'quotation', def: true },
+        { key: 'feat_instant_nda',    icon: '🔒', title: 'Instant Mutual NDA PDF Generator',   desc: '1-click signed NDA download box on Quote page', editTab: 'quotation', def: true },
+        { key: 'feat_growth_pod',     icon: '👥', title: 'Dedicated Execution Growth Pod Box', desc: '4 specialists pod card on Quotation page', editTab: 'quotation', def: true },
+        { key: 'feat_signature_pad',  icon: '✍️', title: 'Digital Approval Signature Pad',     desc: 'Draw signature canvas on Quotation page', editTab: 'quotation', def: true },
+        { key: 'popup_exit_intent',   icon: '🕵️‍♂️', title: 'Exit-Intent VIP Offer Popup',       desc: 'Popup shown when visitor tries to leave page', editTab: 'global', def: true },
+        { key: 'popup_loader_screen', icon: '🎬', title: '3D Logo Initial Loading Screen',     desc: 'Animated brand logo loader on website open', editTab: 'loader', def: true },
+        { key: 'footer_kinetic',      icon: '🚀', title: 'Giant Footer Kinetic Marquee',       desc: 'Scrolling "LET’S SCALE YOUR BRAND" banner above footer', editTab: 'global', def: true }
+      ]
+    }
+  ];
+
+  function ensureSwitchboardInDB() {
+    if (!window.db) return;
+    db.masterSwitchboard = db.masterSwitchboard || {};
+    const sb = db.masterSwitchboard;
+
+    /* Initialize defaults from existing db settings if not set yet */
+    SWITCHBOARD_GROUPS.forEach(function (grp) {
+      grp.items.forEach(function (it) {
+        if (sb[it.key] === undefined) {
+          sb[it.key] = it.def;
+        }
+      });
+    });
+  }
+
+  /* Two-Way Sync: Mirror `db.masterSwitchboard` into Legacy `db.visibility`, `db.boosters`, `db.luxuryUI`, `db.contactPageConfig`, `db.loaderConfig`, and `db.navMenuConfig` */
+  window.syncSwitchboardWithLegacyDB = function () {
+    if (!window.db) return;
+    ensureSwitchboardInDB();
+    const sb = db.masterSwitchboard;
+
+    db.visibility = db.visibility || {};
+    db.visibility.showAnnouncement = sb.top_announcement !== false;
+    db.visibility.showWorldClocks = sb.top_clocks !== false;
+    db.visibility.showScarcityBadge = sb.top_scarcity !== false;
+    db.visibility.show3DStage = sb.home_3d_stage !== false;
+    db.visibility.showMarquee = sb.home_marquee !== false;
+    db.visibility.showStats = sb.home_stats !== false;
+    db.visibility.showWork = sb.home_work !== false;
+    db.visibility.showProcess = sb.home_process !== false;
+    db.visibility.showAwards = sb.home_awards !== false;
+    db.visibility.showFAQ = sb.srv_faq !== false;
+    db.visibility.enableScratchCard = sb.feat_scratch_card !== false;
+
+    db.boosters = db.boosters || {};
+    db.boosters.fomoPulse = sb.float_fomo_pulse !== false;
+    db.boosters.exitIntent = sb.popup_exit_intent !== false;
+    db.boosters.profitCalc = sb.tool_profit_calc !== false;
+
+    db.luxuryUI = db.luxuryUI || {};
+    db.luxuryUI.showGrader = sb.tool_listing_grader !== false;
+    db.luxuryUI.showCallBtn = sb.float_book_call !== false;
+
+    db.contactPageConfig = db.contactPageConfig || {};
+    db.contactPageConfig.showVoiceBox = sb.feat_walkie_talkie !== false;
+
+    db.loaderConfig = db.loaderConfig || {};
+    db.loaderConfig.enabled = sb.popup_loader_screen !== false;
+
+    /* Sync Page Visibility with Navigation Menu Items */
+    db.navMenuConfig = db.navMenuConfig || {};
+    db.navMenuConfig.showVoiceBriefBtn = sb.feat_walkie_talkie !== false;
+    db.navMenuConfig.showSearchInDrawer = sb.nav_search_btn !== false;
+    db.navMenuConfig.showVipPassInDrawer = sb.float_vip_pass !== false;
+
+    const pageToNavMap = {
+      services: 'page_services',
+      quotation: 'page_quotation',
+      portfolio: 'page_portfolio',
+      tracker: 'page_tracker',
+      about: 'page_about',
+      reviews: 'page_reviews',
+      contact: 'page_contact',
+      policies: 'page_policies'
+    };
+    if (Array.isArray(db.navMenuConfig.items)) {
+      db.navMenuConfig.items.forEach(function (navIt) {
+        const sbKey = pageToNavMap[navIt.id];
+        if (sbKey) {
+          navIt.visible = sb[sbKey] !== false;
+        }
+      });
+    }
+  };
+
+  /* 3. Inject Dedicated Tab Button "👁️ Pages & Features ON/OFF" in Admin Navbar */
+  window.mountMasterSwitchboardTab = function () {
+    const homeTab = document.getElementById('adm-tab-home');
+    if (homeTab && !document.getElementById('adm-tab-switchboard')) {
+      const btn = document.createElement('button');
+      btn.id = 'adm-tab-switchboard';
+      btn.type = 'button';
+      btn.onclick = function () { switchAdminTab('switchboard'); };
+      btn.className = 'adm-tab-btn px-4 py-2 rounded-xl text-xs font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 whitespace-nowrap transition shadow-lg';
+      btn.innerHTML = '👁️ Pages & Features ON/OFF';
+      homeTab.insertAdjacentElement('beforebegin', btn);
+    }
+
+    const mainEl = document.querySelector('main');
+    if (mainEl && !document.getElementById('panel-switchboard')) {
+      const sec = document.createElement('section');
+      sec.id = 'panel-switchboard';
+      sec.className = 'adm-panel hidden space-y-6';
+      sec.innerHTML = `
+        <!-- Top Master Command Banner -->
+        <div class="p-6 rounded-3xl bg-gradient-to-r from-emerald-950/70 via-[#111114] to-indigo-950/70 border-2 border-emerald-500/40 space-y-4 shadow-2xl">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase tracking-widest">Master Visibility & Feature Control Center</span>
+              <h2 class="text-xl sm:text-2xl font-extrabold text-white mt-1.5">👁️ All Pages & Features Visibility (Enable / Disable / Edit)</h2>
+              <p class="text-xs text-zinc-300 mt-1">Yahan se aap website ke kisi bhi Page, Walkie-Talkie, Calculator, Popup ya Button ko 1-Click mein <strong>Hide (OFF)</strong> ya <strong>Show (ON)</strong> kar sakte hain—aur Hide rakhte hue bhi <strong>✏️ Edit</strong> daba kar use edit kar sakte hain!</p>
+            </div>
+            <div id="sb-active-counter-badge" class="px-4 py-2.5 rounded-2xl bg-[#09090b] border border-white/15 text-xs font-extrabold text-emerald-400">
+              44 / 44 Active
+            </div>
+          </div>
+
+          <!-- 3 Bulk Preset Action Buttons -->
+          <div class="pt-3 border-t border-white/10 flex flex-wrap items-center gap-2.5">
+            <button type="button" onclick="window.applySwitchboardBulkPreset('clean_minimal')" class="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-black text-xs shadow-lg transition">
+              🧼 1-Click Clean Minimal Mode (Hide Extra Popups, FOMO, Walkie-Talkie & AI Tools)
+            </button>
+            <button type="button" onclick="window.applySwitchboardBulkPreset('disable_all_extras')" class="px-4 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/35 border border-rose-500/40 text-rose-200 font-extrabold text-xs transition">
+              🚫 Disable All Optional Features & Tools at Once
+            </button>
+            <button type="button" onclick="window.applySwitchboardBulkPreset('enable_all')" class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs shadow-lg transition">
+              ✅ Enable Everything (Full-Stack Mode)
+            </button>
+            <input type="text" id="sb-quick-filter-inp" oninput="window.renderSwitchboardCards()" placeholder="🔍 Search any feature (e.g. Walkie, FOMO, Call, Services)..." class="ml-auto px-4 py-2 rounded-xl adm-input text-xs font-bold w-full sm:w-64" />
+          </div>
+        </div>
+
+        <!-- Dynamic Groups Container -->
+        <div id="sb-groups-container" class="space-y-6"></div>
+      `;
+      mainEl.prepend(sec);
+    }
+  };
+
+  /* 4. Render All Switchboard Groups & Cards */
+  window.renderSwitchboardCards = function () {
+    window.mountMasterSwitchboardTab();
+    ensureSwitchboardInDB();
+    if (!window.db) return;
+
+    const sb = db.masterSwitchboard;
+    const query = (document.getElementById('sb-quick-filter-inp')?.value || '').trim().toLowerCase();
+    const box = document.getElementById('sb-groups-container');
+    if (!box) return;
+
+    let totalItems = 0;
+    let enabledItems = 0;
+
+    box.innerHTML = SWITCHBOARD_GROUPS.map(function (grp, gIdx) {
+      const filteredItems = grp.items.filter(function (it) {
+        totalItems++;
+        if (sb[it.key] !== false) enabledItems++;
+        if (!query) return true;
+        return `${it.title} ${it.desc} ${it.key}`.toLowerCase().includes(query);
+      });
+
+      if (filteredItems.length === 0) return '';
+
+      return `
+        <div class="admin-card rounded-3xl p-6 space-y-4 border ${grp.borderCls}">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#242429] pb-3">
+            <div>
+              <h3 class="text-base font-extrabold text-white">${grp.groupTitle}</h3>
+              <p class="text-xs text-zinc-400">${grp.groupDesc}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="window.toggleEntireSwitchboardGroup(${gIdx}, true)" class="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-[11px] font-extrabold border border-emerald-500/30">
+                ✓ Turn Group ON
+              </button>
+              <button type="button" onclick="window.toggleEntireSwitchboardGroup(${gIdx}, false)" class="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-[11px] font-extrabold border border-rose-500/30">
+                ✕ Turn Group OFF
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            ${filteredItems.map(function (it) {
+              const isOn = sb[it.key] !== false;
+              return `
+                <div class="p-4 rounded-2xl bg-[#09090b] border ${isOn ? 'border-emerald-500/35' : 'border-rose-500/25 opacity-75'} flex flex-col justify-between gap-3 transition">
+                  <div class="flex items-start justify-between gap-2">
+                    <div class="flex items-start gap-2.5">
+                      <span class="w-9 h-9 rounded-xl ${isOn ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' : 'bg-zinc-900 text-zinc-500 border border-white/10'} flex items-center justify-center text-base shrink-0">${it.icon}</span>
+                      <div>
+                        <h4 class="text-xs font-extrabold text-white leading-snug">${it.title}</h4>
+                        <p class="text-[11px] text-zinc-400 mt-0.5 leading-relaxed">${it.desc}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="pt-2.5 border-t border-white/10 flex items-center justify-between gap-2">
+                    <button type="button" onclick="window.jumpToFeatureEditor('${it.editTab}', '${it.title.replace(/'/g, "\\'")}')" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[11px] font-bold flex items-center gap-1 transition">
+                      ✏️ Edit Content
+                    </button>
+
+                    <button type="button" onclick="window.toggleSingleSwitchboardItem('${it.key}', '${it.title.replace(/'/g, "\\'")}')" class="px-3.5 py-1.5 rounded-xl text-[11px] font-black tracking-wide transition shadow ${isOn ? 'bg-emerald-500 text-zinc-950 hover:bg-emerald-400' : 'bg-rose-500/25 text-rose-300 border border-rose-500/40 hover:bg-rose-500/40'}">
+                      ${isOn ? '🟢 LIVE (SHOWN)' : '🔴 HIDDEN (OFF)'}
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const badge = document.getElementById('sb-active-counter-badge');
+    if (badge) {
+      badge.innerText = `🟢 ${enabledItems} Shown  •  🔴 ${totalItems - enabledItems} Hidden`;
+    }
+  };
+
+  /* 5. Toggle Single Feature, Entire Group, or Bulk Preset & Sync Immediately */
+  window.toggleSingleSwitchboardItem = async function (key, titleLabel) {
+    ensureSwitchboardInDB();
+    const nextState = !(db.masterSwitchboard[key] !== false);
+    db.masterSwitchboard[key] = nextState;
+    window.syncSwitchboardWithLegacyDB();
+    window.renderSwitchboardCards();
+    if (typeof window.populateAllInputsFromDB === 'function') {
+      try { window.populateAllInputsFromDB(); } catch (e) {}
+    }
+
+    const statusWord = nextState ? 'ENABLED (Shown on Website)' : 'HIDDEN (Disabled on Website)';
+    if (typeof window.quietCollectAndSyncAll === 'function') {
+      await window.quietCollectAndSyncAll(`${titleLabel}: ${statusWord}`, true);
+    } else if (typeof pushToFirebase === 'function') {
+      await pushToFirebase(`${titleLabel}: ${statusWord}`);
+    }
+  };
+
+  window.toggleEntireSwitchboardGroup = async function (groupIdx, stateBool) {
+    ensureSwitchboardInDB();
+    const grp = SWITCHBOARD_GROUPS[groupIdx];
+    if (!grp) return;
+    grp.items.forEach(function (it) {
+      db.masterSwitchboard[it.key] = Boolean(stateBool);
+    });
+    window.syncSwitchboardWithLegacyDB();
+    window.renderSwitchboardCards();
+    if (typeof window.quietCollectAndSyncAll === 'function') {
+      await window.quietCollectAndSyncAll(`${grp.groupTitle} → ${stateBool ? 'All ON' : 'All OFF'}`, true);
+    }
+  };
+
+  window.applySwitchboardBulkPreset = async function (presetMode) {
+    ensureSwitchboardInDB();
+    const sb = db.masterSwitchboard;
+
+    if (presetMode === 'enable_all') {
+      SWITCHBOARD_GROUPS.forEach(g => g.items.forEach(it => { sb[it.key] = true; }));
+    } else if (presetMode === 'disable_all_extras') {
+      SWITCHBOARD_GROUPS.forEach((g, idx) => {
+        g.items.forEach(it => {
+          /* Keep core Services/About/Contact pages ON, turn off all optional tools, popups & extras */
+          if (idx === 0) {
+            sb[it.key] = ['page_services', 'page_quotation', 'page_portfolio', 'page_about', 'page_contact'].includes(it.key);
+          } else if (idx === 2) {
+            sb[it.key] = ['home_3d_stage', 'home_services', 'home_work'].includes(it.key);
+          } else {
+            sb[it.key] = false;
+          }
+        });
+      });
+      sb.nav_quote_cart = true;
+    } else if (presetMode === 'clean_minimal') {
+      /* Clean Minimal Mode: All pages ON, clean Hero/Services/Work/Stats ON, hide noisy popups/walkie-talkie/calculators */
+      SWITCHBOARD_GROUPS.forEach(g => g.items.forEach(it => { sb[it.key] = true; }));
+      const noisyKeys = [
+        'feat_walkie_talkie', 'float_fomo_pulse', 'float_pip_video', 'popup_exit_intent',
+        'nav_xray_btn', 'nav_sound_btn', 'nav_jarvis_mic',
+        'tool_mockup_studio', 'tool_brand_scanner', 'tool_roi_simulator', 'tool_3d_box', 'tool_profit_calc', 'tool_listing_grader',
+        'feat_instant_nda', 'feat_growth_pod', 'float_vip_pass'
+      ];
+      noisyKeys.forEach(k => { sb[k] = false; });
+    }
+
+    window.syncSwitchboardWithLegacyDB();
+    window.renderSwitchboardCards();
+    if (typeof window.quietCollectAndSyncAll === 'function') {
+      await window.quietCollectAndSyncAll('Applied Visibility Preset: ' + presetMode.toUpperCase(), true);
+    }
+  };
+
+  window.jumpToFeatureEditor = function (targetTab, itemTitle) {
+    if (typeof window.switchAdminTab === 'function') {
+      window.switchAdminTab(targetTab || 'home');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  /* 6. Hook into Tab Switch & Populate Lifecycle */
+  const origSwitch = window.switchAdminTab;
+  window.switchAdminTab = function (tabName) {
+    if (typeof origSwitch === 'function') origSwitch(tabName);
+    if (tabName === 'switchboard') {
+      window.renderSwitchboardCards();
+    }
+  };
+
+  const origPop = window.populateAllInputsFromDB;
+  window.populateAllInputsFromDB = function () {
+    if (typeof origPop === 'function') origPop();
+    window.renderSwitchboardCards();
+  };
+
+  setTimeout(function () {
+    window.mountMasterSwitchboardTab();
+    window.renderSwitchboardCards();
+  }, 450);
+})();
+</script>
+<!-- ==================== ADMIN.HTML : MASTER VISIBILITY SWITCHBOARD PATCH COMPLETE ==================== -->
