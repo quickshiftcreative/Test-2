@@ -10244,3 +10244,148 @@
 })();
 </script>
 <!-- ==================== ADMIN.HTML : FINAL LAUNCH-READY COMPACT UX & UNDO/REDO COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : AMAZON/FLIPKART STYLE CLOSED ACCORDIONS, EDIT BUTTONS & UNDO ENGINE (PASTE AT VERY BOTTOM OF admin.html) ==================== -->
+<style id="admin-amazon-style-clean-ux-v26">
+  /* Clean Amazon/Flipkart Listing Style Accordion System */
+  .adm-panel .admin-card {
+    position: relative;
+    border-radius: 20px !important;
+    border: 1px solid #242429 !important;
+    background-color: #111114 !important;
+    margin-bottom: 1rem !important;
+    transition: all 0.25s ease;
+  }
+  .adm-panel .admin-card:hover {
+    border-color: rgba(255, 255, 255, 0.28) !important;
+  }
+  .adm-panel .admin-card.is-card-collapsed .card-expandable-content {
+    display: none !important;
+  }
+  .adm-panel .admin-card.is-card-collapsed {
+    background: linear-gradient(145deg, #111114 0%, #0c0c0f 100%) !important;
+  }
+
+  /* Liquid-Glass Action Buttons for Card Headers */
+  .card-action-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid transparent;
+    cursor: pointer;
+  }
+  .card-is-open-border {
+    border-bottom-color: #242429 !important;
+    background: rgba(255, 255, 255, 0.02);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+  }
+  .card-expandable-content {
+    padding: 1.25rem;
+  }
+</style>
+
+<script id="admin-amazon-accordion-engine-v26">
+(function () {
+  /* 1. Bridge `let db` and `window.db` */
+  try {
+    Object.defineProperty(window, 'db', {
+      get: function () { return typeof db !== 'undefined' ? db : null; },
+      set: function (val) { if (typeof db !== 'undefined') db = val; },
+      configurable: true
+    });
+  } catch (e) {}
+
+  /* 2. Convert Every Admin Card into an Amazon/Flipkart Style Collapsed Accordion with Edit Button */
+  window.transformCardsIntoCleanAccordionsV26 = function () {
+    document.querySelectorAll('.adm-panel').forEach(function (panel) {
+      const cards = Array.from(panel.querySelectorAll(':scope > .admin-card, :scope > div > .admin-card'));
+
+      cards.forEach(function (card, cIdx) {
+        if (card.dataset.amazonWrapped === '1') return;
+        const hEl = card.querySelector('h2, h3, h4, span.text-indigo-400, span.text-emerald-400');
+        if (!hEl) return;
+
+        const cardKey = `${panel.id}_card_${cIdx}`;
+        card.dataset.amazonWrapped = '1';
+        card.dataset.amazonKey = cardKey;
+        card.classList.add('is-card-collapsed');
+
+        const titleText = hEl.innerText.replace(/\*|:/g, '').trim() || `Section #${cIdx + 1}`;
+
+        /* Wrap inner content into .card-expandable-content */
+        const innerHTML = card.innerHTML;
+        card.innerHTML = `
+          <div class="card-action-bar" onclick="window.toggleAmazonCardV26('${cardKey}')">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <span class="w-7 h-7 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-xs font-black text-emerald-400 shrink-0">${cIdx + 1}</span>
+              <div class="min-w-0 flex-1">
+                <h4 class="text-sm font-extrabold text-white truncate">${titleText}</h4>
+                <span class="text-[10px] text-zinc-400">Locked • Click "✏️ Edit Section" to open form</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
+              <button type="button" id="acbtn-${cardKey}" onclick="window.toggleAmazonCardV26('${cardKey}')" class="lg-btn lg-btn-edit">
+                ✏️ Edit Section
+              </button>
+              <button type="button" onclick="window.triggerAdminUndo()" class="lg-btn lg-btn-undo" title="Undo">
+                ↩️ Undo
+              </button>
+              <button type="button" onclick="window.triggerAdminRedo()" class="lg-btn lg-btn-undo" title="Redo">
+                ↪️ Redo
+              </button>
+            </div>
+          </div>
+          <div class="card-expandable-content">
+            ${innerHTML}
+          </div>
+        `;
+      });
+    });
+  };
+
+  window.toggleAmazonCardV26 = function (cardKey) {
+    const card = document.querySelector(`[data-amazon-key="${cardKey}"]`);
+    const btn = document.getElementById('acbtn-' + cardKey);
+    const bar = card ? card.querySelector('.card-action-bar') : null;
+    if (!card) return;
+
+    const willOpen = card.classList.contains('is-card-collapsed');
+    if (willOpen) {
+      card.classList.remove('is-card-collapsed');
+      if (bar) bar.classList.add('card-is-open-border');
+      if (btn) {
+        btn.className = 'lg-btn lg-btn-done';
+        btn.innerHTML = '✓ Close / Save';
+      }
+    } else {
+      card.classList.add('is-card-collapsed');
+      if (bar) bar.classList.remove('card-is-open-border');
+      if (btn) {
+        btn.className = 'lg-btn lg-btn-edit';
+        btn.innerHTML = '✏️ Edit Section';
+      }
+    }
+  };
+
+  /* Hook into tab switching and renderers */
+  const origSwitch = window.switchAdminTab;
+  window.switchAdminTab = function (tabName) {
+    if (typeof origSwitch === 'function') origSwitch(tabName);
+    setTimeout(window.transformCardsIntoCleanAccordionsV26, 60);
+  };
+
+  const origPop = window.populateAllInputsFromDB;
+  window.populateAllInputsFromDB = function () {
+    if (typeof origPop === 'function') origPop();
+    setTimeout(window.transformCardsIntoCleanAccordionsV26, 80);
+  };
+
+  setTimeout(function () {
+    window.transformCardsIntoCleanAccordionsV26();
+  }, 700);
+})();
+</script>
+<!-- ==================== ADMIN.HTML : AMAZON-STYLE CLOSED ACCORDIONS COMPLETE ==================== -->
