@@ -8514,3 +8514,398 @@
 })();
 </script>
 <!-- ==================== ADMIN.HTML : UNIVERSAL PHONE TOGGLES & BUTTON STUDIO COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : 100% GRANULAR ABOUT & 3-TIER LUXURY TEAM STUDIO (PASTE AT VERY BOTTOM OF admin.html) ==================== -->
+<style id="admin-about-team-studio-styles-v23">
+  .about-frame-preview-thumb {
+    width: 68px;
+    height: 68px;
+    object-fit: cover;
+  }
+  .frame-preview-gold_ring {
+    border-radius: 9999px;
+    border: 2px solid #f59e0b;
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.45);
+  }
+  .frame-preview-glass_squircle {
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .frame-preview-arch {
+    border-radius: 34px 34px 10px 10px;
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+  }
+  .frame-preview-octagon {
+    clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+  }
+</style>
+
+<script id="admin-granular-about-team-v23">
+(function () {
+  /* 1. Bridge `let db` and `window.db` safely */
+  try {
+    Object.defineProperty(window, 'db', {
+      get: function () { return typeof db !== 'undefined' ? db : null; },
+      set: function (val) { if (typeof db !== 'undefined') db = val; },
+      configurable: true
+    });
+  } catch (e) {}
+
+  const DEFAULT_ABOUT_V23 = {
+    eyebrow: 'Our Story & DNA',
+    heading: 'Built by Operators, Driven by Measurable Brand Growth.',
+    story: 'Inspired by global design excellence and hardcore marketplace execution, we bridge the gap between high-craft branding and rapid commercial scaling.\n\nWhether launching a D2C consumer electronics brand on Amazon Global & Flipkart, onboarding SKUs onto Blinkit and Zepto dark stores, or crafting 3D product visuals, our studio operates as your dedicated growth engine.',
+    missionTitle: 'Our Mission',
+    mission: 'To empower modern brands across India, UAE, and global markets with transparent, high-ROAS digital operations and iconic visual systems.',
+    visionTitle: 'Our Vision',
+    vision: 'To stand as the most trusted creative and e-commerce growth partner worldwide—where every project is tracked live from 0% to 100%.',
+    showStory: true,
+    showMissionVision: true,
+    showFounderNote: true,
+    founderNoteQuote: '“In e-commerce, pretty designs without conversion architecture are just expensive art. We engineer both.”',
+    founderNoteAuthor: 'Jenish Kamli',
+    founderNoteRole: 'Founder & E-Commerce Growth Consultant',
+    showDnaPillars: true,
+    dnaPillars: [
+      { num: '(01)', title: 'Organic-First Scale', desc: 'A10 & search architecture over ad burn' },
+      { num: '(02)', title: '100% Live Transparency', desc: 'Real-time client portal from 0% to 100%' },
+      { num: '(03)', title: 'High-Craft 3D Visuals', desc: 'A+ storylines & exploded-view renders' },
+      { num: '(04)', title: 'India • UAE • Global Desk', desc: 'Multi-marketplace cross-border scaling' }
+    ],
+    showFoundersTier: true,
+    foundersHeading: 'Founders & Visionary Leadership',
+    foundersSub: 'The strategic architects scaling brands globally.',
+    showPartnersTier: true,
+    partnersHeading: 'Managing & Strategic Partners',
+    partnersSub: 'Regional operations heads and growth consultants.',
+    showTeamTier: true,
+    teamHeading: 'The Execution Desk & Core Team',
+    teamSub: 'Full-stack specialists across creative, ads and compliance.',
+    showBottomCta: true,
+    bottomCtaText: 'Want to scale your brand or join our growth desk?',
+    bottomCtaBtn: 'Start Conversation on WhatsApp →',
+    bottomCtaUrl: 'https://wa.me/919876543210'
+  };
+
+  function ensureAboutConfigReady() {
+    if (!window.db && typeof db !== 'undefined') window.db = db;
+    if (!window.db) return;
+    db.aboutConfig = { ...DEFAULT_ABOUT_V23, ...(db.aboutConfig || {}) };
+    db.about = db.about || {};
+    /* Two-way sync with legacy fields */
+    if (db.about.heading) db.aboutConfig.heading = db.about.heading;
+    if (db.about.story) db.aboutConfig.story = db.about.story;
+    if (db.about.mission) db.aboutConfig.mission = db.about.mission;
+    if (db.about.vision) db.aboutConfig.vision = db.about.vision;
+    db.team = Array.isArray(db.team) ? db.team : [];
+  }
+
+  let aboutSyncTimer = null;
+  window.quietSyncAboutDB = function (note, immediate) {
+    if (!window.db) return;
+    ensureAboutConfigReady();
+    localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(db));
+
+    try {
+      const ch = new BroadcastChannel('OG_AGENCY_LIVE_SYNC_V13');
+      ch.postMessage({ type: 'DB_UPDATED', db: db });
+    } catch (e) {}
+
+    clearTimeout(aboutSyncTimer);
+    aboutSyncTimer = setTimeout(async function () {
+      if (typeof pushToFirebase === 'function') {
+        await pushToFirebase(note || 'Updated About Page & Team');
+      }
+    }, immediate ? 50 : 350);
+  };
+
+  /* 2. Render Full Granular About Studio Inside `#panel-about` */
+  window.renderGranularAboutStudio = function () {
+    ensureAboutConfigReady();
+    if (!window.db) return;
+
+    const panel = document.getElementById('panel-about');
+    if (!panel) return;
+
+    const ac = db.aboutConfig;
+
+    panel.innerHTML = `
+      <!-- Top Command Bar -->
+      <div class="p-6 rounded-3xl bg-gradient-to-r from-amber-950/60 via-[#111114] to-indigo-950/60 border-2 border-amber-500/40 space-y-3 shadow-2xl">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <span class="px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-[10px] font-black uppercase tracking-wider">Granular About & 3-Tier Team Studio</span>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-white mt-1">👥 Edit Every Single Letter, Story, Founder Note, DNA & 3-Tier Team</h2>
+            <p class="text-xs text-zinc-300 mt-0.5">Founders, Partners aur Core Team ko clean tiers mein rakhein, bio ko brief banayein, aur click karne par aane wale popup ke social links edit karein.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="window.addNewGranularMember('Founder')" class="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-black text-xs shadow-lg transition">
+              👑 + Add Founder
+            </button>
+            <button type="button" onclick="window.addNewGranularMember('Partner')" class="px-3.5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs shadow transition">
+              🤝 + Add Partner
+            </button>
+            <button type="button" onclick="window.addNewGranularMember('Core Team')" class="px-3.5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs shadow transition">
+              ⚡ + Add Team Member
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 1: STORY, MISSION, VISION & FOUNDER NOTE -->
+      <div class="admin-card rounded-3xl p-6 space-y-5 border-amber-500/30">
+        <div class="border-b border-[#242429] pb-3 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span class="text-[10px] font-extrabold uppercase text-amber-400">Section 1 • Story & Leadership Message</span>
+            <h3 class="text-base font-extrabold text-white">📖 Agency Narrative, Mission, Vision & Founder's Note</h3>
+          </div>
+          <div class="flex items-center gap-4 text-xs font-bold">
+            <label class="flex items-center gap-2 cursor-pointer text-amber-300">
+              <input type="checkbox" ${ac.showStory !== false ? 'checked' : ''} onchange="db.aboutConfig.showStory=this.checked; window.quietSyncAboutDB('Toggled Story');" /> Show Story
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer text-indigo-300">
+              <input type="checkbox" ${ac.showMissionVision !== false ? 'checked' : ''} onchange="db.aboutConfig.showMissionVision=this.checked; window.quietSyncAboutDB('Toggled Mission/Vision');" /> Show Mission & Vision
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer text-emerald-300">
+              <input type="checkbox" ${ac.showFounderNote !== false ? 'checked' : ''} onchange="db.aboutConfig.showFounderNote=this.checked; window.quietSyncAboutDB('Toggled Founder Note');" /> Show Founder Note
+            </label>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+          <div class="md:col-span-3">
+            <label class="text-[11px] font-bold text-amber-400 block mb-1">Top Eyebrow Badge</label>
+            <input type="text" value="${(ac.eyebrow || '').replace(/"/g, '&quot;')}" oninput="db.aboutConfig.eyebrow=this.value; window.quietSyncAboutDB('Edited About Eyebrow');" placeholder="Our Story & DNA" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs font-bold" />
+          </div>
+          <div class="md:col-span-9">
+            <label class="text-[11px] font-bold text-white block mb-1">Main About Headline *</label>
+            <input type="text" value="${(ac.heading || '').replace(/"/g, '&quot;')}" oninput="db.aboutConfig.heading=this.value; db.about.heading=this.value; window.quietSyncAboutDB('Edited About Heading');" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs font-extrabold text-white" />
+          </div>
+          <div class="md:col-span-12">
+            <label class="text-[11px] font-bold text-zinc-300 block mb-1">Detailed Story Paragraphs (Supports line breaks)</label>
+            <textarea rows="3" oninput="db.aboutConfig.story=this.value; db.about.story=this.value; window.quietSyncAboutDB('Edited About Story');" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs leading-relaxed">${ac.story || ''}</textarea>
+          </div>
+          <div class="md:col-span-6 space-y-2">
+            <input type="text" value="${(ac.missionTitle || 'Our Mission').replace(/"/g, '&quot;')}" oninput="db.aboutConfig.missionTitle=this.value; window.quietSyncAboutDB('Edited Mission Title');" class="w-full px-3 py-1.5 rounded-xl adm-input text-xs font-bold text-emerald-400" />
+            <textarea rows="2" oninput="db.aboutConfig.mission=this.value; db.about.mission=this.value; window.quietSyncAboutDB('Edited Mission Text');" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs">${ac.mission || ''}</textarea>
+          </div>
+          <div class="md:col-span-6 space-y-2">
+            <input type="text" value="${(ac.visionTitle || 'Our Vision').replace(/"/g, '&quot;')}" oninput="db.aboutConfig.visionTitle=this.value; window.quietSyncAboutDB('Edited Vision Title');" class="w-full px-3 py-1.5 rounded-xl adm-input text-xs font-bold text-indigo-400" />
+            <textarea rows="2" oninput="db.aboutConfig.vision=this.value; db.about.vision=this.value; window.quietSyncAboutDB('Edited Vision Text');" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs">${ac.vision || ''}</textarea>
+          </div>
+        </div>
+
+        <!-- Founder Note Box -->
+        <div class="p-4 rounded-2xl bg-[#09090b] border border-amber-500/30 space-y-3">
+          <span class="text-xs font-extrabold text-amber-400 uppercase">✍️ Founder's Quote Card</span>
+          <textarea rows="2" oninput="db.aboutConfig.founderNoteQuote=this.value; window.quietSyncAboutDB('Edited Founder Quote');" placeholder="Type Founder Quote..." class="w-full px-3.5 py-2 rounded-xl adm-input text-xs italic">${ac.founderNoteQuote || ''}</textarea>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <input type="text" value="${(ac.founderNoteAuthor || '').replace(/"/g, '&quot;')}" oninput="db.aboutConfig.founderNoteAuthor=this.value; window.quietSyncAboutDB('Edited Quote Author');" placeholder="Author Name (e.g. Jenish Kamli)" class="px-3 py-2 rounded-xl adm-input text-xs font-bold text-white" />
+            <input type="text" value="${(ac.founderNoteRole || '').replace(/"/g, '&quot;')}" oninput="db.aboutConfig.founderNoteRole=this.value; window.quietSyncAboutDB('Edited Quote Role');" placeholder="Designation (e.g. Founder & Managing Partner)" class="px-3 py-2 rounded-xl adm-input text-xs text-amber-300" />
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: 4 DNA PILLARS STRIP -->
+      <div class="admin-card rounded-3xl p-6 space-y-4 border-indigo-500/30">
+        <div class="border-b border-[#242429] pb-3 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span class="text-[10px] font-extrabold uppercase text-indigo-400">Section 2 • Core Brand Values</span>
+            <h3 class="text-base font-extrabold text-white">🧬 4 DNA Pillars Bento Strip</h3>
+          </div>
+          <label class="flex items-center gap-2 cursor-pointer text-xs font-extrabold text-emerald-400">
+            <input type="checkbox" ${ac.showDnaPillars !== false ? 'checked' : ''} onchange="db.aboutConfig.showDnaPillars=this.checked; window.quietSyncAboutDB('Toggled DNA Pillars');" /> Show DNA Pillars
+          </label>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          ${(ac.dnaPillars || []).map((dna, dIdx) => `
+            <div class="p-3.5 rounded-2xl bg-[#09090b] border border-white/10 space-y-2">
+              <div class="flex justify-between items-center">
+                <input type="text" value="${dna.num}" oninput="db.aboutConfig.dnaPillars[${dIdx}].num=this.value; window.quietSyncAboutDB('Edited DNA Num');" class="w-16 px-2 py-1 rounded adm-input text-xs font-mono font-bold text-indigo-400" />
+                <span class="text-[10px] text-zinc-500 font-bold">Pillar #${dIdx + 1}</span>
+              </div>
+              <input type="text" value="${(dna.title || '').replace(/"/g, '&quot;')}" oninput="db.aboutConfig.dnaPillars[${dIdx}].title=this.value; window.quietSyncAboutDB('Edited DNA Title');" placeholder="Pillar Title" class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs font-bold text-white" />
+              <input type="text" value="${(dna.desc || '').replace(/"/g, '&quot;')}" oninput="db.aboutConfig.dnaPillars[${dIdx}].desc=this.value; window.quietSyncAboutDB('Edited DNA Desc');" placeholder="Pillar Subtitle" class="w-full px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- SECTION 3: 3-TIER TEAM ARCHITECTURE & MEMBERS LIST -->
+      <div class="space-y-6">
+        <!-- TIER A: FOUNDERS -->
+        ${window.buildTeamTierManagerHTML('Founder', '👑 Tier 1: Founders & Executive Leadership', 'founders', 'border-amber-500/40', 'bg-amber-500/20 text-amber-300')}
+        <!-- TIER B: PARTNERS -->
+        ${window.buildTeamTierManagerHTML('Partner', '🤝 Tier 2: Managing & Strategic Partners', 'partners', 'border-indigo-500/40', 'bg-indigo-500/20 text-indigo-300')}
+        <!-- TIER C: CORE TEAM -->
+        ${window.buildTeamTierManagerHTML('Core Team', '⚡ Tier 3: Core Team & Specialists', 'team', 'border-emerald-500/40', 'bg-emerald-500/20 text-emerald-300')}
+      </div>
+    `;
+  };
+
+  /* 3. Helper to Generate Tier Management Block with Custom Headings & Member Cards */
+  window.buildTeamTierManagerHTML = function (tierType, tierTitle, tierKey, borderCls, badgeCls) {
+    const ac = db.aboutConfig;
+    const isShown = ac[`show${tierKey.charAt(0).toUpperCase() + tierKey.slice(1)}Tier`] !== false;
+    const members = (db.team || []).map((m, idx) => ({ ...m, origIdx: idx })).filter(m => (m.type || 'Staff') === tierType);
+
+    return `
+      <div class="admin-card rounded-3xl p-6 space-y-5 border-2 ${borderCls} bg-[#111114]">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#242429] pb-3.5">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full ${badgeCls} text-[10px] font-black uppercase tracking-wider">${tierType}</span>
+              <h3 class="text-base font-extrabold text-white">${tierTitle} (${members.length})</h3>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <button type="button" onclick="window.addNewGranularMember('${tierType}')" class="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold">
+              + Add ${tierType}
+            </button>
+            <label class="flex items-center gap-2 text-xs font-extrabold text-emerald-400 cursor-pointer">
+              <input type="checkbox" ${isShown ? 'checked' : ''} onchange="db.aboutConfig.show${tierKey.charAt(0).toUpperCase() + tierKey.slice(1)}Tier=this.checked; window.quietSyncAboutDB('Toggled ${tierType} Tier');" />
+              Show Tier on Website
+            </label>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="text-[11px] font-bold text-zinc-400 block mb-1">Tier Section Heading on Website</label>
+            <input type="text" value="${(ac[tierKey + 'Heading'] || '').replace(/"/g, '&quot;')}" oninput="db.aboutConfig['${tierKey}Heading']=this.value; window.quietSyncAboutDB('Edited ${tierType} Heading');" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold text-white" />
+          </div>
+          <div>
+            <label class="text-[11px] font-bold text-zinc-400 block mb-1">Tier Section Subtitle</label>
+            <input type="text" value="${(ac[tierKey + 'Sub'] || '').replace(/"/g, '&quot;')}" oninput="db.aboutConfig['${tierKey}Sub']=this.value; window.quietSyncAboutDB('Edited ${tierType} Subtitle');" class="w-full px-3 py-2 rounded-xl adm-input text-xs" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          ${members.length === 0 ? `<div class="col-span-full p-6 rounded-2xl bg-[#09090b] text-center text-xs text-zinc-500">No members in this tier yet. Click "+ Add ${tierType}".</div>` : members.map(m => window.buildMemberCardEditorHTML(m)).join('')}
+        </div>
+      </div>
+    `;
+  };
+
+  /* 4. Complete Member Card Editor HTML (Name, Role, Brief, Detailed Bio, Luxury Frame, Skills, All Social Links) */
+  window.buildMemberCardEditorHTML = function (m) {
+    const idx = m.origIdx;
+    const avatar = m.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name || 'Member')}&background=6366f1&color=fff`;
+    const soc = m.socials || {};
+    const frame = m.frameStyle || 'gold_ring';
+
+    return `
+      <div class="p-5 rounded-2xl bg-[#09090b] border border-[#242429] space-y-4 text-xs transition">
+        <!-- Top: Photo + Name + Tier Switch + Actions -->
+        <div class="flex items-start gap-3.5 border-b border-[#242429] pb-3.5">
+          <div class="relative shrink-0">
+            <img src="${avatar}" class="about-frame-preview-thumb frame-preview-${frame}" />
+            <label class="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-lg bg-indigo-600 text-[9px] font-bold text-white cursor-pointer shadow">
+              📷
+              <input type="file" accept="image/*" onchange="uploadDirectCallback(this, false, function(u){ db.team[${idx}].photo=u; window.renderGranularAboutStudio(); window.quietSyncAboutDB('Uploaded Member Photo', true); })" class="hidden" />
+            </label>
+          </div>
+          <div class="flex-1 min-w-0 space-y-1.5">
+            <div class="flex items-center justify-between gap-1">
+              <input type="text" value="${(m.name || '').replace(/"/g, '&quot;')}" oninput="db.team[${idx}].name=this.value; window.quietSyncAboutDB('Edited Member Name');" placeholder="Full Name *" class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs font-black text-white" />
+              <button type="button" onclick="window.deleteGranularMember(${idx})" class="text-rose-400 hover:text-rose-300 font-bold px-2">🗑️</button>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <select onchange="db.team[${idx}].type=this.value; window.renderGranularAboutStudio(); window.quietSyncAboutDB('Switched Member Tier', true);" class="px-2 py-1 rounded-lg adm-input text-[11px] font-bold text-amber-300">
+                <option value="Founder" ${m.type==='Founder'?'selected':''}>👑 Founder</option>
+                <option value="Partner" ${m.type==='Partner'?'selected':''}>🤝 Partner</option>
+                <option value="Core Team" ${(m.type==='Core Team'||m.type==='Staff')?'selected':''}>⚡ Core Team</option>
+              </select>
+              <select onchange="db.team[${idx}].frameStyle=this.value; window.renderGranularAboutStudio(); window.quietSyncAboutDB('Changed Frame Style', true);" class="px-2 py-1 rounded-lg adm-input text-[11px] font-bold text-emerald-300">
+                <option value="gold_ring" ${frame==='gold_ring'?'selected':''}>👑 Gold Ring</option>
+                <option value="glass_squircle" ${frame==='glass_squircle'?'selected':''}>🍎 Squircle</option>
+                <option value="arch" ${frame==='arch'?'selected':''}>🏛️ Arch</option>
+                <option value="octagon" ${frame==='octagon'?'selected':''}>💎 Octagon</option>
+                <option value="circle" ${frame==='circle'?'selected':''}>◯ Circle</option>
+                <option value="square" ${frame==='square'?'selected':''}>▢ Square</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Role Designation & 1-Line Card Brief -->
+        <div class="space-y-2">
+          <div>
+            <label class="text-[10px] text-zinc-400 block mb-0.5">Role / Designation *</label>
+            <input type="text" value="${(m.role || '').replace(/"/g, '&quot;')}" oninput="db.team[${idx}].role=this.value; window.quietSyncAboutDB('Edited Member Role');" placeholder="e.g. Founder & E-Commerce Growth Consultant" class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs font-bold text-indigo-300" />
+          </div>
+          <div>
+            <label class="text-[10px] text-zinc-400 block mb-0.5">1-Line Clean Card Brief (Shown on website card)</label>
+            <input type="text" value="${(m.cardBrief || m.bio || '').replace(/"/g, '&quot;')}" oninput="db.team[${idx}].cardBrief=this.value; window.quietSyncAboutDB('Edited Card Brief');" placeholder="e.g. 10+ Yrs Scaling Amazon Global & D2C Brands" class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs" />
+          </div>
+        </div>
+
+        <!-- Full Detailed Bio & Skill Pills (Inside Click Modal) -->
+        <div class="space-y-2 pt-2 border-t border-[#242429]">
+          <div>
+            <label class="text-[10px] text-amber-400 font-bold block mb-0.5">Full Detailed Bio / Story (Shown inside Click Modal)</label>
+            <textarea rows="2" oninput="db.team[${idx}].detailedBio=this.value; window.quietSyncAboutDB('Edited Detailed Bio');" placeholder="Detailed professional journey, accolades and brand scaling experience..." class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs leading-relaxed">${m.detailedBio || m.bio || ''}</textarea>
+          </div>
+          <div>
+            <label class="text-[10px] text-emerald-400 font-bold block mb-0.5">Expertise / Skill Pills (Comma separated)</label>
+            <input type="text" value="${(Array.isArray(m.skills) ? m.skills.join(', ') : (m.skills || ''))}" oninput="db.team[${idx}].skills=this.value.split(',').map(s=>s.trim()).filter(Boolean); window.quietSyncAboutDB('Edited Skills');" placeholder="Amazon Global, Organic SEO, 3D CGI Renders, Paid ROAS" class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs font-mono" />
+          </div>
+        </div>
+
+        <!-- Official Social Media Links & Direct Chat -->
+        <div class="pt-2 border-t border-[#242429] space-y-2">
+          <span class="text-[10px] font-black uppercase text-zinc-400">🔗 Social Media Links (Only filled icons appear on website)</span>
+          <div class="grid grid-cols-2 gap-2">
+            <input type="url" value="${soc.linkedin || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.linkedin=this.value; window.quietSyncAboutDB('Edited LinkedIn');" placeholder="LinkedIn URL" class="px-2.5 py-1 rounded-lg adm-input text-[11px]" />
+            <input type="url" value="${soc.instagram || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.instagram=this.value; window.quietSyncAboutDB('Edited Instagram');" placeholder="Instagram URL" class="px-2.5 py-1 rounded-lg adm-input text-[11px]" />
+            <input type="url" value="${soc.twitter || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.twitter=this.value; window.quietSyncAboutDB('Edited Twitter');" placeholder="X (Twitter) URL" class="px-2.5 py-1 rounded-lg adm-input text-[11px]" />
+            <input type="url" value="${soc.behance || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.behance=this.value; window.quietSyncAboutDB('Edited Behance');" placeholder="Behance / Portfolio" class="px-2.5 py-1 rounded-lg adm-input text-[11px]" />
+            <input type="tel" value="${soc.whatsapp || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.whatsapp=this.value; window.quietSyncAboutDB('Edited WhatsApp');" placeholder="WhatsApp (e.g. 919876543210)" class="px-2.5 py-1 rounded-lg adm-input text-[11px]" />
+            <input type="email" value="${soc.email || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.email=this.value; window.quietSyncAboutDB('Edited Email');" placeholder="Official Email" class="px-2.5 py-1 rounded-lg adm-input text-[11px]" />
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  /* 5. Add / Delete Granular Member Helpers */
+  window.addNewGranularMember = function (tierType) {
+    ensureAboutConfigReady();
+    db.team.unshift({
+      id: 'TM-' + Date.now(),
+      name: 'New ' + tierType,
+      role: tierType === 'Founder' ? 'Founder & Growth Consultant' : tierType === 'Partner' ? 'Managing Partner' : 'Marketplace Specialist',
+      type: tierType,
+      photo: '',
+      frameStyle: tierType === 'Founder' ? 'gold_ring' : 'glass_squircle',
+      cardBrief: 'Growth & Creative Execution Specialist.',
+      detailedBio: 'Extensive hands-on experience in scaling modern D2C & consumer electronics brands across digital marketplaces.',
+      skills: ['E-Commerce Growth', 'Visual Systems', 'Marketplaces'],
+      socials: { linkedin: '', instagram: '', twitter: '', behance: '', whatsapp: '', email: '' }
+    });
+    window.renderGranularAboutStudio();
+    window.quietSyncAboutDB('Added New ' + tierType, true);
+  };
+
+  window.deleteGranularMember = function (idx) {
+    if (!confirm('Delete this member from team list?')) return;
+    db.team.splice(idx, 1);
+    window.renderGranularAboutStudio();
+    window.quietSyncAboutDB('Deleted Member', true);
+  };
+
+  /* Hook into Tab Switching */
+  const origSwitchTab = window.switchAdminTab;
+  window.switchAdminTab = function (tabName) {
+    if (typeof origSwitchTab === 'function') origSwitchTab(tabName);
+    if (tabName === 'about') {
+      window.renderGranularAboutStudio();
+    }
+  };
+
+  setTimeout(function () {
+    window.renderGranularAboutStudio();
+  }, 500);
+})();
+</script>
+<!-- ==================== ADMIN.HTML : GRANULAR ABOUT & 3-TIER TEAM STUDIO COMPLETE ==================== -->
