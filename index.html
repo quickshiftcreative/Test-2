@@ -10389,3 +10389,538 @@
 })();
 </script>
 <!-- ==================== ADMIN.HTML : AMAZON-STYLE CLOSED ACCORDIONS COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : INSTAGRAM/AMAZON VISUAL VIEW MODE + CLOSED FORM DRAWER & MICRO-TEXT STUDIO (PASTE AT VERY BOTTOM OF admin.html) ==================== -->
+<style id="admin-visual-view-closed-form-v27">
+  /* 1. Neutralize v25 & v26 Blind Folder Hiders Immediately */
+  .adm-folder-bar,
+  .card-action-bar {
+    display: none !important;
+  }
+  .adm-folder-body-closed,
+  .adm-panel .admin-card.is-card-collapsed .card-expandable-content {
+    display: block !important;
+  }
+
+  /* 2. Instagram / Amazon Seller Hub Visual Card + Closed Form System */
+  .adm-panel .admin-card {
+    position: relative;
+    background: linear-gradient(145deg, #121216 0%, #0b0b0e 100%) !important;
+    border: 1px solid #27272a !important;
+    border-radius: 24px !important;
+    padding: 1.35rem !important;
+    margin-bottom: 1.25rem !important;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
+  }
+  .adm-panel .admin-card.ig-card-editing {
+    border-color: rgba(16, 185, 129, 0.65) !important;
+    box-shadow: 0 20px 50px -15px rgba(16, 185, 129, 0.22) !important;
+  }
+
+  /* Visual Summary Grid Shown When Form is Closed (So User Sees Everything Visually!) */
+  .ig-visual-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(9, 9, 11, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .ig-summary-item {
+    padding: 8px 11px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .ig-summary-lbl {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #a1a1aa;
+  }
+  .ig-summary-val {
+    font-size: 12px;
+    font-weight: 700;
+    color: #f4f4f5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Hide Raw Form Inputs ONLY When Card is in Closed-Form Mode, while Keeping Visual Previews & Headers 100% Visible! */
+  .admin-card.ig-form-closed .ig-form-body-wrap {
+    display: none !important;
+  }
+  .admin-card.ig-card-editing .ig-visual-summary-grid {
+    display: none !important;
+  }
+</style>
+
+<script id="admin-visual-dashboard-and-micro-editor-v27">
+(function () {
+  /* 1. Bridge `let db` and `window.db` */
+  try {
+    Object.defineProperty(window, 'db', {
+      get: function () { return typeof db !== 'undefined' ? db : null; },
+      set: function (val) { if (typeof db !== 'undefined') db = val; },
+      configurable: true
+    });
+  } catch (e) {}
+
+  /* 2. CANCEL v25 & v26 Blind Folder Wrappers Before Their Timers Fire! */
+  window.wrapAdminCardsIntoFoldersV25 = function () {};
+  window.transformCardsIntoCleanAccordionsV26 = function () {};
+
+  function unwrapAnyBrokenV25V26Nodes() {
+    document.querySelectorAll('.adm-folder-bar, .card-action-bar').forEach(el => el.remove());
+    document.querySelectorAll('.adm-folder-body-closed, .is-card-collapsed').forEach(el => {
+      el.classList.remove('adm-folder-body-closed', 'is-card-collapsed');
+    });
+    document.querySelectorAll('.card-expandable-content').forEach(wrap => {
+      const parent = wrap.parentElement;
+      if (parent) {
+        while (wrap.firstChild) parent.appendChild(wrap.firstChild);
+        wrap.remove();
+      }
+    });
+  }
+
+  /* ============================================================================
+     3. INSTAGRAM / AMAZON VISUAL PROFILE CARDS FOR TEAM MEMBERS (`#panel-about`)
+     ============================================================================ */
+  window.openTeamMemberIdsV25 = window.openTeamMemberIdsV25 || new Set();
+
+  window.buildMemberCardEditorHTML = function (m) {
+    const idx = m.origIdx;
+    const mId = m.id || ('TM-' + idx);
+    m.id = mId;
+    const isEditing = window.openTeamMemberIdsV25.has(mId) && !m.locked;
+    const avatar = m.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name || 'Member')}&background=6366f1&color=fff&size=256`;
+    const soc = m.socials || {};
+    const skillsArr = Array.isArray(m.skills) ? m.skills : (m.skills ? String(m.skills).split(',').map(s => s.trim()).filter(Boolean) : []);
+    const isKnownTier = (window.TEAM_TIERS_16 || []).some(t => t.id === m.type);
+    const isKnownRole = (window.AGENCY_DESIGNATIONS_26 || []).includes(m.role);
+
+    /* VISUAL PROFILE CARD (Always Visible — Shows Framed Photo, Placement Info, Bio, Skills & Socials) */
+    const visualProfileHeader = `
+      <div class="p-5 rounded-3xl bg-[#09090b] border-2 ${isEditing ? 'border-emerald-500/60' : m.locked ? 'border-amber-500/40' : 'border-[#27272a]'} space-y-4 transition shadow-xl">
+        <!-- Top Action Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-1 rounded-lg bg-amber-400/20 text-amber-300 text-[11px] font-black uppercase">${m.type || 'Founder'}</span>
+            <span class="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 text-[11px] font-bold">${m.role || 'Founder'}</span>
+            <span class="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[10px] text-zinc-400">📐 ${m.placement || 'center'} • ${m.photoSize || 185}px</span>
+            ${m.locked ? `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold">🔒 Locked</span>` : ''}
+          </div>
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button type="button" onclick="if(${Boolean(m.locked)}){alert('🔒 Profile Locked! Click Unlock first.');}else{window.toggleMemberEditCardV25('${mId}');}" class="lg-btn ${isEditing ? 'lg-btn-done' : 'lg-btn-edit'}">
+              ${isEditing ? '✓ Save & Close Form' : '✏️ Edit Profile'}
+            </button>
+            <button type="button" onclick="window.triggerAdminUndo()" class="lg-btn lg-btn-undo" title="Undo">↩️ Undo</button>
+            <button type="button" onclick="window.triggerAdminRedo()" class="lg-btn lg-btn-undo" title="Redo">↪️ Redo</button>
+            <button type="button" onclick="window.toggleMemberLockV25(${idx})" class="lg-btn lg-btn-lock">${m.locked ? '🔒 Unlock' : '🔓 Lock'}</button>
+            <button type="button" onclick="window.deleteGranularMember(${idx})" class="lg-btn lg-btn-del">🗑️ Remove</button>
+          </div>
+        </div>
+
+        <!-- Visual Instagram-Style Profile Display (Always Visible!) -->
+        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 p-4 rounded-2xl bg-[#111114] border border-white/10">
+          <div class="relative shrink-0 overflow-hidden flex items-center justify-center bg-black" style="width:92px;height:92px;border-radius:22px;border:${m.borderWidth ?? 3}px solid ${m.borderColor || '#f59e0b'};box-shadow:0 0 20px rgba(245,158,11,0.25);">
+            <img src="${avatar}" style="width:100%;height:100%;object-fit:cover;object-position:50% ${m.photoPosY ?? 20}%;transform:scale(${(m.photoZoom || 100)/100});" />
+          </div>
+          <div class="flex-1 min-w-0 text-center sm:text-left space-y-1.5">
+            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+              <h4 class="text-base sm:text-lg font-extrabold text-white">${m.name || 'Unnamed Member'}</h4>
+              ${m.verifiedBadge !== false ? `<span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black">✓ Verified</span>` : ''}
+              ${m.locationBadge ? `<span class="text-[11px] text-zinc-400">• ${m.locationBadge}</span>` : ''}
+            </div>
+            <p class="text-xs font-bold text-emerald-400">${m.role || ''}</p>
+            <p class="text-xs text-zinc-300 leading-relaxed">${m.cardBrief || m.bio || 'No brief added yet.'}</p>
+            ${skillsArr.length > 0 ? `
+              <div class="flex flex-wrap justify-center sm:justify-start gap-1.5 pt-1">
+                ${skillsArr.map(sk => `<span class="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold text-zinc-300">${sk}</span>`).join('')}
+              </div>
+            ` : ''}
+          </div>
+        </div>
+
+        <!-- CLOSED FORM DRAWER (Opens ONLY When User Clicks "✏️ Edit Profile") -->
+        ${isEditing ? `
+          <div class="pt-4 border-t-2 border-emerald-500/40 space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black uppercase text-emerald-400">📝 Edit Profile Form (Changes Auto-Sync Live)</span>
+              <div class="flex gap-1.5">
+                <button type="button" onclick="window.moveTeamMemberV24(${idx}, -1)" class="lg-btn">↑ Move Up</button>
+                <button type="button" onclick="window.moveTeamMemberV24(${idx}, 1)" class="lg-btn">↓ Move Down</button>
+                <button type="button" onclick="window.duplicateTeamMemberV24(${idx})" class="lg-btn">📋 Duplicate</button>
+              </div>
+            </div>
+
+            <!-- Name, Photo Upload & Badges -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 rounded-2xl bg-[#111114] border border-white/10">
+              <div>
+                <label class="text-[10px] font-bold text-zinc-400 block mb-1">Full Name *</label>
+                <input type="text" value="${(m.name || '').replace(/"/g, '&quot;')}" oninput="db.team[${idx}].name=this.value; window.quietSyncAboutDB('Edited Name');" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-extrabold text-white" />
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-emerald-400 block mb-1">Location / Experience Tag</label>
+                <input type="text" value="${(m.locationBadge || '').replace(/"/g, '&quot;')}" oninput="db.team[${idx}].locationBadge=this.value; window.quietSyncAboutDB('Edited Location Tag');" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold text-emerald-300" />
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-amber-300 block mb-1">Upload or Paste Photo</label>
+                <div class="flex gap-1.5">
+                  <input type="text" value="${(m.photo && !m.photo.startsWith('data:') ? m.photo : '').replace(/"/g, '&quot;')}" oninput="db.team[${idx}].photo=this.value; window.quietSyncAboutDB('Edited Photo URL');" placeholder="Photo URL..." class="flex-1 px-2.5 py-2 rounded-xl adm-input text-xs" />
+                  <label class="px-3 py-2 rounded-xl bg-amber-400 text-zinc-950 font-black text-xs cursor-pointer shrink-0">
+                    📷
+                    <input type="file" accept="image/*" onchange="uploadDirectCallback(this, false, function(u){ db.team[${idx}].photo=u; window.renderGranularAboutStudio(); window.quietSyncAboutDB('Uploaded Photo', true); })" class="hidden" />
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- 1-Word Tier Dropdown & Short Role Designation Dropdown -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-2xl bg-[#111114] border border-indigo-500/30">
+              <div class="space-y-1.5">
+                <label class="text-[10px] font-extrabold uppercase text-amber-400 block">1. Tier / Group (Simple 1-Word Dropdown)</label>
+                <select onchange="if(this.value==='__CUSTOM_TIER__'){ document.getElementById('cust-tier-inp-${idx}').classList.remove('hidden'); } else { document.getElementById('cust-tier-inp-${idx}').classList.add('hidden'); db.team[${idx}].type=this.value; window.renderGranularAboutStudio(); window.quietSyncAboutDB('Changed Tier', true); }" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold text-amber-300">
+                  ${(window.TEAM_TIERS_16 || []).map(t => `<option value="${t.id}" ${m.type === t.id ? 'selected' : ''}>${t.label}</option>`).join('')}
+                  <option value="__CUSTOM_TIER__" ${!isKnownTier ? 'selected' : ''}>✍️ + Custom Tier...</option>
+                </select>
+                <input type="text" id="cust-tier-inp-${idx}" value="${(m.type || '').replace(/"/g, '&quot;')}" onchange="db.team[${idx}].type=this.value.trim()||'Founder'; window.renderGranularAboutStudio(); window.quietSyncAboutDB('Set Custom Tier', true);" placeholder="Type Custom Tier..." class="${!isKnownTier ? '' : 'hidden'} w-full px-2.5 py-1.5 rounded-lg adm-input text-xs font-bold" />
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="text-[10px] font-extrabold uppercase text-indigo-300 block">2. Designation (Short Dropdown + Custom)</label>
+                <select onchange="if(this.value!=='CUSTOM_ROLE'){ db.team[${idx}].role=this.value; document.getElementById('role-txt-inp-${idx}').value=this.value; window.quietSyncAboutDB('Changed Role', true); } else { document.getElementById('role-txt-inp-${idx}').focus(); }" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold text-indigo-300">
+                  ${(window.AGENCY_DESIGNATIONS_26 || []).map(r => `<option value="${r}" ${(isKnownRole && m.role === r) || (!isKnownRole && r === 'CUSTOM_ROLE') ? 'selected' : ''}>${r === 'CUSTOM_ROLE' ? '✍️ + Type Custom Designation...' : r}</option>`).join('')}
+                </select>
+                <input type="text" id="role-txt-inp-${idx}" value="${(m.role || '').replace(/"/g, '&quot;')}" oninput="db.team[${idx}].role=this.value; window.quietSyncAboutDB('Typed Custom Role');" placeholder="Or type exact designation..." class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs font-bold text-white" />
+              </div>
+            </div>
+
+            <!-- Photo Placement (Center/Left/Right/Banner), Size Slider (64-420px), 30 Crop Shapes & 30 Border Frames -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3.5 rounded-2xl bg-[#111114] border border-emerald-500/30">
+              <div>
+                <label class="text-[10px] font-bold text-emerald-300 block mb-1">Photo Placement</label>
+                <select onchange="db.team[${idx}].placement=this.value; window.quietSyncAboutDB('Changed Placement', true);" class="w-full px-2.5 py-2 rounded-xl adm-input text-xs font-bold">
+                  <option value="center" ${m.placement==='center'?'selected':''}>🎯 Center Spotlight</option>
+                  <option value="full_banner" ${m.placement==='full_banner'?'selected':''}>🖼️ Full Banner Maximize</option>
+                  <option value="split_magazine" ${m.placement==='split_magazine'?'selected':''}>📰 50/50 Magazine Split</option>
+                  <option value="left" ${m.placement==='left'?'selected':''}>⬅️ Left Photo</option>
+                  <option value="right" ${m.placement==='right'?'selected':''}>➡️ Right Photo</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-white block mb-1">Crop Shape (30 Designs)</label>
+                <select onchange="db.team[${idx}].cropShape=this.value; window.quietSyncAboutDB('Changed Crop Shape', true);" class="w-full px-2.5 py-2 rounded-xl adm-input text-xs font-bold">
+                  ${(window.PHOTO_SHAPES_30 || []).map(s => `<option value="${s.id}" ${(m.cropShape || 's01_circle') === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}
+                </select>
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-amber-300 block mb-1">Border Frame (30 Designs)</label>
+                <select onchange="db.team[${idx}].borderFrame=this.value; window.quietSyncAboutDB('Changed Border Frame', true);" class="w-full px-2.5 py-2 rounded-xl adm-input text-xs font-bold text-amber-300">
+                  ${(window.BORDER_FRAMES_30 || []).map(b => `<option value="${b.id}" ${(m.borderFrame || 'b01_gold_halo') === b.id ? 'selected' : ''}>${b.name}</option>`).join('')}
+                </select>
+              </div>
+              <div>
+                <div class="flex justify-between text-[10px] font-bold mb-1">
+                  <span class="text-zinc-300">Photo Size:</span>
+                  <span id="mbr-sz-lbl-${idx}" class="text-amber-400">${m.photoSize || 185}px</span>
+                </div>
+                <input type="range" min="64" max="420" step="4" value="${m.photoSize || 185}" oninput="document.getElementById('mbr-sz-lbl-${idx}').innerText=this.value+'px'; db.team[${idx}].photoSize=Number(this.value); window.quietSyncAboutDB('Resized Photo');" class="w-full accent-amber-400" />
+              </div>
+            </div>
+
+            <!-- Border Color, Border Width, Face Zoom & Face Y Position -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 rounded-2xl bg-[#111114] border border-white/10 items-center">
+              <div>
+                <label class="text-[10px] text-zinc-400 block mb-1">Border Color</label>
+                <input type="color" value="${m.borderColor || '#f59e0b'}" oninput="db.team[${idx}].borderColor=this.value; window.quietSyncAboutDB('Changed Border Color');" class="w-full h-8 rounded cursor-pointer bg-transparent border border-white/20" />
+              </div>
+              <div>
+                <label class="text-[10px] text-zinc-400 block mb-1">Border Width (${m.borderWidth ?? 3}px)</label>
+                <input type="range" min="0" max="10" value="${m.borderWidth ?? 3}" oninput="db.team[${idx}].borderWidth=Number(this.value); window.quietSyncAboutDB('Changed Border Width');" class="w-full accent-amber-400" />
+              </div>
+              <div>
+                <label class="text-[10px] text-zinc-400 block mb-1">Face Zoom (${m.photoZoom || 100}%)</label>
+                <input type="range" min="100" max="170" value="${m.photoZoom || 100}" oninput="db.team[${idx}].photoZoom=Number(this.value); window.quietSyncAboutDB('Changed Zoom');" class="w-full accent-indigo-400" />
+              </div>
+              <div>
+                <label class="text-[10px] text-zinc-400 block mb-1">Face Y-Align (${m.photoPosY ?? 20}%)</label>
+                <input type="range" min="0" max="100" value="${m.photoPosY ?? 20}" oninput="db.team[${idx}].photoPosY=Number(this.value); window.quietSyncAboutDB('Changed Y-Align');" class="w-full accent-emerald-400" />
+              </div>
+            </div>
+
+            <!-- 1-Line Card Brief, Full Modal Bio & Skills -->
+            <div class="space-y-2.5">
+              <div>
+                <label class="text-[10px] font-bold text-zinc-300 block mb-1">1-Line Short Brief (Shown on Card Front)</label>
+                <input type="text" value="${(m.cardBrief || m.bio || '').replace(/"/g, '&quot;')}" oninput="db.team[${idx}].cardBrief=this.value; window.quietSyncAboutDB('Edited Card Brief');" class="w-full px-3 py-2 rounded-xl adm-input text-xs" />
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-amber-300 block mb-1">Full Detailed Bio (Shown Inside Click Popup)</label>
+                <textarea rows="2" oninput="db.team[${idx}].detailedBio=this.value; window.quietSyncAboutDB('Edited Detailed Bio');" class="w-full px-3 py-2 rounded-xl adm-input text-xs">${m.detailedBio || m.bio || ''}</textarea>
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-emerald-400 block mb-1">Skills / Expertise Pills (Comma Separated)</label>
+                <input type="text" value="${skillsArr.join(', ')}" oninput="db.team[${idx}].skills=this.value.split(',').map(s=>s.trim()).filter(Boolean); window.quietSyncAboutDB('Edited Skills');" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-mono" />
+              </div>
+            </div>
+
+            <!-- Social Media Links -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-white/10">
+              <input type="url" value="${soc.linkedin || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.linkedin=this.value; window.quietSyncAboutDB('Edited LinkedIn');" placeholder="LinkedIn URL" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+              <input type="url" value="${soc.instagram || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.instagram=this.value; window.quietSyncAboutDB('Edited Instagram');" placeholder="Instagram URL" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+              <input type="url" value="${soc.twitter || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.twitter=this.value; window.quietSyncAboutDB('Edited Twitter/X');" placeholder="X / Twitter URL" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+              <input type="url" value="${soc.behance || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.behance=this.value; window.quietSyncAboutDB('Edited Behance');" placeholder="Behance URL" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+              <input type="url" value="${soc.youtube || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.youtube=this.value; window.quietSyncAboutDB('Edited YouTube');" placeholder="YouTube URL" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+              <input type="url" value="${soc.website || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.website=this.value; window.quietSyncAboutDB('Edited Website');" placeholder="Website URL" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+              <input type="tel" value="${soc.whatsapp || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.whatsapp=this.value; window.quietSyncAboutDB('Edited WhatsApp');" placeholder="WhatsApp Number" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px] text-emerald-300 font-bold" />
+              <input type="email" value="${soc.email || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.email=this.value; window.quietSyncAboutDB('Edited Email');" placeholder="Official Email" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+            </div>
+
+            <div class="pt-2 flex justify-end">
+              <button type="button" onclick="window.toggleMemberEditCardV25('${mId}')" class="lg-btn lg-btn-done">✓ Save & Close Profile Form</button>
+            </div>
+          </div>
+        ` : ''}
+      </div>
+    `;
+
+    return visualProfileHeader;
+  };
+
+  /* ============================================================================
+     4. VISUAL VIEW MODE + CLOSED FORM DRAWER FOR ALL OTHER ADMIN SECTIONS
+     ============================================================================ */
+  window.openAdminCardFormsV27 = new Set();
+
+  function buildVisualSummaryItemsForCard(card) {
+    const items = [];
+    const inputs = card.querySelectorAll('input:not([type="hidden"]):not([type="file"]):not(.phone-toggle-input), textarea, select');
+    inputs.forEach(function (inp) {
+      if (items.length >= 8) return;
+      let label = '';
+      const prevLbl = inp.previousElementSibling;
+      if (prevLbl && (prevLbl.tagName === 'LABEL' || prevLbl.tagName === 'SPAN' || prevLbl.tagName === 'DIV')) {
+        label = prevLbl.innerText.replace(/\*|:/g, '').trim();
+      }
+      if (!label && inp.parentElement) {
+        const pLbl = inp.parentElement.querySelector('label, span.font-bold');
+        if (pLbl) label = pLbl.innerText.replace(/\*|:/g, '').trim();
+      }
+      if (!label) label = (inp.getAttribute('placeholder') || inp.id || 'Field').replace(/\*|\.\.\./g, '').trim();
+
+      let val = '';
+      if (inp.type === 'checkbox') {
+        val = inp.checked ? '🟢 ON' : '⚫ OFF';
+      } else if (inp.tagName === 'SELECT') {
+        val = inp.options[inp.selectedIndex]?.text || inp.value || '';
+      } else {
+        val = (inp.value || '').trim();
+      }
+      if (val && !val.startsWith('data:image')) {
+        items.push({ lbl: label.substring(0, 26), val: val.substring(0, 42) });
+      }
+    });
+    return items;
+  }
+
+  window.applyInstagramVisualModeToCardsV27 = function () {
+    unwrapAnyBrokenV25V26Nodes();
+
+    document.querySelectorAll('.adm-panel').forEach(function (panel) {
+      /* Skip #panel-switchboard & #panel-services & #panel-about member lists which already have custom visual cards */
+      if (panel.id === 'panel-switchboard') return;
+
+      const cards = Array.from(panel.querySelectorAll(':scope > .admin-card'));
+      cards.forEach(function (card, idx) {
+        /* Skip container cards that only hold dynamic sub-cards */
+        if (card.id === 'adm-category-quick-manager') return;
+
+        const cardKey = card.id || `${panel.id}_igcard_${idx}`;
+        card.dataset.igKey = cardKey;
+
+        /* Ensure top action bar & visual summary exist without destroying original DOM nodes */
+        let igHeader = card.querySelector(':scope > .ig-card-top-bar');
+        let igSummary = card.querySelector(':scope > .ig-visual-summary-grid');
+        let igFormWrap = card.querySelector(':scope > .ig-form-body-wrap');
+
+        if (!igFormWrap) {
+          const titleEl = card.querySelector('h2, h3, h4');
+          const titleTxt = titleEl ? titleEl.innerText.trim() : `Section #${idx + 1}`;
+
+          igHeader = document.createElement('div');
+          igHeader.className = 'ig-card-top-bar flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-white/10';
+          igHeader.innerHTML = `
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <span class="w-8 h-8 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-xs font-black text-emerald-400 shrink-0">${idx + 1}</span>
+              <div class="min-w-0 flex-1">
+                <h3 class="text-sm sm:text-base font-extrabold text-white truncate">${titleTxt}</h3>
+                <span class="ig-mode-sub text-[11px] text-emerald-400/90 font-semibold">👁️ Visual View Mode (Form Closed to Prevent Accidental Edits)</span>
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-1.5 shrink-0">
+              <button type="button" id="igbtn-${cardKey}" onclick="window.toggleIgCardFormV27('${cardKey}')" class="lg-btn lg-btn-edit">
+                ✏️ Edit Form
+              </button>
+              <button type="button" onclick="window.triggerAdminUndo()" class="lg-btn lg-btn-undo" title="Undo">↩️ Undo</button>
+              <button type="button" onclick="window.triggerAdminRedo()" class="lg-btn lg-btn-undo" title="Redo">↪️ Redo</button>
+            </div>
+          `;
+
+          igSummary = document.createElement('div');
+          igSummary.className = 'ig-visual-summary-grid';
+
+          igFormWrap = document.createElement('div');
+          igFormWrap.className = 'ig-form-body-wrap pt-4 space-y-4';
+
+          /* Move existing children into igFormWrap EXCEPT live preview stages so previews stay visible! */
+          const children = Array.from(card.children);
+          children.forEach(function (ch) {
+            igFormWrap.appendChild(ch);
+          });
+
+          const closeFooter = document.createElement('div');
+          closeFooter.className = 'pt-3 border-t border-white/10 flex justify-end';
+          closeFooter.innerHTML = `<button type="button" onclick="window.toggleIgCardFormV27('${cardKey}')" class="lg-btn lg-btn-done">✓ Save & Close Form</button>`;
+          igFormWrap.appendChild(closeFooter);
+
+          card.appendChild(igHeader);
+          card.appendChild(igSummary);
+          card.appendChild(igFormWrap);
+        }
+
+        /* Populate Visual Summary Grid with Live Values from the Card's Inputs */
+        const summaryData = buildVisualSummaryItemsForCard(igFormWrap);
+        if (summaryData.length > 0) {
+          igSummary.innerHTML = summaryData.map(function (item) {
+            return `
+              <div class="ig-summary-item">
+                <span class="ig-summary-lbl">${item.lbl}</span>
+                <span class="ig-summary-val">${item.val}</span>
+              </div>
+            `;
+          }).join('');
+        } else {
+          igSummary.innerHTML = `<div class="ig-summary-item col-span-full"><span class="ig-summary-val text-zinc-400">Click "✏️ Edit Form" to view or customize options inside this section.</span></div>`;
+        }
+
+        const isEditing = window.openAdminCardFormsV27.has(cardKey);
+        card.classList.toggle('ig-form-closed', !isEditing);
+        card.classList.toggle('ig-card-editing', isEditing);
+
+        const btn = document.getElementById('igbtn-' + cardKey);
+        const sub = igHeader.querySelector('.ig-mode-sub');
+        if (btn) {
+          btn.className = isEditing ? 'lg-btn lg-btn-done' : 'lg-btn lg-btn-edit';
+          btn.innerHTML = isEditing ? '✓ Save & Close Form' : '✏️ Edit Form';
+        }
+        if (sub) {
+          sub.innerText = isEditing ? '📝 Form Open — Edit any field below & click Save & Close' : '👁️ Visual View Mode (Form Closed to Prevent Accidental Edits)';
+        }
+      });
+    });
+  };
+
+  window.toggleIgCardFormV27 = function (cardKey) {
+    if (window.openAdminCardFormsV27.has(cardKey)) {
+      window.openAdminCardFormsV27.delete(cardKey);
+      if (typeof window.quietCollectAndSyncAll === 'function') {
+        window.quietCollectAndSyncAll('Saved Section Form', true);
+      }
+    } else {
+      window.openAdminCardFormsV27.add(cardKey);
+    }
+    window.applyInstagramVisualModeToCardsV27();
+  };
+
+  /* ============================================================================
+     5. "🔤 A-TO-Z MICRO TEXT, SINGLE ALPHABET & NUMBER EDITOR" IN HOME TAB
+     ============================================================================ */
+  const MICRO_TEXT_FIELDS = [
+    { key: 'slotPrefix',       label: 'Top Bar Scarcity Prefix',       def: '🔥 Only' },
+    { key: 'slotSuffix',       label: 'Top Bar Scarcity Suffix',       def: 'Client Onboarding Slots Left' },
+    { key: 'navQuoteLabel',    label: 'Navbar Cart Button Word',       def: 'Quote' },
+    { key: 'stat1NumBadge',    label: 'Metric Card 1 Top Number',      def: '(01)' },
+    { key: 'stat2NumBadge',    label: 'Metric Card 2 Top Number',      def: '(02)' },
+    { key: 'stat3NumBadge',    label: 'Metric Card 3 Top Number',      def: '(03)' },
+    { key: 'stat4NumBadge',    label: 'Metric Card 4 Top Number',      def: '(04)' },
+    { key: 'srvCardDelivWord', label: 'Service Card "Deliverables" Word', def: 'Deliverables' },
+    { key: 'srvCardBtnText',   label: 'Service Card Action Button',    def: 'Inspect & Add ↗' },
+    { key: 'scannerBadge',     label: 'AI Scanner Top Badge',          def: '⚡ VIRAL AI DIAGNOSTIC' },
+    { key: 'scannerHeading',   label: 'AI Scanner Main Title',         def: '10-Second Brand Revenue Leak Scanner' },
+    { key: 'scannerBtn',       label: 'AI Scanner Button Text',        def: '🔍 Run 10-Second AI Brand Scan Now' },
+    { key: 'roiBadge',         label: 'ROI Simulator Top Badge',       def: 'Interactive Calculator' },
+    { key: 'roiHeading',       label: 'ROI Simulator Main Title',      def: '6-Month Brand ROI Simulator' },
+    { key: 'box3dHeading',     label: '3D Packaging Box Title',        def: '🎨 Live 3D Packaging Box Previewer' },
+    { key: 'scratchBadge',     label: 'Quotation Scratch Card Title',  def: '🎁 Interactive VIP Founder Grant' },
+    { key: 'scratchBtnText',   label: 'Quotation Scratch Bar Text',    def: '✨ TAP OR SCRATCH HERE TO UNLOCK VIP GRANT ✨' },
+    { key: 'reviewsEyebrow',   label: 'Reviews Page Top Badge',        def: 'Client Testimonials' },
+    { key: 'reviewsHeading',   label: 'Reviews Page Main Heading',     def: 'Verified 5-Star Reviews' },
+    { key: 'reviewsBtnText',   label: 'Write Review Button Text',      def: '★ Write a Client Review' },
+    { key: 'dockCallText',     label: 'Floating Call Button Text',     def: '📅 Book 15m Audit Call' },
+    { key: 'dockVipText',      label: 'Floating VIP Pass Button Text', def: '💳 VIP Pass' },
+    { key: 'dockWaText',       label: 'Floating WhatsApp Button Text', def: '💬 WhatsApp Desk' }
+  ];
+
+  function injectMicroTextEditorCardV27() {
+    const panelHome = document.getElementById('panel-home');
+    if (!panelHome || document.getElementById('micro-text-editor-card-v27')) return;
+
+    db.microTexts = db.microTexts || {};
+    const mCard = document.createElement('div');
+    mCard.id = 'micro-text-editor-card-v27';
+    mCard.className = 'admin-card rounded-3xl p-6 space-y-4 border border-amber-500/40';
+    mCard.innerHTML = `
+      <div>
+        <span class="text-[10px] font-extrabold uppercase text-amber-400">Single Alphabet, Word & Number Control</span>
+        <h3 class="text-base font-bold text-white">🔤 6. A-to-Z Website Micro-Text, Numbers & Button Labels Editor</h3>
+        <p class="text-xs text-zinc-400">Website ke har chhote-se-chhote word, number badge (`(01)`), button text aur tool title ko yahan se ek-ek alphabet tak edit karein.</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        ${MICRO_TEXT_FIELDS.map(f => {
+          const val = db.microTexts[f.key] !== undefined ? db.microTexts[f.key] : f.def;
+          return `
+            <div>
+              <label class="text-[10px] font-bold text-zinc-400 block mb-1">${f.label}</label>
+              <input type="text" value="${String(val).replace(/"/g, '&quot;')}" oninput="db.microTexts=db.microTexts||{}; db.microTexts['${f.key}']=this.value; window.quietCollectAndSyncAll('Edited Micro Text: ${f.label}', false);" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold text-white" />
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+    panelHome.appendChild(mCard);
+  }
+
+  /* Hook into Tab Switch & Populate */
+  const origSwitch = window.switchAdminTab;
+  window.switchAdminTab = function (tabName) {
+    if (typeof origSwitch === 'function') origSwitch(tabName);
+    setTimeout(function () {
+      injectMicroTextEditorCardV27();
+      window.applyInstagramVisualModeToCardsV27();
+    }, 50);
+  };
+
+  setTimeout(function () {
+    unwrapAnyBrokenV25V26Nodes();
+    injectMicroTextEditorCardV27();
+    if (typeof window.renderGranularAboutStudio === 'function') window.renderGranularAboutStudio();
+    if (typeof window.renderAdminServices === 'function') window.renderAdminServices();
+    window.applyInstagramVisualModeToCardsV27();
+  }, 350);
+
+  setTimeout(function () {
+    unwrapAnyBrokenV25V26Nodes();
+    window.applyInstagramVisualModeToCardsV27();
+  }, 900);
+})();
+</script>
+<!-- ==================== ADMIN.HTML : INSTAGRAM/AMAZON VISUAL VIEW & CLOSED FORM COMPLETE ==================== -->
