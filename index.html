@@ -13244,3 +13244,1033 @@
 })();
 </script>
 <!-- ==================== ADMIN.HTML : V30 PERMANENT SELF-HEALING ENGINE COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : V31 FINAL NUCLEAR CLEANUP, 100% CLOSED FORMS & UNIFIED "ADD & MANAGE PEOPLE" STUDIO (PASTE AT VERY BOTTOM OF admin.html) ==================== -->
+<style id="admin-v31-master-clean-styles">
+  /* 1. Force Hide All Old Broken Headers & Wrappers from v23–v30 */
+  .adm-folder-bar,
+  .card-action-bar,
+  .ig-card-top-bar,
+  .ig-visual-summary-grid,
+  .v28-card-header,
+  .v28-visual-summary-strip,
+  .v29-sec-header,
+  .v30-header-bar,
+  #global-photo-master-bar-v24 {
+    display: none !important;
+  }
+
+  /* 2. Universal Closed-Form Section Card Styling */
+  .adm-panel .admin-card {
+    background: linear-gradient(145deg, #131318 0%, #0b0b0e 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.13) !important;
+    border-radius: 22px !important;
+    padding: 16px 20px !important;
+    margin-bottom: 14px !important;
+    transition: border-color 0.22s ease, box-shadow 0.22s ease !important;
+  }
+  .adm-panel .admin-card:hover {
+    border-color: rgba(255, 255, 255, 0.28) !important;
+  }
+  .adm-panel .admin-card.v31-open {
+    border: 2px solid rgba(16, 185, 129, 0.7) !important;
+    box-shadow: 0 24px 55px -15px rgba(16, 185, 129, 0.25) !important;
+    background: #111116 !important;
+  }
+
+  /* STRICT RULE: When a Card has .v31-closed, Hide ALL Children Except .v31-card-hdr! */
+  .adm-panel .admin-card.v31-closed > *:not(.v31-card-hdr) {
+    display: none !important;
+  }
+  .adm-panel .admin-card.v31-open > .v31-card-hdr .v31-chip-row {
+    display: none !important;
+  }
+  .adm-panel .admin-card.v31-open > .v31-card-hdr {
+    padding-bottom: 14px !important;
+    margin-bottom: 16px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+  }
+
+  /* 3. Visual Data Preview Chips Inside Closed Card Header */
+  .v31-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 11px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  .v31-chip {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 10px;
+    padding: 4px 10px;
+    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    max-width: 260px;
+  }
+  .v31-chip strong {
+    color: #a1a1aa;
+    font-size: 10px;
+    text-transform: uppercase;
+  }
+  .v31-chip span {
+    color: #f4f4f5;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* 4. Liquid-Glass Action Buttons */
+  .lg-btn {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
+    backdrop-filter: blur(18px) !important;
+    -webkit-backdrop-filter: blur(18px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    color: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 6px 12px !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    user-select: none !important;
+  }
+  .lg-btn:hover {
+    transform: translateY(-1px) !important;
+    border-color: rgba(255, 255, 255, 0.45) !important;
+  }
+  .lg-btn-edit {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.28) 0%, rgba(16, 185, 129, 0.10) 100%) !important;
+    border-color: rgba(16, 185, 129, 0.5) !important;
+    color: #6ee7b7 !important;
+  }
+  .lg-btn-done {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    border-color: #34d399 !important;
+    color: #09090b !important;
+  }
+  .lg-btn-undo {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.26) 0%, rgba(99, 102, 241, 0.08) 100%) !important;
+    border-color: rgba(99, 102, 241, 0.45) !important;
+    color: #c7d2fe !important;
+  }
+  .lg-btn-del {
+    background: linear-gradient(135deg, rgba(244, 63, 94, 0.25) 0%, rgba(244, 63, 94, 0.08) 100%) !important;
+    border-color: rgba(244, 63, 94, 0.4) !important;
+    color: #fda4af !important;
+  }
+</style>
+
+<script id="admin-v31-nuclear-engine">
+(function () {
+  /* ============================================================================
+     1. KILL ALL PENDING TIMERS FROM OLD PATCHES (v6 TO v30) IMMEDIATELY!
+     ============================================================================ */
+  const maxTimerId = window.setTimeout(function () {}, 0);
+  for (let i = 1; i <= maxTimerId; i++) {
+    window.clearTimeout(i);
+    window.clearInterval(i);
+  }
+
+  /* Bridge `let db` and `window.db` Safely */
+  try {
+    Object.defineProperty(window, 'db', {
+      get: function () { return typeof db !== 'undefined' ? db : null; },
+      set: function (val) { if (typeof db !== 'undefined') db = val; },
+      configurable: true
+    });
+  } catch (e) {}
+
+  /* Remove Old Conflicting Style Tags */
+  [
+    'admin-about-team-studio-styles-v23',
+    'admin-compact-liquid-ux-v25',
+    'admin-amazon-style-clean-ux-v26',
+    'admin-visual-view-closed-form-v27',
+    'admin-clean-visual-closed-forms-v28',
+    'admin-final-clean-master-v29',
+    'admin-v30-unbreakable-clean-ui'
+  ].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  });
+
+  /* Neutralize All Old Wrapper Functions */
+  window.wrapAdminCardsIntoFoldersV25 = function () {};
+  window.transformCardsIntoCleanAccordionsV26 = function () {};
+  window.applyInstagramVisualModeToCardsV27 = function () {};
+  window.enforceAllCardsClosedVisualModeV28 = function () {};
+  window.applyCleanClosedCardsV29 = function () {};
+  window.lockAllAdminCardsClosedV30 = function () {};
+
+  window.openSectionKeyV31 = null;
+  window.openPersonIdV31 = null;
+  window.openServiceIdV31 = null;
+  window.peopleFilterV31 = 'ALL';
+
+  /* ============================================================================
+     2. CATALOGS: 16 SIMPLE 1-WORD ROLES, 26 DESIGNATIONS, 30 SHAPES & 30 BORDERS
+     ============================================================================ */
+  const ROLES_16 = [
+    { id: 'Founder',     label: '👑 Founder' },
+    { id: 'Co-Founder',  label: '🌟 Co-Founder' },
+    { id: 'Partner',     label: '🤝 Partner' },
+    { id: 'Director',    label: '🎬 Director' },
+    { id: 'Advisor',     label: '🧠 Advisor' },
+    { id: 'Head',        label: '🚀 Head' },
+    { id: 'Manager',     label: '📊 Manager' },
+    { id: 'Core Team',   label: '⚡ Core Team / Employee' },
+    { id: 'Specialist',  label: '🎯 Specialist' },
+    { id: 'Consultant',  label: '💼 Consultant' },
+    { id: 'Designer',    label: '🎨 Designer' },
+    { id: 'Developer',   label: '💻 Developer' },
+    { id: 'Editor',      label: '🎞️ Editor' },
+    { id: 'Operations',  label: '📦 Operations' },
+    { id: 'Marketing',   label: '📈 Marketing' },
+    { id: 'Legal',       label: '⚖️ Legal' }
+  ];
+
+  const DESIGNATIONS_26 = [
+    'Founder', 'Co-Founder', 'Partner', 'Managing Partner', 'CEO', 'COO', 'CCO', 'CTO',
+    'Director', 'Creative Director', 'Growth Consultant', 'Brand Strategist', 'Account Manager',
+    'Operations Lead', 'Marketplace Lead', 'Quick-Commerce Lead', 'Ads Specialist', 'SEO Specialist',
+    '3D Artist', 'Graphic Designer', 'Packaging Designer', 'Video Editor', 'Photographer',
+    'Web Developer', 'Legal Advisor', 'Client Success', 'CUSTOM_ROLE'
+  ];
+
+  const SHAPES_30 = window.PHOTO_SHAPES_30 || [
+    { id: 's01_circle', name: '01. Classic Circle' },
+    { id: 's02_squircle', name: '02. Apple Squircle (26%)' },
+    { id: 's03_round_soft', name: '03. Soft Rounded Square (16px)' },
+    { id: 's04_round_deep', name: '04. Deep Luxury Rounded (32px)' },
+    { id: 's05_sharp_square', name: '05. Sharp Editorial Square' },
+    { id: 's06_capsule_pill', name: '06. Vertical Capsule Pill' },
+    { id: 's07_roman_arch', name: '07. Roman Gallery Arch' },
+    { id: 's08_cathedral_arch', name: '08. Gothic Pointed Arch' },
+    { id: 's09_inverted_arch', name: '09. Inverted U-Dome' },
+    { id: 's10_hexagon', name: '10. Classic Hexagon' },
+    { id: 's11_hex_vertical', name: '11. Vertical Hexagon' },
+    { id: 's12_octagon', name: '12. Royal Octagon' },
+    { id: 's13_diamond', name: '13. Precision Diamond' },
+    { id: 's14_soft_diamond', name: '14. Soft Rhombus' },
+    { id: 's15_pentagon', name: '15. Pentagon Crest' },
+    { id: 's16_heptagon', name: '16. Heptagon Gem' },
+    { id: 's17_decagon', name: '17. Decagon Star' },
+    { id: 's18_royal_shield', name: '18. Executive Shield' },
+    { id: 's19_teardrop_left', name: '19. Teardrop Left' },
+    { id: 's20_teardrop_right', name: '20. Teardrop Right' },
+    { id: 's21_botanical_leaf', name: '21. Botanical Leaf' },
+    { id: 's22_cyber_bevel_4', name: '22. Cyber 4-Corner Cut' },
+    { id: 's23_cyber_cut_trbl', name: '23. Diagonal Cut TR-BL' },
+    { id: 's24_cyber_cut_tlbr', name: '24. Diagonal Cut TL-BR' },
+    { id: 's25_ticket_notch', name: '25. Cinema Ticket Notch' },
+    { id: 's26_parallelogram', name: '26. Parallelogram Slant' },
+    { id: 's27_trapezoid', name: '27. Monument Trapezoid' },
+    { id: 's28_starburst_12', name: '28. 12-Point Emblem' },
+    { id: 's29_modern_pebble', name: '29. Asymmetric Pebble' },
+    { id: 's30_full_portrait', name: '30. Full Portrait (4:5)' }
+  ];
+
+  const BORDERS_30 = window.BORDER_FRAMES_30 || [
+    { id: 'b01_gold_halo', name: '01. Metallic Gold Double Halo' },
+    { id: 'b02_gold_spin_orbit', name: '02. Spinning 3D Gold Orbit' },
+    { id: 'b03_apple_titanium', name: '03. Apple Brushed Titanium' },
+    { id: 'b04_liquid_glass', name: '04. Frosted Liquid-Glass Rim' },
+    { id: 'b05_emerald_neon', name: '05. Cyber Emerald Neon Glow' },
+    { id: 'b06_indigo_electric', name: '06. Royal Indigo Electric Aura' },
+    { id: 'b07_sunset_grad', name: '07. Sunset Gold-to-Rose' },
+    { id: 'b08_hologram_prism', name: '08. Prismatic Hologram' },
+    { id: 'b09_dashed_radar', name: '09. Dashed Tech Radar' },
+    { id: 'b10_dotted_matrix', name: '10. Dotted Matrix Orbit' },
+    { id: 'b11_double_offset', name: '11. Double Offset Luxury Ring' },
+    { id: 'b12_triple_halo', name: '12. Concentric Triple Halo' },
+    { id: 'b13_silver_chrome', name: '13. Silver Chrome Bevel' },
+    { id: 'b14_rose_gold', name: '14. Rose Gold Luxury Rim' },
+    { id: 'b15_crimson_velvet', name: '15. Crimson Velvet Glow' },
+    { id: 'b16_cyan_laser', name: '16. Cyan Laser Pulse' },
+    { id: 'b17_amber_solar', name: '17. Amber Solar Flare' },
+    { id: 'b18_obsidian_matte', name: '18. Obsidian Matte Stealth' },
+    { id: 'b19_white_gallery', name: '19. Pure White Gallery Frame' },
+    { id: 'b20_museum_gold', name: '20. Vintage Museum Gold' },
+    { id: 'b21_hud_brackets', name: '21. Corner HUD Brackets' },
+    { id: 'b22_top_bot_arc', name: '22. Top & Bottom Glowing Arcs' },
+    { id: 'b23_left_right_neon', name: '23. Left & Right Split Neon' },
+    { id: 'b24_deep_levitate', name: '24. Floating Deep Levitation' },
+    { id: 'b25_pearl_lumina', name: '25. Soft Pearl Lumina' },
+    { id: 'b26_gold_emerald', name: '26. Gold & Emerald Dual Ring' },
+    { id: 'b27_indigo_pink', name: '27. Indigo & Pink Cyber Ring' },
+    { id: 'b28_heavy_armor', name: '28. Heavy Bold Armor (6px)' },
+    { id: 'b29_hairline_minimal', name: '29. Ultra-Thin Hairline (1px)' },
+    { id: 'b30_frameless_clean', name: '30. Frameless Clean Edge' }
+  ];
+
+  /* ============================================================================
+     3. BUILD UNIFIED ABOUT & "ADD / MANAGE PEOPLE" DIRECTORY (`#panel-about`)
+        Merges all duplicate boxes into ONLY 2 Clean Closed Sections!
+     ============================================================================ */
+  window.renderCleanAboutAndPeopleV31 = function () {
+    if (!window.db && typeof db !== 'undefined') window.db = db;
+    if (!window.db) return;
+
+    const panel = document.getElementById('panel-about');
+    if (!panel) return;
+
+    db.about = db.about || {};
+    db.aboutConfig = db.aboutConfig || {};
+    const ac = db.aboutConfig;
+    ac.eyebrow = ac.eyebrow || 'Our Story & DNA';
+    ac.heading = ac.heading || db.about.heading || 'Built by Operators, Driven by Measurable Brand Growth.';
+    ac.story = ac.story || db.about.story || '';
+    ac.missionTitle = ac.missionTitle || 'Our Mission';
+    ac.mission = ac.mission || db.about.mission || '';
+    ac.visionTitle = ac.visionTitle || 'Our Vision';
+    ac.vision = ac.vision || db.about.vision || '';
+    ac.founderNoteQuote = ac.founderNoteQuote || '“In e-commerce, pretty designs without conversion architecture are just expensive art. We engineer both.”';
+    ac.founderNoteAuthor = ac.founderNoteAuthor || 'Jenish Kamli';
+    ac.founderNoteRole = ac.founderNoteRole || 'Founder';
+    if (!Array.isArray(ac.dnaPillars) || ac.dnaPillars.length === 0) {
+      ac.dnaPillars = [
+        { num: '(01)', title: 'Organic-First Scale', desc: 'A10 & search architecture over ad burn' },
+        { num: '(02)', title: '100% Live Transparency', desc: 'Real-time client portal from 0% to 100%' },
+        { num: '(03)', title: 'High-Craft 3D Visuals', desc: 'A+ storylines & exploded-view renders' },
+        { num: '(04)', title: 'India • UAE • Global Desk', desc: 'Multi-marketplace cross-border scaling' }
+      ];
+    }
+
+    db.aboutPhotoStudio = db.aboutPhotoStudio || {
+      placement: 'center', sizePx: 140, founderSizePx: 185, shape: 's01_circle', borderFrame: 'b01_gold_halo',
+      columnsFounder: 2, columnsPartner: 3, columnsTeam: 3
+    };
+    const ps = db.aboutPhotoStudio;
+
+    db.team = Array.isArray(db.team) ? db.team : [];
+    db.team.forEach(function (m, i) {
+      if (!m.id) m.id = 'TM-' + (i + 1);
+      if (!m.type || m.type === 'Staff') m.type = i === 0 ? 'Founder' : 'Core Team';
+      if (!m.placement) m.placement = 'center';
+      if (!m.photoSize) m.photoSize = (m.type === 'Founder' || m.type === 'Co-Founder') ? 185 : 140;
+      if (!m.cropShape) m.cropShape = 's01_circle';
+      if (!m.borderFrame) m.borderFrame = 'b01_gold_halo';
+      if (!m.borderColor) m.borderColor = '#f59e0b';
+      if (m.borderWidth === undefined) m.borderWidth = 3;
+    });
+
+    const roleTabs = ['ALL', ...new Set(db.team.map(m => m.type || 'Core Team'))];
+    const visiblePeople = db.team
+      .map(function (m, idx) { return { ...m, origIdx: idx }; })
+      .filter(function (m) { return window.peopleFilterV31 === 'ALL' || m.type === window.peopleFilterV31; });
+
+    panel.innerHTML = `
+      <!-- Clean Top Header -->
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-[#242429] pb-4">
+        <div>
+          <span class="text-[10px] font-extrabold uppercase tracking-widest text-emerald-400">✓ Unified Clean About & People Directory</span>
+          <h2 class="text-2xl font-bold text-white mt-0.5">👥 About Us & Add/Manage People</h2>
+          <p class="text-xs text-zinc-400">Saara kachra hata kar sirf 2 clean band sections banaye gaye hain. Kisi bhi section ko kholne ke liye <strong>✏️ Edit</strong> dabayein.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="if(typeof window.triggerAdminUndo==='function') window.triggerAdminUndo();" class="lg-btn lg-btn-undo">↩️ Undo</button>
+          <button type="button" onclick="if(typeof window.triggerAdminRedo==='function') window.triggerAdminRedo();" class="lg-btn lg-btn-undo">↪️ Redo</button>
+          <button type="button" onclick="window.syncEverythingV31('Saved About & People', true)" class="px-5 py-2.5 rounded-xl bg-emerald-500 text-zinc-950 font-black text-xs shadow-lg">✓ Save About Page</button>
+        </div>
+      </div>
+
+      <!-- =================================================================== -->
+      <!-- SECTION 1: AGENCY STORY, MISSION, VISION, FOUNDER QUOTE & 4 PILLARS -->
+      <!-- =================================================================== -->
+      <div id="v31-about-story-card" class="admin-card rounded-3xl space-y-5">
+        <div class="hidden">
+          <h3>📖 1. Agency Story, Mission, Vision & 4 DNA Pillars</h3>
+          <p class="text-xs">Edit main about headline, agency story, mission, vision, founder quote & 4 core pillars</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+          <div class="md:col-span-3">
+            <label class="text-[11px] font-bold text-amber-400 block mb-1">Top Eyebrow Badge</label>
+            <input type="text" value="${(ac.eyebrow || '').replace(/"/g, '&quot;')}" oninput="db.aboutConfig.eyebrow=this.value; window.syncEverythingV31('Edited Eyebrow');" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs font-bold" />
+          </div>
+          <div class="md:col-span-9">
+            <label class="text-[11px] font-bold text-white block mb-1">About Page Main Heading *</label>
+            <input type="text" id="ab-heading" value="${(ac.heading || '').replace(/"/g, '&quot;')}" oninput="db.about.heading=this.value; db.aboutConfig.heading=this.value; window.syncEverythingV31('Edited Heading');" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs font-extrabold text-white" />
+          </div>
+          <div class="md:col-span-12">
+            <label class="text-[11px] font-bold text-zinc-300 block mb-1">Agency Story</label>
+            <textarea id="ab-story" rows="3" oninput="db.about.story=this.value; db.aboutConfig.story=this.value; window.syncEverythingV31('Edited Story');" class="w-full px-3.5 py-2.5 rounded-xl adm-input text-xs leading-relaxed">${ac.story || ''}</textarea>
+          </div>
+          <div class="md:col-span-6 space-y-2">
+            <input type="text" value="${(ac.missionTitle || 'Our Mission').replace(/"/g, '&quot;')}" oninput="db.aboutConfig.missionTitle=this.value; window.syncEverythingV31('Edited Mission Title');" class="w-full px-3 py-1.5 rounded-xl adm-input text-xs font-bold text-emerald-400" />
+            <textarea id="ab-mission" rows="2" oninput="db.about.mission=this.value; db.aboutConfig.mission=this.value; window.syncEverythingV31('Edited Mission');" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs">${ac.mission || ''}</textarea>
+          </div>
+          <div class="md:col-span-6 space-y-2">
+            <input type="text" value="${(ac.visionTitle || 'Our Vision').replace(/"/g, '&quot;')}" oninput="db.aboutConfig.visionTitle=this.value; window.syncEverythingV31('Edited Vision Title');" class="w-full px-3 py-1.5 rounded-xl adm-input text-xs font-bold text-indigo-400" />
+            <textarea id="ab-vision" rows="2" oninput="db.about.vision=this.value; db.aboutConfig.vision=this.value; window.syncEverythingV31('Edited Vision');" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs">${ac.vision || ''}</textarea>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-[#09090b] border border-amber-500/30 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span class="text-xs font-extrabold text-amber-400 uppercase">✍️ Founder's Quote</span>
+            <div class="flex flex-wrap gap-4 text-xs font-bold">
+              <label class="flex items-center gap-2 cursor-pointer text-amber-300"><input type="checkbox" ${ac.showFounderNote !== false ? 'checked' : ''} onchange="db.aboutConfig.showFounderNote=this.checked; window.syncEverythingV31('Toggled Quote', true);" /> Show Quote</label>
+              <label class="flex items-center gap-2 cursor-pointer text-indigo-300"><input type="checkbox" ${ac.showDnaPillars !== false ? 'checked' : ''} onchange="db.aboutConfig.showDnaPillars=this.checked; window.syncEverythingV31('Toggled DNA', true);" /> Show 4 DNA Pillars</label>
+            </div>
+          </div>
+          <textarea rows="2" oninput="db.aboutConfig.founderNoteQuote=this.value; window.syncEverythingV31('Edited Quote');" class="w-full px-3.5 py-2 rounded-xl adm-input text-xs italic">${ac.founderNoteQuote || ''}</textarea>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <input type="text" value="${(ac.founderNoteAuthor || '').replace(/"/g, '&quot;')}" oninput="db.aboutConfig.founderNoteAuthor=this.value; window.syncEverythingV31('Edited Quote Author');" placeholder="Author Name" class="px-3 py-2 rounded-xl adm-input text-xs font-bold" />
+            <input type="text" value="${(ac.founderNoteRole || '').replace(/"/g, '&quot;')}" oninput="db.aboutConfig.founderNoteRole=this.value; window.syncEverythingV31('Edited Quote Role');" placeholder="Author Role" class="px-3 py-2 rounded-xl adm-input text-xs text-amber-300" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          ${(ac.dnaPillars || []).map(function (dna, dIdx) {
+            return `
+              <div class="p-3 rounded-2xl bg-[#09090b] border border-white/10 space-y-1.5">
+                <input type="text" value="${dna.num}" oninput="db.aboutConfig.dnaPillars[${dIdx}].num=this.value; window.syncEverythingV31('Edited DNA');" class="w-16 px-2 py-1 rounded adm-input text-[11px] font-mono font-bold text-indigo-400" />
+                <input type="text" value="${(dna.title || '').replace(/"/g, '&quot;')}" oninput="db.aboutConfig.dnaPillars[${dIdx}].title=this.value; window.syncEverythingV31('Edited DNA');" class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs font-bold text-white" />
+                <input type="text" value="${(dna.desc || '').replace(/"/g, '&quot;')}" oninput="db.aboutConfig.dnaPillars[${dIdx}].desc=this.value; window.syncEverythingV31('Edited DNA');" class="w-full px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <div class="hidden">
+          <select id="ab-photo-shape"><option value="circle">Circle</option></select>
+          <select id="ab-photo-align"><option value="center">Center</option></select>
+          <input type="range" id="ab-photo-size" value="140" />
+          <span id="ab-size-lbl">140</span>
+        </div>
+      </div>
+
+      <!-- =================================================================== -->
+      <!-- SECTION 2: ADD & MANAGE PEOPLE (FOUNDERS, PARTNERS & EMPLOYEES)     -->
+      <!-- =================================================================== -->
+      <div id="v31-about-people-card" class="admin-card rounded-3xl space-y-5">
+        <div class="hidden">
+          <h3>👥 2. Add People & Team Directory (${db.team.length} People: Founders, Partners & Employees)</h3>
+          <p class="text-xs">Click Edit to open People Directory — Add, Edit or Delete any Founder, Co-Founder, Partner or Employee</p>
+        </div>
+
+        <!-- Add New Person Bar -->
+        <div class="p-4 rounded-2xl bg-[#09090b] border border-emerald-500/40 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-2 flex-1 min-w-[240px]">
+            <span class="text-xs font-extrabold text-emerald-400">➕ Add Person:</span>
+            <input type="text" id="v31-new-person-name" placeholder="Enter Full Name (e.g. Jenish Kamli)..." class="flex-1 min-w-[160px] px-3.5 py-2 rounded-xl adm-input text-xs font-bold text-white" />
+            <select id="v31-new-person-role" class="px-3 py-2 rounded-xl adm-input text-xs font-bold text-amber-300">
+              ${ROLES_16.map(function (r) { return `<option value="${r.id}">${r.label}</option>`; }).join('')}
+            </select>
+            <button type="button" onclick="window.addPersonV31()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs shadow-lg transition">
+              ➕ Create Person
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2 text-xs">
+            <span class="text-zinc-400 font-bold">Founder Layout:</span>
+            <select onchange="db.aboutPhotoStudio.columnsFounder=Number(this.value); window.syncEverythingV31('Updated Founder Layout', true);" class="px-2.5 py-1.5 rounded-xl adm-input text-xs font-bold text-amber-300">
+              <option value="1" ${ps.columnsFounder===1?'selected':''}>1 Giant Center Card</option>
+              <option value="2" ${(ps.columnsFounder||2)===2?'selected':''}>2 Cards / Row</option>
+              <option value="3" ${ps.columnsFounder===3?'selected':''}>3 Cards / Row</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Role Filter Buttons -->
+        <div class="flex flex-wrap items-center gap-1.5">
+          ${roleTabs.map(function (rt) {
+            const cnt = rt === 'ALL' ? db.team.length : db.team.filter(function (x) { return x.type === rt; }).length;
+            const act = window.peopleFilterV31 === rt;
+            return `<button type="button" onclick="window.peopleFilterV31='${rt}'; window.openSectionKeyV31='v31-about-people-card'; window.renderCleanAboutAndPeopleV31(); window.lockAllCardsClosedV31();" class="px-3 py-1.5 rounded-xl text-xs font-extrabold transition ${act ? 'bg-emerald-500 text-zinc-950' : 'bg-[#09090b] text-zinc-300 border border-white/10'}">${rt === 'ALL' ? 'All People' : rt} (${cnt})</button>`;
+          }).join('')}
+        </div>
+
+        <!-- Unified People List (All Closed by Default!) -->
+        <div id="adm-team-list" class="space-y-3">
+          ${visiblePeople.length === 0 ? `<div class="p-8 rounded-2xl bg-[#09090b] text-center text-xs text-zinc-500">No people in this category. Use "➕ Add Person" above.</div>` : visiblePeople.map(function (m) {
+            const idx = m.origIdx;
+            const mId = m.id;
+            const isOpen = window.openPersonIdV31 === mId && !m.locked;
+            const avatar = m.photo || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(m.name || 'P') + '&background=6366f1&color=fff&size=200');
+            const soc = m.socials || {};
+            const skillsArr = Array.isArray(m.skills) ? m.skills : (m.skills ? String(m.skills).split(',').map(function (s) { return s.trim(); }).filter(Boolean) : []);
+            const isKnownRole = ROLES_16.some(function (r) { return r.id === m.type; });
+            const isKnownDesig = DESIGNATIONS_26.includes(m.role);
+
+            return `
+              <div class="p-4 rounded-2xl bg-[#09090b] border-2 ${isOpen ? 'border-emerald-500/70 shadow-2xl' : 'border-[#242429] hover:border-white/20'} transition">
+                <!-- COMPACT PERSON SUMMARY ROW (Always Visible) -->
+                <div class="flex flex-wrap items-center justify-between gap-3 cursor-pointer" onclick="window.togglePersonV31('${mId}', ${Boolean(m.locked)})">
+                  <div class="flex items-center gap-3.5 min-w-0 flex-1">
+                    <div class="relative shrink-0 overflow-hidden bg-black flex items-center justify-center" style="width:52px;height:52px;border-radius:15px;border:2px solid ${m.borderColor || '#f59e0b'};">
+                      <img src="${avatar}" style="width:100%;height:100%;object-fit:cover;object-position:50% ${m.photoPosY ?? 20}%;transform:scale(${(m.photoZoom || 100)/100});" />
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div class="flex flex-wrap items-center gap-1.5">
+                        <strong class="text-sm sm:text-base font-extrabold text-white truncate">${m.name || 'Unnamed'}</strong>
+                        <span class="px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 text-[10px] font-black uppercase">${m.type || 'Founder'}</span>
+                        <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-bold">${m.role || ''}</span>
+                        <span class="text-[10px] text-zinc-500">📐 ${m.placement || 'center'} • ${m.photoSize || 185}px</span>
+                      </div>
+                      <p class="text-xs text-zinc-400 truncate mt-0.5">${m.cardBrief || m.bio || 'Click ✏️ Edit to customize photo, role, bio & social links'}</p>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-wrap items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
+                    <button type="button" onclick="window.togglePersonV31('${mId}', ${Boolean(m.locked)})" class="lg-btn ${isOpen ? 'lg-btn-done' : 'lg-btn-edit'}">
+                      ${isOpen ? '✓ Close' : '✏️ Edit'}
+                    </button>
+                    <button type="button" onclick="window.movePersonV31(${idx}, -1)" class="lg-btn" title="Move Up">↑</button>
+                    <button type="button" onclick="window.movePersonV31(${idx}, 1)" class="lg-btn" title="Move Down">↓</button>
+                    <button type="button" onclick="window.deletePersonV31(${idx})" class="lg-btn lg-btn-del">🗑️ Delete</button>
+                  </div>
+                </div>
+
+                <!-- EXPANDED PERSON FORM (Opens ONLY when `✏️ Edit` is clicked) -->
+                ${isOpen ? `
+                  <div class="mt-4 pt-4 border-t border-white/15 space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3.5 rounded-2xl bg-[#111114] border border-white/10">
+                      <div>
+                        <label class="text-[10px] font-bold text-white block mb-1">1. Full Name *</label>
+                        <input type="text" value="${(m.name || '').replace(/"/g, '&quot;')}" oninput="db.team[${idx}].name=this.value; window.syncEverythingV31('Edited Name');" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-extrabold text-white" />
+                      </div>
+                      <div>
+                        <label class="text-[10px] font-bold text-amber-400 block mb-1">2. Role Group (1-Word Dropdown)</label>
+                        <select onchange="if(this.value==='__CUSTOM__'){ document.getElementById('v31-cgrp-${idx}').classList.remove('hidden'); } else { document.getElementById('v31-cgrp-${idx}').classList.add('hidden'); db.team[${idx}].type=this.value; window.syncEverythingV31('Changed Group', true); }" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold text-amber-300">
+                          ${ROLES_16.map(function (r) { return `<option value="${r.id}" ${m.type === r.id ? 'selected' : ''}>${r.label}</option>`; }).join('')}
+                          <option value="__CUSTOM__" ${!isKnownRole ? 'selected' : ''}>✍️ + Custom Group...</option>
+                        </select>
+                        <input type="text" id="v31-cgrp-${idx}" value="${(m.type || '').replace(/"/g, '&quot;')}" oninput="db.team[${idx}].type=this.value; window.syncEverythingV31('Typed Custom Group');" placeholder="Type Group..." class="${!isKnownRole ? '' : 'hidden'} mt-1.5 w-full px-2.5 py-1.5 rounded-lg adm-input text-xs font-bold" />
+                      </div>
+                      <div>
+                        <label class="text-[10px] font-bold text-indigo-300 block mb-1">3. Designation (Dropdown / Custom)</label>
+                        <select onchange="if(this.value!=='CUSTOM_ROLE'){ db.team[${idx}].role=this.value; document.getElementById('v31-cdes-${idx}').value=this.value; window.syncEverythingV31('Changed Designation', true); }" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold text-indigo-300">
+                          ${DESIGNATIONS_26.map(function (d) { return `<option value="${d}" ${(isKnownDesig && m.role === d) || (!isKnownDesig && d === 'CUSTOM_ROLE') ? 'selected' : ''}>${d === 'CUSTOM_ROLE' ? '✍️ + Custom Designation...' : d}</option>`; }).join('')}
+                        </select>
+                        <input type="text" id="v31-cdes-${idx}" value="${(m.role || '').replace(/"/g, '&quot;')}" oninput="db.team[${idx}].role=this.value; window.syncEverythingV31('Typed Designation');" placeholder="Type exact designation..." class="mt-1.5 w-full px-2.5 py-1.5 rounded-lg adm-input text-xs font-bold text-white" />
+                      </div>
+                      <div>
+                        <label class="text-[10px] font-bold text-emerald-400 block mb-1">4. Photo Upload / URL</label>
+                        <div class="flex gap-1.5">
+                          <input type="text" value="${(m.photo && !m.photo.startsWith('data:') ? m.photo : '').replace(/"/g, '&quot;')}" oninput="db.team[${idx}].photo=this.value; window.syncEverythingV31('Edited Photo URL');" placeholder="Photo URL..." class="flex-1 px-2.5 py-2 rounded-xl adm-input text-xs" />
+                          <label class="px-3 py-2 rounded-xl bg-amber-400 text-zinc-950 font-black text-xs cursor-pointer shrink-0">
+                            📷 Upload
+                            <input type="file" accept="image/*" onchange="uploadDirectCallback(this, false, function(u){ db.team[${idx}].photo=u; window.openSectionKeyV31='v31-about-people-card'; window.renderCleanAboutAndPeopleV31(); window.lockAllCardsClosedV31(); window.syncEverythingV31('Uploaded Photo', true); })" class="hidden" />
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Photo Placement, Size, 30 Crop Shapes & 30 Border Frames -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3.5 rounded-2xl bg-[#111114] border border-emerald-500/30">
+                      <div>
+                        <label class="text-[10px] font-bold text-emerald-300 block mb-1">Photo Placement on Card</label>
+                        <select onchange="db.team[${idx}].placement=this.value; window.syncEverythingV31('Changed Placement', true);" class="w-full px-2.5 py-2 rounded-xl adm-input text-xs font-bold">
+                          <option value="center" ${m.placement==='center'?'selected':''}>🎯 Center Spotlight</option>
+                          <option value="full_banner" ${m.placement==='full_banner'?'selected':''}>🖼️ Full Banner Maximize</option>
+                          <option value="split_magazine" ${m.placement==='split_magazine'?'selected':''}>📰 50/50 Magazine Split</option>
+                          <option value="left" ${m.placement==='left'?'selected':''}>⬅️ Left Photo</option>
+                          <option value="right" ${m.placement==='right'?'selected':''}>➡️ Right Photo</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label class="text-[10px] font-bold text-white block mb-1">Crop Shape (30 Designs)</label>
+                        <select onchange="db.team[${idx}].cropShape=this.value; window.syncEverythingV31('Changed Crop Shape', true);" class="w-full px-2.5 py-2 rounded-xl adm-input text-xs font-bold">
+                          ${SHAPES_30.map(function (s) { return `<option value="${s.id}" ${(m.cropShape || 's01_circle') === s.id ? 'selected' : ''}>${s.name}</option>`; }).join('')}
+                        </select>
+                      </div>
+                      <div>
+                        <label class="text-[10px] font-bold text-amber-300 block mb-1">Border Frame (30 Designs)</label>
+                        <select onchange="db.team[${idx}].borderFrame=this.value; window.syncEverythingV31('Changed Border Frame', true);" class="w-full px-2.5 py-2 rounded-xl adm-input text-xs font-bold text-amber-300">
+                          ${BORDERS_30.map(function (b) { return `<option value="${b.id}" ${(m.borderFrame || 'b01_gold_halo') === b.id ? 'selected' : ''}>${b.name}</option>`; }).join('')}
+                        </select>
+                      </div>
+                      <div>
+                        <div class="flex justify-between text-[10px] font-bold mb-1">
+                          <span class="text-zinc-300">Photo Size:</span>
+                          <span id="v31-sz-${idx}" class="text-amber-400">${m.photoSize || 185}px</span>
+                        </div>
+                        <input type="range" min="64" max="420" step="4" value="${m.photoSize || 185}" oninput="document.getElementById('v31-sz-${idx}').innerText=this.value+'px'; db.team[${idx}].photoSize=Number(this.value); window.syncEverythingV31('Resized Photo');" class="w-full accent-amber-400" />
+                      </div>
+                    </div>
+
+                    <!-- Border Color, Thickness, Zoom & Face Y -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 rounded-2xl bg-[#111114] border border-white/10 items-center">
+                      <div>
+                        <label class="text-[10px] text-zinc-400 block mb-1">Border Color</label>
+                        <input type="color" value="${m.borderColor || '#f59e0b'}" oninput="db.team[${idx}].borderColor=this.value; window.syncEverythingV31('Changed Border Color');" class="w-full h-8 rounded cursor-pointer bg-transparent border border-white/20" />
+                      </div>
+                      <div>
+                        <label class="text-[10px] text-zinc-400 block mb-1">Border Width (${m.borderWidth ?? 3}px)</label>
+                        <input type="range" min="0" max="10" value="${m.borderWidth ?? 3}" oninput="db.team[${idx}].borderWidth=Number(this.value); window.syncEverythingV31('Changed Border Width');" class="w-full accent-amber-400" />
+                      </div>
+                      <div>
+                        <label class="text-[10px] text-zinc-400 block mb-1">Inner Zoom (${m.photoZoom || 100}%)</label>
+                        <input type="range" min="100" max="170" value="${m.photoZoom || 100}" oninput="db.team[${idx}].photoZoom=Number(this.value); window.syncEverythingV31('Changed Zoom');" class="w-full accent-indigo-400" />
+                      </div>
+                      <div>
+                        <label class="text-[10px] text-zinc-400 block mb-1">Face Up/Down (${m.photoPosY ?? 20}%)</label>
+                        <input type="range" min="0" max="100" value="${m.photoPosY ?? 20}" oninput="db.team[${idx}].photoPosY=Number(this.value); window.syncEverythingV31('Changed Face Y');" class="w-full accent-emerald-400" />
+                      </div>
+                    </div>
+
+                    <!-- Brief, Full Bio, Skills & Socials -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label class="text-[10px] font-bold text-zinc-300 block mb-1">1-Line Brief (Shown on Card Front)</label>
+                        <input type="text" value="${(m.cardBrief || m.bio || '').replace(/"/g, '&quot;')}" oninput="db.team[${idx}].cardBrief=this.value; window.syncEverythingV31('Edited Brief');" class="w-full px-3 py-2 rounded-xl adm-input text-xs" />
+                      </div>
+                      <div>
+                        <label class="text-[10px] font-bold text-emerald-400 block mb-1">Skills (Comma Separated)</label>
+                        <input type="text" value="${skillsArr.join(', ')}" oninput="db.team[${idx}].skills=this.value.split(',').map(function(s){return s.trim();}).filter(Boolean); window.syncEverythingV31('Edited Skills');" placeholder="Amazon Global, Flipkart, 3D CGI" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-mono" />
+                      </div>
+                      <div class="sm:col-span-2">
+                        <label class="text-[10px] font-bold text-amber-300 block mb-1">Full Detailed Bio (Shown Inside Click Popup)</label>
+                        <textarea rows="2" oninput="db.team[${idx}].detailedBio=this.value; window.syncEverythingV31('Edited Bio');" class="w-full px-3 py-2 rounded-xl adm-input text-xs">${m.detailedBio || m.bio || ''}</textarea>
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-white/10">
+                      <input type="url" value="${soc.linkedin || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.linkedin=this.value; window.syncEverythingV31('Edited LinkedIn');" placeholder="LinkedIn URL" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+                      <input type="url" value="${soc.instagram || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.instagram=this.value; window.syncEverythingV31('Edited Instagram');" placeholder="Instagram URL" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+                      <input type="url" value="${soc.twitter || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.twitter=this.value; window.syncEverythingV31('Edited Twitter');" placeholder="X / Twitter URL" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+                      <input type="url" value="${soc.behance || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.behance=this.value; window.syncEverythingV31('Edited Behance');" placeholder="Behance URL" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+                      <input type="url" value="${soc.youtube || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.youtube=this.value; window.syncEverythingV31('Edited YouTube');" placeholder="YouTube URL" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+                      <input type="url" value="${soc.website || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.website=this.value; window.syncEverythingV31('Edited Website');" placeholder="Website URL" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+                      <input type="tel" value="${soc.whatsapp || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.whatsapp=this.value; window.syncEverythingV31('Edited WhatsApp');" placeholder="WhatsApp Number" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px] text-emerald-300 font-bold" />
+                      <input type="email" value="${soc.email || ''}" oninput="db.team[${idx}].socials=db.team[${idx}].socials||{}; db.team[${idx}].socials.email=this.value; window.syncEverythingV31('Edited Email');" placeholder="Official Email" class="px-2.5 py-1.5 rounded-lg adm-input text-[11px]" />
+                    </div>
+
+                    <div class="pt-2 flex justify-end">
+                      <button type="button" onclick="window.togglePersonV31('${mId}', false)" class="lg-btn lg-btn-done">✓ Save & Close Person Form</button>
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  };
+
+  window.renderGranularAboutStudio = window.renderCleanAboutAndPeopleV31;
+  window.renderAdminTeam = window.renderCleanAboutAndPeopleV31;
+
+  window.togglePersonV31 = function (mId, isLocked) {
+    if (isLocked) {
+      alert('🔒 Profile Locked!');
+      return;
+    }
+    window.openSectionKeyV31 = 'v31-about-people-card';
+    window.openPersonIdV31 = (window.openPersonIdV31 === mId) ? null : mId;
+    window.renderCleanAboutAndPeopleV31();
+    window.lockAllCardsClosedV31();
+  };
+
+  window.addPersonV31 = function () {
+    const nameEl = document.getElementById('v31-new-person-name');
+    const roleEl = document.getElementById('v31-new-person-role');
+    const name = (nameEl?.value || '').trim() || 'New Team Member';
+    const role = roleEl?.value || 'Founder';
+    const newId = 'TM-' + Date.now();
+
+    db.team = db.team || [];
+    db.team.unshift({
+      id: newId,
+      name: name,
+      role: role,
+      type: role,
+      photo: '',
+      placement: 'center',
+      photoSize: (role === 'Founder' || role === 'Co-Founder') ? 185 : 140,
+      cropShape: 's01_circle',
+      borderFrame: 'b01_gold_halo',
+      borderColor: '#f59e0b',
+      borderWidth: 3,
+      cardBrief: 'Scaling brands across global marketplaces.',
+      detailedBio: 'Hands-on growth specialist.',
+      skills: ['E-Commerce', 'Brand Strategy'],
+      socials: {}
+    });
+    window.peopleFilterV31 = 'ALL';
+    window.openSectionKeyV31 = 'v31-about-people-card';
+    window.openPersonIdV31 = newId;
+    window.renderCleanAboutAndPeopleV31();
+    window.lockAllCardsClosedV31();
+    window.syncEverythingV31('Created Person: ' + name, true);
+  };
+
+  window.movePersonV31 = function (idx, dir) {
+    const target = idx + dir;
+    if (target < 0 || target >= db.team.length) return;
+    const tmp = db.team[idx];
+    db.team[idx] = db.team[target];
+    db.team[target] = tmp;
+    window.openSectionKeyV31 = 'v31-about-people-card';
+    window.renderCleanAboutAndPeopleV31();
+    window.lockAllCardsClosedV31();
+    window.syncEverythingV31('Reordered People', true);
+  };
+
+  window.deletePersonV31 = function (idx) {
+    const m = db.team[idx];
+    if (!m) return;
+    if (!confirm('Delete "' + (m.name || 'Person') + '" from People Directory?')) return;
+    db.team.splice(idx, 1);
+    window.openSectionKeyV31 = 'v31-about-people-card';
+    window.renderCleanAboutAndPeopleV31();
+    window.lockAllCardsClosedV31();
+    window.syncEverythingV31('Deleted Person', true);
+  };
+
+  /* ============================================================================
+     4. UNIVERSAL CLOSED-FORM VISUAL CARD LOCKER (`lockAllCardsClosedV31`)
+     ============================================================================ */
+  const PANEL_ICONS_V31 = {
+    'panel-home':     '🏠',
+    'panel-menu':     '🍔',
+    'panel-loader':   '🎬',
+    'panel-services': '⚡',
+    'panel-quotation':'📄',
+    'panel-portfolio':'🎥',
+    'panel-tracker':  '📊',
+    'panel-about':    '👥',
+    'panel-reviews':  '★',
+    'panel-contact':  '📞',
+    'panel-custom':   '➕',
+    'panel-crm':      '📬',
+    'panel-global':   '🎨'
+  };
+
+  function unwrapAnyOldContainersV31() {
+    document.querySelectorAll('.adm-folder-bar, .card-action-bar, .ig-card-top-bar, .ig-visual-summary-grid, .v28-card-header, .v28-visual-summary-strip, .v29-sec-header, .v30-header-bar').forEach(function (el) { el.remove(); });
+    document.querySelectorAll('.card-expandable-content, .ig-form-body-wrap, .v28-form-drawer').forEach(function (wrap) {
+      const p = wrap.parentElement;
+      if (p) {
+        while (wrap.firstChild) p.appendChild(wrap.firstChild);
+        wrap.remove();
+      }
+    });
+    document.querySelectorAll('.admin-card').forEach(function (c) {
+      c.classList.remove('adm-folder-body-closed', 'is-card-collapsed', 'ig-form-closed', 'ig-card-editing', 'v28-is-closed', 'v28-is-open', 'v29-closed', 'v29-open', 'v30-card-closed', 'v30-card-open');
+    });
+  }
+
+  function extractCardSummaryV31(card) {
+    const chips = [];
+    let thumb = '';
+    const imgEl = card.querySelector('img[src]');
+    if (imgEl && imgEl.getAttribute('src') && !imgEl.getAttribute('src').includes('ui-avatars.com')) {
+      thumb = imgEl.getAttribute('src');
+    }
+
+    const inputs = card.querySelectorAll('input:not([type="hidden"]):not([type="file"]):not([type="color"]):not(.phone-toggle-input), textarea, select');
+    inputs.forEach(function (inp) {
+      if (chips.length >= 5) return;
+      if (inp.closest('.hidden')) return;
+      let lbl = '';
+      const prev = inp.previousElementSibling;
+      if (prev && (prev.tagName === 'LABEL' || prev.tagName === 'SPAN')) {
+        lbl = prev.innerText.replace(/\*|:/g, '').trim();
+      }
+      if (!lbl) lbl = (inp.getAttribute('placeholder') || inp.id || 'Field').replace(/\*|\.\.\./g, '').trim();
+      lbl = lbl.replace(/^(hm|gl|qk|hd|qt|tr|ab|cp|ms|ldr|hb14|hb15|sm|gbs)-/i, '');
+
+      let val = '';
+      if (inp.type === 'checkbox') val = inp.checked ? '🟢 ON' : '⚫ OFF';
+      else if (inp.tagName === 'SELECT') val = inp.options[inp.selectedIndex]?.text || inp.value || '';
+      else val = (inp.value || '').trim();
+
+      if (val && !val.startsWith('data:')) {
+        chips.push({ k: lbl.substring(0, 18), v: val.substring(0, 28) });
+      }
+    });
+    return { chips: chips, thumb: thumb };
+  }
+
+  window.lockAllCardsClosedV31 = function () {
+    unwrapAnyOldContainersV31();
+
+    document.querySelectorAll('.adm-panel').forEach(function (panel) {
+      if (panel.id === 'panel-switchboard') return;
+      const icon = PANEL_ICONS_V31[panel.id] || '✨';
+
+      const cards = Array.from(panel.querySelectorAll('.admin-card'));
+      cards.forEach(function (card, idx) {
+        if (card.id === 'adm-category-quick-manager') return;
+
+        const cKey = card.id || (panel.id + '_v31_' + idx);
+        card.dataset.v31Key = cKey;
+
+        let hdr = card.querySelector(':scope > .v31-card-hdr');
+        if (!hdr) {
+          const hEl = card.querySelector('h2, h3, h4');
+          const pEl = card.querySelector('p.text-xs, span.text-\\[10px\\]');
+          const titleTxt = hEl ? hEl.innerText.trim() : ('Section #' + (idx + 1));
+          const subTxt = pEl ? pEl.innerText.trim() : 'Click "✏️ Edit" to open & customize this section';
+
+          hdr = document.createElement('div');
+          hdr.className = 'v31-card-hdr cursor-pointer select-none';
+          hdr.dataset.title = titleTxt;
+          hdr.dataset.sub = subTxt;
+          hdr.onclick = function () { window.toggleSectionCardV31(cKey); };
+          card.prepend(hdr);
+        }
+
+        const isOpen = window.openSectionKeyV31 === cKey;
+        card.classList.toggle('v31-open', isOpen);
+        card.classList.toggle('v31-closed', !isOpen);
+
+        const titleTxt = hdr.dataset.title || ('Section #' + (idx + 1));
+        const subTxt = hdr.dataset.sub || '';
+        const prev = extractCardSummaryV31(card);
+
+        hdr.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3.5 min-w-0 flex-1">
+              ${prev.thumb ? `
+                <img src="${prev.thumb}" class="w-11 h-11 rounded-2xl object-cover border border-emerald-400/50 shrink-0 bg-black" />
+              ` : `
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 border border-white/15 flex items-center justify-center text-base shrink-0">
+                  ${icon}
+                </div>
+              `}
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <h3 class="text-sm sm:text-base font-extrabold text-white truncate">${titleTxt}</h3>
+                  <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${isOpen ? 'bg-emerald-500 text-zinc-950' : 'bg-white/10 text-zinc-400'}">${isOpen ? 'OPEN FOR EDITING' : 'CLOSED'}</span>
+                </div>
+                <p class="text-[11px] text-zinc-400 truncate mt-0.5">${subTxt}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
+              <button type="button" onclick="window.toggleSectionCardV31('${cKey}')" class="lg-btn ${isOpen ? 'lg-btn-done' : 'lg-btn-edit'}">
+                ${isOpen ? '✓ Save & Close' : '✏️ Edit'}
+              </button>
+              <button type="button" onclick="if(typeof window.triggerAdminUndo==='function') window.triggerAdminUndo();" class="lg-btn lg-btn-undo" title="Undo">↩️ Undo</button>
+              <button type="button" onclick="if(typeof window.triggerAdminRedo==='function') window.triggerAdminRedo();" class="lg-btn lg-btn-undo" title="Redo">↪️</button>
+            </div>
+          </div>
+
+          <div class="v31-chip-row">
+            ${prev.chips.length > 0
+              ? prev.chips.map(function (p) { return `<div class="v31-chip"><strong>${p.k}:</strong><span>${p.v}</span></div>`; }).join('')
+              : `<div class="v31-chip"><strong>Status:</strong><span class="text-emerald-400">Ready • Click ✏️ Edit to open</span></div>`
+            }
+          </div>
+        `;
+      });
+    });
+  };
+
+  window.toggleSectionCardV31 = function (cKey) {
+    if (window.openSectionKeyV31 === cKey) {
+      window.openSectionKeyV31 = null;
+      window.openPersonIdV31 = null;
+      window.syncEverythingV31('Saved Section Changes', true);
+    } else {
+      window.openSectionKeyV31 = cKey;
+    }
+    window.lockAllCardsClosedV31();
+  };
+
+  /* ============================================================================
+     5. SEVER BROKEN `switchAdminTab` & `populateAllInputsFromDB` CHAINS!
+        Replaces them with Direct, Clean Functions that NEVER Call Old Timers!
+     ============================================================================ */
+  let syncDebounceV31 = null;
+  window.syncEverythingV31 = function (note, immediate) {
+    if (!window.db) return;
+    localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(db));
+    try {
+      const ch = new BroadcastChannel('OG_AGENCY_LIVE_SYNC_V13');
+      ch.postMessage({ type: 'DB_UPDATED', db: db });
+    } catch (e) {}
+
+    clearTimeout(syncDebounceV31);
+    syncDebounceV31 = setTimeout(async function () {
+      if (typeof pushToFirebase === 'function') {
+        await pushToFirebase(note || 'Saved Studio Changes');
+      }
+      if (immediate && typeof window.showLiquidSavePopup === 'function') {
+        window.showLiquidSavePopup(note || 'Saved & Synced Live!');
+      }
+    }, immediate ? 40 : 400);
+  };
+
+  /* Direct Clean Tab Switcher (Never triggers old v23-v28 wrapper chains!) */
+  window.switchAdminTab = function (tabName) {
+    window.openSectionKeyV31 = null;
+    window.openPersonIdV31 = null;
+    localStorage.setItem(ADMIN_ACTIVE_TAB_KEY, tabName);
+
+    document.querySelectorAll('.adm-panel').forEach(function (p) { p.classList.add('hidden'); });
+    const panel = document.getElementById('panel-' + tabName);
+    if (panel) panel.classList.remove('hidden');
+
+    document.querySelectorAll('.adm-tab-btn').forEach(function (b) { b.classList.remove('tab-btn-active'); });
+    const btn = document.getElementById('adm-tab-' + tabName);
+    if (btn) btn.classList.add('tab-btn-active');
+
+    if (tabName === 'about') window.renderCleanAboutAndPeopleV31();
+    if (tabName === 'services' && typeof window.renderAdminServices === 'function') window.renderAdminServices();
+    if (tabName === 'contact' && typeof window.renderContactPageStudio === 'function') window.renderContactPageStudio();
+    if (tabName === 'switchboard' && typeof window.renderSwitchboardCards === 'function') window.renderSwitchboardCards();
+
+    window.lockAllCardsClosedV31();
+  };
+
+  /* Direct Clean Input Populator (Populates all fields without triggering old crash chains) */
+  window.populateAllInputsFromDB = function () {
+    if (!window.db) return;
+    const setV = function (id, val) { const el = document.getElementById(id); if (el) el.value = val ?? ''; };
+    const setC = function (id, val) { const el = document.getElementById(id); if (el) el.checked = Boolean(val); };
+
+    setV('qk-name', db.brand?.name);
+    setV('qk-tagline', db.brand?.tagline);
+    setV('qk-phone', db.brand?.phone);
+    setV('qk-whatsapp', db.brand?.whatsapp);
+    setV('qk-email', db.brand?.email);
+    setV('qk-domain', db.brand?.domain);
+    setV('qk-logo-text', db.brand?.logoText || (db.brand?.name || 'BP').substring(0, 2).toUpperCase());
+    setV('qk-logo-size', db.brand?.logoSize || 40);
+
+    setV('hm-announcement', db.brand?.announcement);
+    setV('hm-scarcity-slots', db.visibility?.scarcitySlots ?? 2);
+    setV('hm-hero-badge', db.brand?.heroBadge);
+    setV('hm-hero-title', db.brand?.heroTitle);
+    setV('hm-hero-sub', db.brand?.heroSub);
+    setV('hm-btn1', db.brand?.heroBtn1);
+    setV('hm-btn2', db.brand?.heroBtn2);
+    setV('hm-pills', (db.brand?.pills || []).join(', '));
+    setV('hm-marquee', (db.brand?.marqueeItems || []).join(', '));
+
+    setC('hm-show-3d', db.visibility?.show3DStage !== false);
+    setV('h3d-mode', db.hero3D?.mode || 'character_image');
+    setV('h3d-position', db.hero3D?.position || 'right');
+    setV('h3d-scale', db.hero3D?.scale || 100);
+    setV('h3d-offx', db.hero3D?.offsetX || 0);
+    setV('h3d-offy', db.hero3D?.offsetY || 0);
+    setV('h3d-badge', db.hero3D?.badgeText);
+    setV('h3d-title', db.hero3D?.title);
+    setV('h3d-sub', db.hero3D?.subtitle);
+    setV('h3d-img-url', db.hero3D?.imageUrl);
+    setV('h3d-vid-url', db.hero3D?.videoUrl);
+    setV('h3d-glb-url', db.hero3D?.glbUrl);
+    setV('h3d-spline-url', db.hero3D?.splineUrl);
+    if (typeof updateHeroStageLivePreview === 'function') updateHeroStageLivePreview();
+
+    setV('hm-st1-v', db.brand?.stat1Val);
+    setV('hm-st1-l', db.brand?.stat1Lbl);
+    setV('hm-st2-v', db.brand?.stat2Val);
+    setV('hm-st2-l', db.brand?.stat2Lbl);
+    setV('hm-st3-l', db.brand?.stat3Lbl);
+    setV('hm-st4-v', db.brand?.stat4Val);
+    setV('hm-st4-l', db.brand?.stat4Lbl);
+    setV('hm-pip-video', db.visibility?.pipVideoUrl);
+
+    setC('vis-ann', db.visibility?.showAnnouncement !== false);
+    setC('vis-clocks', db.visibility?.showWorldClocks !== false);
+    setC('vis-scarcity', db.visibility?.showScarcityBadge !== false);
+    setC('vis-marquee', db.visibility?.showMarquee !== false);
+    setC('vis-stats', db.visibility?.showStats !== false);
+    setC('vis-viral', db.visibility?.showViralSuite !== false);
+    setC('vis-work', db.visibility?.showWork !== false);
+    setC('vis-process', db.visibility?.showProcess !== false);
+    setC('vis-awards', db.visibility?.showAwards !== false);
+
+    setV('hd-srv-eyebrow', db.headings?.srvPageEyebrow);
+    setV('hd-srv-heading', db.headings?.srvPageHeading);
+    setV('hd-srv-sub', db.headings?.srvPageSub);
+
+    setV('qt-pricing-mode', db.visibility?.pricingMode || 'show');
+    setV('qt-usd-rate', db.brand?.usdRate || 84);
+    setV('qt-aed-rate', db.brand?.aedRate || 23);
+    setV('qt-gst-pct', db.brand?.gstPercent || 0);
+    setC('qt-enable-scratch', db.visibility?.enableScratchCard !== false);
+    setV('qt-scratch-pct', db.visibility?.scratchDiscountPercent || 10);
+    setV('qt-terms', db.brand?.quoteTerms);
+
+    setV('gl-name', db.brand?.name);
+    setV('gl-tagline', db.brand?.tagline);
+    setV('gl-domain', db.brand?.domain);
+    setV('gl-phone', db.brand?.phone);
+    setV('gl-whatsapp', db.brand?.whatsapp);
+    setV('gl-email', db.brand?.email);
+    setV('gl-logo', db.brand?.logo);
+    setV('gl-kinetic', db.brand?.kineticFooterText);
+    setV('gl-copy', db.brand?.copyright);
+    setC('gl-stealth-copy', Boolean(db.visibility?.stealthAntiCopy));
+
+    setV('th-bg', db.theme?.bgSolid || '#09090b');
+    setV('th-card', db.theme?.cardCharcoal || '#111114');
+    setV('th-pri', db.theme?.accentPrimary || '#6366f1');
+    setV('th-sec', db.theme?.accentSecondary || '#10b981');
+    setV('th-font-head', db.theme?.fontHeading || 'Space Grotesk');
+    setV('th-font-body', db.theme?.fontBody || 'Plus Jakarta Sans');
+    setV('th-font-scale', db.theme?.fontScale || 100);
+
+    setV('seo-inp-title', db.seo?.title);
+    setV('seo-inp-desc', db.seo?.desc);
+    setV('seo-inp-keys', db.seo?.keywords);
+    setV('seo-inp-fav', db.seo?.favicon);
+    setV('seo-inp-og', db.seo?.ogImage);
+
+    setV('pol-inp-privacy', db.policies?.privacy);
+    setV('pol-inp-terms', db.policies?.terms);
+    setV('pol-inp-refund', db.policies?.refund);
+
+    if (typeof renderHomeOrderList === 'function') renderHomeOrderList();
+    if (typeof window.renderWordPressBlocks === 'function') window.renderWordPressBlocks();
+    if (typeof window.renderAdminServices === 'function') window.renderAdminServices();
+    if (typeof window.renderAdminPortfolio === 'function') window.renderAdminPortfolio();
+    if (typeof window.renderAdminProjects === 'function') window.renderAdminProjects();
+    if (typeof renderAdminReviews === 'function') renderAdminReviews();
+    if (typeof renderAdminStudios === 'function') renderAdminStudios();
+    if (typeof renderAdminProcess === 'function') renderAdminProcess();
+    if (typeof renderAdminAwards === 'function') renderAdminAwards();
+    if (typeof renderAdminFAQs === 'function') renderAdminFAQs();
+    if (typeof window.renderAdminCustomPages === 'function') window.renderAdminCustomPages();
+    if (typeof renderAdminCRM === 'function') renderAdminCRM();
+    if (typeof renderAdminSocials === 'function') renderAdminSocials();
+    if (typeof renderAdminStaffRBAC === 'function') renderAdminStaffRBAC();
+    if (typeof window.renderDedicatedMenuStudio === 'function') window.renderDedicatedMenuStudio();
+    if (typeof window.renderLoaderStudioWorkspace === 'function') window.renderLoaderStudioWorkspace();
+    if (typeof window.renderContactPageStudio === 'function') window.renderContactPageStudio();
+    if (typeof window.renderSwitchboardCards === 'function') window.renderSwitchboardCards();
+
+    /* Render Clean Unified About & People Directory & Lock All Cards Closed */
+    window.renderCleanAboutAndPeopleV31();
+    window.lockAllCardsClosedV31();
+  };
+
+  /* Boot V31 Immediately & After Firebase Pull Completes */
+  async function bootV31CleanEngine() {
+    if (!window.db && typeof loadLocalDB === 'function') {
+      window.db = loadLocalDB();
+    }
+    window.populateAllInputsFromDB();
+    const activeTab = localStorage.getItem(ADMIN_ACTIVE_TAB_KEY) || 'home';
+    window.switchAdminTab(activeTab);
+
+    if (typeof pullFromFirebase === 'function') {
+      await pullFromFirebase();
+      window.populateAllInputsFromDB();
+      window.switchAdminTab(localStorage.getItem(ADMIN_ACTIVE_TAB_KEY) || 'home');
+    }
+    if (typeof restoreAdminSession === 'function') {
+      restoreAdminSession();
+    }
+  }
+
+  bootV31CleanEngine();
+})();
+</script>
+<!-- ==================== ADMIN.HTML : V31 FINAL NUCLEAR CLEANUP & PEOPLE STUDIO COMPLETE ==================== -->
