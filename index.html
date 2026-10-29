@@ -10924,3 +10924,794 @@
 })();
 </script>
 <!-- ==================== ADMIN.HTML : INSTAGRAM/AMAZON VISUAL VIEW & CLOSED FORM COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : 100% CLOSED-FORM VISUAL STUDIO, SINGLE-OPEN-FORM LOCK & WORDPRESS DRAG-AND-DROP MEDIA BUILDER (PASTE AT VERY BOTTOM OF admin.html) ==================== -->
+<style id="admin-clean-visual-closed-forms-v28">
+  /* 1. Clean Visual Section Card Architecture */
+  .v28-section-card {
+    background: linear-gradient(145deg, #131318 0%, #0b0b0e 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.11) !important;
+    border-radius: 22px !important;
+    padding: 16px 20px !important;
+    margin-bottom: 14px !important;
+    transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1) !important;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.65) !important;
+  }
+  .v28-section-card:hover {
+    border-color: rgba(255, 255, 255, 0.25) !important;
+  }
+  .v28-section-card.v28-is-open {
+    border: 2px solid rgba(16, 185, 129, 0.65) !important;
+    box-shadow: 0 24px 55px -15px rgba(16, 185, 129, 0.25) !important;
+    background: #111115 !important;
+  }
+
+  /* 2. STRICT RULE: When a Card is Closed (.v28-is-closed), Hide its Form Body 100%! */
+  .v28-section-card.v28-is-closed > .v28-form-drawer,
+  .v28-section-card.v28-is-closed > .ig-form-body-wrap,
+  .v28-item-row.v28-is-closed > .v28-item-form-drawer {
+    display: none !important;
+  }
+
+  /* When a Card is Open (.v28-is-open), Hide the Compact Preview Chips & Show the Form */
+  .v28-section-card.v28-is-open > .v28-visual-summary-strip {
+    display: none !important;
+  }
+  .v28-section-card.v28-is-open > .v28-form-drawer,
+  .v28-item-row.v28-is-open > .v28-item-form-drawer {
+    display: block !important;
+    padding-top: 16px !important;
+    margin-top: 14px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+    animation: v28SlideDown 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  @keyframes v28SlideDown {
+    0% { opacity: 0; transform: translateY(-8px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* 3. Visual Summary Strip (Shows What is Inside the Section Without Opening the Form) */
+  .v28-visual-summary-strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .v28-chip {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 10px;
+    padding: 5px 10px;
+    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 260px;
+  }
+  .v28-chip-k {
+    color: #a1a1aa;
+    font-weight: 700;
+    font-size: 10px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .v28-chip-v {
+    color: #ffffff;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* 4. Drag and Drop Page Builder Blocks */
+  .wp-drag-item {
+    cursor: grab;
+    transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  }
+  .wp-drag-item:active {
+    cursor: grabbing;
+  }
+  .wp-drag-item.dragging-now {
+    opacity: 0.55;
+    border-color: #10b981 !important;
+    transform: scale(0.98);
+  }
+</style>
+
+<script id="admin-master-single-form-and-wp-builder-v28">
+(function () {
+  /* 1. Bridge `let db` and `window.db` Safely */
+  try {
+    Object.defineProperty(window, 'db', {
+      get: function () { return typeof db !== 'undefined' ? db : null; },
+      set: function (val) { if (typeof db !== 'undefined') db = val; },
+      configurable: true
+    });
+  } catch (e) {}
+
+  /* Disable conflicting older card wrappers */
+  window.wrapAdminCardsIntoFoldersV25 = function () {};
+  window.transformCardsIntoCleanAccordionsV26 = function () {};
+  window.applyInstagramVisualModeToCardsV27 = function () {};
+
+  /* Track ONLY ONE currently open section card & ONE currently open list item at a time! */
+  window.activeOpenSectionKeyV28 = null;
+  window.activeOpenListItemKeyV28 = null;
+
+  const PANEL_ICONS_MAP = {
+    'panel-home':        '🏠',
+    'panel-menu':        '🍔',
+    'panel-loader':      '🎬',
+    'panel-services':    '⚡',
+    'panel-quotation':   '📄',
+    'panel-portfolio':   '🎥',
+    'panel-tracker':     '📊',
+    'panel-about':       '👥',
+    'panel-reviews':     '★',
+    'panel-contact':     '📞',
+    'panel-custom':      '➕',
+    'panel-crm':         '📬',
+    'panel-global':      '🎨',
+    'panel-switchboard': '👁️'
+  };
+
+  /* Helper: Extract 4 Clean Preview Chips + Any Media Thumbnail from Inside a Form Container */
+  function extractVisualPreviewData(formContainer) {
+    const chips = [];
+    let thumbUrl = '';
+
+    /* Check if there's an image or video inside */
+    const imgEl = formContainer.querySelector('img[src]');
+    if (imgEl && imgEl.getAttribute('src') && !imgEl.getAttribute('src').includes('ui-avatars.com')) {
+      thumbUrl = imgEl.getAttribute('src');
+    }
+
+    const inputs = formContainer.querySelectorAll('input:not([type="hidden"]):not([type="file"]):not([type="color"]):not(.phone-toggle-input), textarea, select');
+    inputs.forEach(function (inp) {
+      if (chips.length >= 5) return;
+      let lbl = '';
+      const prev = inp.previousElementSibling;
+      if (prev && (prev.tagName === 'LABEL' || prev.tagName === 'SPAN' || prev.tagName === 'DIV')) {
+        lbl = prev.innerText.replace(/\*|:/g, '').trim();
+      }
+      if (!lbl && inp.parentElement) {
+        const pLbl = inp.parentElement.querySelector('label, span.font-bold');
+        if (pLbl) lbl = pLbl.innerText.replace(/\*|:/g, '').trim();
+      }
+      if (!lbl) lbl = (inp.getAttribute('placeholder') || inp.id || 'Setting').replace(/\*|\.\.\./g, '').trim();
+      lbl = lbl.replace(/^(hm|gl|qk|hd|qt|tr|ab|cp|ms|ldr|hb14|hb15|sm|gbs)-/i, '');
+
+      let val = '';
+      if (inp.type === 'checkbox') {
+        val = inp.checked ? '🟢 ON' : '⚫ OFF';
+      } else if (inp.tagName === 'SELECT') {
+        val = inp.options[inp.selectedIndex]?.text || inp.value || '';
+      } else {
+        val = (inp.value || '').trim();
+      }
+
+      if (!thumbUrl && (val.startsWith('http') || val.startsWith('data:image')) && /\.(png|jpg|jpeg|webp|gif|svg)/i.test(val)) {
+        thumbUrl = val;
+      }
+
+      if (val && !val.startsWith('data:')) {
+        chips.push({ k: lbl.substring(0, 18), v: val.substring(0, 28) });
+      }
+    });
+
+    return { chips, thumbUrl };
+  }
+
+  /* ============================================================================
+     2. CONVERT ALL `.admin-card` ELEMENTS (INCLUDING NESTED ONES) INTO CLOSED VISUAL CARDS
+     ============================================================================ */
+  window.enforceAllCardsClosedVisualModeV28 = function () {
+    /* Remove any leftover v25/v26/v27 headers first */
+    document.querySelectorAll('.adm-folder-bar, .card-action-bar, .ig-card-top-bar, .ig-visual-summary-grid').forEach(el => el.remove());
+
+    document.querySelectorAll('.adm-panel').forEach(function (panel) {
+      const panelId = panel.id || 'panel';
+      const panelIcon = PANEL_ICONS_MAP[panelId] || '✨';
+
+      /* Select ALL `.admin-card` inside this panel (even inside nested grids!) */
+      const allCards = Array.from(panel.querySelectorAll('.admin-card'));
+
+      allCards.forEach(function (card, idx) {
+        /* Skip wrapper cards that only hold sub-lists or switchboard toggles */
+        if (
+          panelId === 'panel-switchboard' ||
+          card.querySelector('#adm-services-list') ||
+          card.querySelector('#adm-portfolio-list') ||
+          card.querySelector('#adm-projects-list') ||
+          card.querySelector('#adm-reviews-list') ||
+          card.querySelector('#adm-studios-list') ||
+          card.querySelector('#adm-process-list') ||
+          card.querySelector('#adm-awards-list') ||
+          card.querySelector('#adm-faqs-list') ||
+          card.querySelector('#adm-wp-blocks-list') ||
+          card.classList.contains('v28-skip-wrap')
+        ) {
+          return;
+        }
+
+        const cardKey = card.id || `${panelId}_v28card_${idx}`;
+        card.dataset.v28Key = cardKey;
+        card.classList.add('v28-section-card');
+
+        let topBar = card.querySelector(':scope > .v28-card-header');
+        let summaryStrip = card.querySelector(':scope > .v28-visual-summary-strip');
+        let formDrawer = card.querySelector(':scope > .v28-form-drawer');
+
+        /* If v27 wrapped it in .ig-form-body-wrap earlier, reuse that as .v28-form-drawer */
+        const oldIgWrap = card.querySelector(':scope > .ig-form-body-wrap');
+        if (oldIgWrap && !formDrawer) {
+          oldIgWrap.className = 'v28-form-drawer space-y-4';
+          formDrawer = oldIgWrap;
+        }
+
+        if (!formDrawer) {
+          /* Extract clean title & subtitle before moving children into formDrawer */
+          const headingEl = card.querySelector('h2, h3, h4');
+          const subEl = card.querySelector('p.text-xs, span.text-\\[10px\\]');
+          const titleText = headingEl ? headingEl.innerText.trim() : `Section #${idx + 1}`;
+          const subText = subEl ? subEl.innerText.trim() : 'Click "✏️ Edit" to open form & customize';
+
+          topBar = document.createElement('div');
+          topBar.className = 'v28-card-header flex flex-wrap items-center justify-between gap-3 cursor-pointer select-none';
+          topBar.onclick = function () { window.toggleSingleSectionFormV28(cardKey); };
+
+          summaryStrip = document.createElement('div');
+          summaryStrip.className = 'v28-visual-summary-strip';
+
+          formDrawer = document.createElement('div');
+          formDrawer.className = 'v28-form-drawer space-y-4';
+
+          const existingChildren = Array.from(card.children);
+          existingChildren.forEach(function (ch) {
+            formDrawer.appendChild(ch);
+          });
+
+          /* Bottom Save & Close Bar inside Form Drawer */
+          const bottomBar = document.createElement('div');
+          bottomBar.className = 'pt-4 mt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-2';
+          bottomBar.innerHTML = `
+            <span class="text-[11px] text-emerald-400 font-bold">✓ All changes auto-sync to Frontend</span>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="window.triggerAdminUndo()" class="lg-btn lg-btn-undo">↩️ Undo</button>
+              <button type="button" onclick="window.toggleSingleSectionFormV28('${cardKey}')" class="lg-btn lg-btn-done">✓ Done & Close Form</button>
+            </div>
+          `;
+          formDrawer.appendChild(bottomBar);
+
+          topBar.dataset.title = titleText;
+          topBar.dataset.sub = subText;
+
+          card.appendChild(topBar);
+          card.appendChild(summaryStrip);
+          card.appendChild(formDrawer);
+        }
+
+        const isOpen = window.activeOpenSectionKeyV28 === cardKey;
+        card.classList.toggle('v28-is-open', isOpen);
+        card.classList.toggle('v28-is-closed', !isOpen);
+
+        const titleText = topBar.dataset.title || `Section #${idx + 1}`;
+        const subText = topBar.dataset.sub || '';
+        const preview = extractVisualPreviewData(formDrawer);
+
+        topBar.innerHTML = `
+          <div class="flex items-center gap-3.5 min-w-0 flex-1">
+            ${preview.thumbUrl ? `
+              <img src="${preview.thumbUrl}" class="w-11 h-11 rounded-2xl object-cover border border-emerald-400/50 shrink-0 bg-black" />
+            ` : `
+              <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 border border-white/15 flex items-center justify-center text-base shrink-0 shadow-inner">
+                ${panelIcon}
+              </div>
+            `}
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                <h3 class="text-sm sm:text-base font-extrabold text-white truncate">${titleText}</h3>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${isOpen ? 'bg-emerald-500 text-zinc-950' : 'bg-white/10 text-zinc-400'}">${isOpen ? 'OPEN FOR EDITING' : 'CLOSED'}</span>
+              </div>
+              <p class="text-[11px] text-zinc-400 truncate mt-0.5">${subText}</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
+            <button type="button" onclick="window.toggleSingleSectionFormV28('${cardKey}')" class="lg-btn ${isOpen ? 'lg-btn-done' : 'lg-btn-edit'}">
+              ${isOpen ? '✓ Close Form' : '✏️ Edit'}
+            </button>
+            <button type="button" onclick="window.triggerAdminUndo()" class="lg-btn lg-btn-undo" title="Undo Last Edit">↩️ Undo</button>
+            <button type="button" onclick="window.triggerAdminRedo()" class="lg-btn lg-btn-undo" title="Redo">↪️</button>
+          </div>
+        `;
+
+        if (preview.chips.length > 0) {
+          summaryStrip.innerHTML = preview.chips.map(function (c) {
+            return `<div class="v28-chip"><span class="v28-chip-k">${c.k}:</span><span class="v28-chip-v">${c.v}</span></div>`;
+          }).join('');
+        } else {
+          summaryStrip.innerHTML = `<div class="v28-chip"><span class="v28-chip-k">Status:</span><span class="v28-chip-v text-emerald-400">Ready • Click ✏️ Edit to open</span></div>`;
+        }
+      });
+    });
+  };
+
+  /* Clicking `✏️ Edit` on any Section Card opens ONLY that card and closes all others! */
+  window.toggleSingleSectionFormV28 = function (cardKey) {
+    if (window.activeOpenSectionKeyV28 === cardKey) {
+      window.activeOpenSectionKeyV28 = null;
+      if (typeof window.quietCollectAndSyncAll === 'function') {
+        window.quietCollectAndSyncAll('Saved Section Changes', true);
+      }
+    } else {
+      window.activeOpenSectionKeyV28 = cardKey;
+    }
+    window.enforceAllCardsClosedVisualModeV28();
+  };
+
+  /* Single-Open Lock for Team Members & Services */
+  window.toggleMemberEditCardV25 = function (memberId) {
+    if (window.openTeamMemberIdsV25.has(memberId)) {
+      window.openTeamMemberIdsV25.clear();
+    } else {
+      window.openTeamMemberIdsV25.clear(); // Close any other open member first!
+      window.openTeamMemberIdsV25.add(memberId);
+    }
+    if (typeof window.renderGranularAboutStudio === 'function') window.renderGranularAboutStudio();
+  };
+
+  window.toggleServiceOpenV25 = function (sId) {
+    if (window.openServiceIdsV25.has(sId)) {
+      window.openServiceIdsV25.clear();
+    } else {
+      window.openServiceIdsV25.clear(); // Close any other open service first!
+      window.openServiceIdsV25.add(sId);
+    }
+    if (typeof window.renderAdminServices === 'function') window.renderAdminServices();
+  };
+
+  /* ============================================================================
+     3. CONVERT ALL DYNAMIC LISTS (PORTFOLIO, TRACKER, REVIEWS, STUDIOS, PROCESS, AWARDS, FAQS, CUSTOM PAGES) TO CLOSED VISUAL CARDS!
+     ============================================================================ */
+  window.toggleDynamicListItemV28 = function (itemKey, renderFnName) {
+    if (window.activeOpenListItemKeyV28 === itemKey) {
+      window.activeOpenListItemKeyV28 = null;
+      if (typeof window.quietCollectAndSyncAll === 'function') {
+        window.quietCollectAndSyncAll('Saved Item Edit', true);
+      }
+    } else {
+      window.activeOpenListItemKeyV28 = itemKey;
+    }
+    if (typeof window[renderFnName] === 'function') window[renderFnName]();
+  };
+
+  /* A. Portfolio Projects List (Closed Visual Card by Default) */
+  window.renderAdminPortfolio = function () {
+    const box = document.getElementById('adm-portfolio-list');
+    if (!box || !window.db) return;
+    box.innerHTML = (db.portfolio || []).map(function (pf, idx) {
+      const iKey = 'pf_item_' + idx;
+      const isOpen = window.activeOpenListItemKeyV28 === iKey;
+      const thumb = pf.afterImg || pf.beforeImg || '';
+
+      return `
+        <div class="v28-item-row ${isOpen ? 'v28-is-open border-emerald-500/60' : 'v28-is-closed border-[#27272a]'} p-5 rounded-3xl bg-[#111114] border-2 transition mb-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 cursor-pointer" onclick="window.toggleDynamicListItemV28('${iKey}', 'renderAdminPortfolio')">
+            <div class="flex items-center gap-3.5 min-w-0 flex-1">
+              ${thumb ? `<img src="${thumb}" class="w-14 h-14 rounded-2xl object-cover border border-white/15 shrink-0" />` : `<div class="w-14 h-14 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-lg">🎬</div>`}
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-black">${pf.index || '(0' + (idx + 1) + ')'}</span>
+                  <strong class="text-sm sm:text-base font-extrabold text-white truncate">${pf.title || 'Project'}</strong>
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">${pf.metric || ''}</span>
+                </div>
+                <p class="text-xs text-zinc-400 truncate mt-0.5">${pf.client || ''} • ${pf.category || ''}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
+              <button type="button" onclick="window.toggleDynamicListItemV28('${iKey}', 'renderAdminPortfolio')" class="lg-btn ${isOpen ? 'lg-btn-done' : 'lg-btn-edit'}">${isOpen ? '✓ Close' : '✏️ Edit'}</button>
+              <button type="button" onclick="window.triggerAdminUndo()" class="lg-btn lg-btn-undo">↩️ Undo</button>
+              <button type="button" onclick="deletePortfolioItem(${idx})" class="lg-btn lg-btn-del">🗑️ Remove</button>
+            </div>
+          </div>
+
+          <div class="v28-item-form-drawer space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+              <div><label class="text-[10px] text-zinc-400 block mb-1">Number</label><input type="text" value="${pf.index || ''}" oninput="db.portfolio[${idx}].index=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" /></div>
+              <div><label class="text-[10px] text-zinc-400 block mb-1">Client Name</label><input type="text" value="${pf.client || ''}" oninput="db.portfolio[${idx}].client=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs" /></div>
+              <div><label class="text-[10px] text-zinc-400 block mb-1">Category</label><input type="text" value="${pf.category || ''}" oninput="db.portfolio[${idx}].category=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs" /></div>
+              <div><label class="text-[10px] text-emerald-400 font-bold block mb-1">Growth Metric</label><input type="text" value="${pf.metric || ''}" oninput="db.portfolio[${idx}].metric=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold text-emerald-400" /></div>
+            </div>
+            <div><label class="text-[10px] text-white font-bold block mb-1">Project Headline</label><input type="text" value="${pf.title || ''}" oninput="db.portfolio[${idx}].title=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" /></div>
+            <div><label class="text-[10px] text-zinc-400 block mb-1">Summary</label><textarea rows="2" oninput="db.portfolio[${idx}].summary=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs">${pf.summary || ''}</textarea></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div class="p-3 rounded-2xl bg-[#09090b] border border-white/10 space-y-2">
+                <span class="text-[10px] font-bold text-rose-400 block">1. BEFORE Image</span>
+                <input type="text" value="${pf.beforeImg || ''}" oninput="db.portfolio[${idx}].beforeImg=this.value" placeholder="Before Image URL..." class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs" />
+                <label class="inline-block px-3 py-1 rounded bg-white/10 text-white text-[11px] font-bold cursor-pointer">📁 Upload<input type="file" accept="image/*" onchange="uploadDirectCallback(this, false, (u)=>{db.portfolio[${idx}].beforeImg=u;renderAdminPortfolio();pushToFirebase('Updated Before Photo');})" class="hidden" /></label>
+              </div>
+              <div class="p-3 rounded-2xl bg-[#09090b] border border-white/10 space-y-2">
+                <span class="text-[10px] font-bold text-emerald-400 block">2. AFTER Image (Main)</span>
+                <input type="text" value="${pf.afterImg || ''}" oninput="db.portfolio[${idx}].afterImg=this.value" placeholder="After Image URL..." class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs" />
+                <label class="inline-block px-3 py-1 rounded bg-emerald-500 text-zinc-950 text-[11px] font-extrabold cursor-pointer">📁 Upload<input type="file" accept="image/*" onchange="uploadDirectCallback(this, false, (u)=>{db.portfolio[${idx}].afterImg=u;renderAdminPortfolio();pushToFirebase('Updated After Photo');})" class="hidden" /></label>
+              </div>
+              <div class="p-3 rounded-2xl bg-[#09090b] border border-white/10 space-y-2">
+                <span class="text-[10px] font-bold text-indigo-400 block">3. Video Reel (.mp4)</span>
+                <input type="text" value="${pf.videoUrl || ''}" oninput="db.portfolio[${idx}].videoUrl=this.value" placeholder="Video .mp4 URL..." class="w-full px-2.5 py-1.5 rounded-lg adm-input text-xs" />
+                <label class="inline-block px-3 py-1 rounded bg-indigo-600 text-white text-[11px] font-bold cursor-pointer">📹 Upload Video<input type="file" accept="video/*" onchange="uploadDirectCallback(this, true, (u)=>{db.portfolio[${idx}].videoUrl=u;renderAdminPortfolio();pushToFirebase('Uploaded Reel');})" class="hidden" /></label>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <input type="text" value="${pf.challenge || ''}" oninput="db.portfolio[${idx}].challenge=this.value" placeholder="The Challenge..." class="px-3 py-2 rounded-xl adm-input text-xs" />
+              <input type="text" value="${pf.solution || ''}" oninput="db.portfolio[${idx}].solution=this.value" placeholder="Our Solution..." class="px-3 py-2 rounded-xl adm-input text-xs" />
+              <input type="url" value="${pf.liveUrl || ''}" oninput="db.portfolio[${idx}].liveUrl=this.value" placeholder="Live Link (Optional)" class="px-3 py-2 rounded-xl adm-input text-xs" />
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  };
+
+  /* B. Client Tracker Projects List (Closed Visual Card by Default) */
+  window.renderAdminProjects = function () {
+    const box = document.getElementById('adm-projects-list');
+    if (!box || !window.db) return;
+    box.innerHTML = (db.projects || []).map(function (p, pIdx) {
+      const iKey = 'prj_item_' + pIdx;
+      const isOpen = window.activeOpenListItemKeyV28 === iKey;
+      return `
+        <div class="v28-item-row ${isOpen ? 'v28-is-open border-emerald-500/60' : 'v28-is-closed border-[#27272a]'} p-5 rounded-3xl bg-[#111114] border-2 transition mb-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 cursor-pointer" onclick="window.toggleDynamicListItemV28('${iKey}', 'renderAdminProjects')">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <div class="w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-xs font-black text-emerald-300 shrink-0">${p.progress || 0}%</div>
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] font-black">${p.code}</span>
+                  <strong class="text-sm font-extrabold text-white truncate">${p.clientName} — ${p.projectName}</strong>
+                </div>
+                <p class="text-xs text-zinc-400 truncate mt-0.5">📧 ${p.clientEmail} • Stage: ${p.stage} • ${(p.steps || []).length} Milestones</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
+              <button type="button" onclick="window.sendClientTrackerOnWhatsApp(${pIdx})" class="lg-btn">📲 WhatsApp Login</button>
+              <button type="button" onclick="window.toggleDynamicListItemV28('${iKey}', 'renderAdminProjects')" class="lg-btn ${isOpen ? 'lg-btn-done' : 'lg-btn-edit'}">${isOpen ? '✓ Close' : '✏️ Edit'}</button>
+              <button type="button" onclick="window.triggerAdminUndo()" class="lg-btn lg-btn-undo">↩️ Undo</button>
+              <button type="button" onclick="deleteClientProject(${pIdx})" class="lg-btn lg-btn-del">🗑️</button>
+            </div>
+          </div>
+
+          <div class="v28-item-form-drawer space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div><label class="text-[10px] text-emerald-400 font-bold block mb-1">Client Email</label><input type="email" value="${p.clientEmail || ''}" oninput="db.projects[${pIdx}].clientEmail=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" /></div>
+              <div><label class="text-[10px] text-indigo-400 font-bold block mb-1">Project ID</label><input type="text" value="${p.code || ''}" oninput="db.projects[${pIdx}].code=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" /></div>
+              <div><label class="text-[10px] text-zinc-400 block mb-1">Brand Name</label><input type="text" value="${p.clientName || ''}" oninput="db.projects[${pIdx}].clientName=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs" /></div>
+              <div><label class="text-[10px] text-zinc-400 block mb-1">Current Stage</label><input type="text" value="${p.stage || ''}" oninput="db.projects[${pIdx}].stage=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs" /></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+              <div class="md:col-span-2"><label class="text-[10px] text-zinc-400 block mb-1">Project Title</label><input type="text" value="${p.projectName || ''}" oninput="db.projects[${pIdx}].projectName=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" /></div>
+              <div>
+                <div class="flex justify-between text-xs font-extrabold mb-1"><span class="text-zinc-400">Progress:</span><span id="prj-pct-lbl-${pIdx}" class="text-emerald-400">${p.progress || 0}%</span></div>
+                <input type="range" min="0" max="100" value="${p.progress || 0}" oninput="document.getElementById('prj-pct-lbl-${pIdx}').innerText=this.value+'%'; db.projects[${pIdx}].progress=Number(this.value);" onchange="pushToFirebase('Updated Project Progress')" class="w-full accent-emerald-500 cursor-pointer" />
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <input type="text" value="${p.note || ''}" oninput="db.projects[${pIdx}].note=this.value" placeholder="Status Note..." class="px-3 py-2 rounded-xl adm-input text-xs" />
+              <input type="url" value="${p.liveLink || ''}" oninput="db.projects[${pIdx}].liveLink=this.value" placeholder="Deliverables Link..." class="px-3 py-2 rounded-xl adm-input text-xs" />
+            </div>
+            <div class="space-y-2 pt-2 border-t border-white/10">
+              <div class="flex items-center justify-between"><span class="text-xs font-bold text-zinc-400">Milestones</span><button type="button" onclick="addProjectStep(${pIdx}); window.activeOpenListItemKeyV28='${iKey}'; renderAdminProjects();" class="lg-btn lg-btn-edit">+ Add Milestone</button></div>
+              ${(p.steps || []).map((st, sIdx) => `
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center p-2 rounded-xl bg-[#09090b] border border-white/10">
+                  <input type="text" value="${st.title || ''}" oninput="db.projects[${pIdx}].steps[${sIdx}].title=this.value" class="sm:col-span-6 px-3 py-1.5 rounded-lg adm-input text-xs font-bold" />
+                  <input type="text" value="${st.date || ''}" oninput="db.projects[${pIdx}].steps[${sIdx}].date=this.value" class="sm:col-span-2 px-2.5 py-1.5 rounded-lg adm-input text-xs" />
+                  <select onchange="db.projects[${pIdx}].steps[${sIdx}].status=this.value; pushToFirebase('Updated Step');" class="sm:col-span-3 px-2.5 py-1.5 rounded-lg adm-input text-xs font-bold">
+                    <option value="completed" ${st.status==='completed'?'selected':''}>Completed</option>
+                    <option value="in_progress" ${st.status==='in_progress'?'selected':''}>In Progress</option>
+                    <option value="pending" ${st.status==='pending'?'selected':''}>Pending</option>
+                  </select>
+                  <button type="button" onclick="deleteProjectStep(${pIdx}, ${sIdx}); window.activeOpenListItemKeyV28='${iKey}'; renderAdminProjects();" class="sm:col-span-1 lg-btn lg-btn-del justify-center">✕</button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  };
+
+  /* C. Custom Pages List (Closed Visual Card by Default) */
+  window.renderAdminCustomPages = function () {
+    const box = document.getElementById('adm-custom-pages-list');
+    if (!box || !window.db) return;
+    box.innerHTML = (db.customPages || []).map(function (cp, idx) {
+      const iKey = 'cp_item_' + idx;
+      const isOpen = window.activeOpenListItemKeyV28 === iKey;
+      return `
+        <div class="v28-item-row ${isOpen ? 'v28-is-open border-emerald-500/60' : 'v28-is-closed border-[#27272a]'} p-5 rounded-3xl bg-[#111114] border-2 transition mb-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 cursor-pointer" onclick="window.toggleDynamicListItemV28('${iKey}', 'renderAdminCustomPages')">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <div class="w-11 h-11 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-base">📄</div>
+              <div class="min-w-0 flex-1">
+                <strong class="text-sm font-extrabold text-white truncate block">${cp.navLabel || cp.title} <span class="text-emerald-400 font-mono text-xs">(#custom:${cp.slug})</span></strong>
+                <p class="text-xs text-zinc-400 truncate">${cp.title || ''}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
+              <button type="button" onclick="window.toggleDynamicListItemV28('${iKey}', 'renderAdminCustomPages')" class="lg-btn ${isOpen ? 'lg-btn-done' : 'lg-btn-edit'}">${isOpen ? '✓ Close' : '✏️ Edit Page'}</button>
+              <button type="button" onclick="window.triggerAdminUndo()" class="lg-btn lg-btn-undo">↩️ Undo</button>
+              <button type="button" onclick="if(canUserDelete()){db.customPages.splice(${idx},1);renderAdminCustomPages();pushToFirebase('Deleted Page');}" class="lg-btn lg-btn-del">🗑️</button>
+            </div>
+          </div>
+
+          <div class="v28-item-form-drawer space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div><label class="text-[10px] text-zinc-400 block mb-1">Navbar Button Name</label><input type="text" value="${cp.navLabel || ''}" oninput="db.customPages[${idx}].navLabel=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" /></div>
+              <div><label class="text-[10px] text-zinc-400 block mb-1">URL Slug</label><input type="text" value="${cp.slug || ''}" oninput="db.customPages[${idx}].slug=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'')" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-mono" /></div>
+              <div><label class="text-[10px] text-zinc-400 block mb-1">Top Badge</label><input type="text" value="${cp.badge || ''}" oninput="db.customPages[${idx}].badge=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs" /></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div><label class="text-[10px] text-white font-bold block mb-1">Page Heading</label><input type="text" value="${cp.title || ''}" oninput="db.customPages[${idx}].title=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" /></div>
+              <div><label class="text-[10px] text-zinc-400 block mb-1">Subtitle</label><input type="text" value="${cp.subtitle || ''}" oninput="db.customPages[${idx}].subtitle=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs" /></div>
+            </div>
+            <div><label class="text-[10px] text-zinc-400 block mb-1">Cover Image or Video URL</label><input type="text" value="${cp.mediaUrl || ''}" oninput="db.customPages[${idx}].mediaUrl=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs" /></div>
+            <div><label class="text-[10px] text-zinc-400 block mb-1">Full Page Content</label><textarea rows="4" oninput="db.customPages[${idx}].content=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs">${cp.content || ''}</textarea></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  };
+
+  /* ============================================================================
+     4. WORDPRESS-STYLE DRAG & DROP PAGE LAYOUT + VIDEO/PHOTO PLACEMENT BUILDER
+     ============================================================================ */
+  window.activeWpFilterPageV28 = 'ALL';
+
+  window.renderWordPressBlocks = function () {
+    const box = document.getElementById('adm-wp-blocks-list');
+    if (!box || !window.db) return;
+    db.customMediaBlocks = Array.isArray(db.customMediaBlocks) ? db.customMediaBlocks : [];
+
+    const pageOptions = [
+      { id: 'home_top',    lbl: '🏠 Home Page — Top (Above Hero)' },
+      { id: 'home_hero',   lbl: '🏠 Home Page — Below Hero Section' },
+      { id: 'home_middle', lbl: '🏠 Home Page — Middle Section' },
+      { id: 'home_bottom', lbl: '🏠 Home Page — Bottom Section' },
+      { id: 'services',    lbl: '⚡ Services Page' },
+      { id: 'quotation',   lbl: '📄 Instant Quotation Page' },
+      { id: 'portfolio',   lbl: '🎬 Work / Portfolio Page' },
+      { id: 'tracker',     lbl: '📊 Client Tracker Page' },
+      { id: 'about',       lbl: '👥 About Us & Team Page' },
+      { id: 'reviews',     lbl: '★ Reviews Page' },
+      { id: 'contact',     lbl: '📞 Contact Page' }
+    ];
+
+    const topToolbarHTML = `
+      <div class="p-4 rounded-2xl bg-[#09090b] border border-indigo-500/40 flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs font-extrabold text-indigo-300">🧩 Filter Page Blocks:</span>
+          <select onchange="window.activeWpFilterPageV28=this.value; window.renderWordPressBlocks();" class="px-3 py-1.5 rounded-xl adm-input text-xs font-bold text-emerald-400">
+            <option value="ALL" ${window.activeWpFilterPageV28==='ALL'?'selected':''}>🌐 Show All Pages (${db.customMediaBlocks.length} Blocks)</option>
+            ${pageOptions.map(p => `<option value="${p.id}" ${window.activeWpFilterPageV28===p.id?'selected':''}>${p.lbl}</option>`).join('')}
+          </select>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="window.addQuickMediaBlockV28('video')" class="lg-btn lg-btn-done">📹 + Add Video Block</button>
+          <button type="button" onclick="window.addQuickMediaBlockV28('image')" class="lg-btn lg-btn-edit">🖼️ + Add Photo / Banner</button>
+          <button type="button" onclick="window.triggerAdminUndo()" class="lg-btn lg-btn-undo">↩️ Undo</button>
+        </div>
+      </div>
+    `;
+
+    const filteredBlocks = db.customMediaBlocks
+      .map((b, i) => ({ ...b, origIdx: i }))
+      .filter(b => window.activeWpFilterPageV28 === 'ALL' || b.page === window.activeWpFilterPageV28);
+
+    if (filteredBlocks.length === 0) {
+      box.innerHTML = topToolbarHTML + `
+        <div class="p-8 rounded-3xl bg-[#09090b] border border-dashed border-white/15 text-center space-y-3">
+          <p class="text-xs text-zinc-400">Abhi is page par koi custom Video ya Photo block nahi hai.</p>
+          <div class="flex justify-center gap-2">
+            <button type="button" onclick="window.addQuickMediaBlockV28('video')" class="lg-btn lg-btn-done">📹 + Add Video Block Here</button>
+            <button type="button" onclick="window.addQuickMediaBlockV28('image')" class="lg-btn lg-btn-edit">🖼️ + Add Photo Block Here</button>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    const blocksHTML = filteredBlocks.map(function (blk) {
+      const idx = blk.origIdx;
+      const iKey = 'wp_blk_' + idx;
+      const isOpen = window.activeOpenListItemKeyV28 === iKey;
+      const isVid = blk.mediaUrl && (blk.mediaUrl.startsWith('data:video') || /\.(mp4|webm|ogg)(\?.*)?$/i.test(blk.mediaUrl));
+      const layout = blk.layout || 'center';
+      const widthPct = blk.widthPct || 100;
+      const heightPx = blk.heightPx || 420;
+      const pageLbl = (pageOptions.find(p => p.id === blk.page) || { lbl: blk.page || 'Home' }).lbl;
+
+      return `
+        <div draggable="true" ondragstart="window.onWpDragStartV28(event, ${idx})" ondragover="event.preventDefault()" ondrop="window.onWpDropV28(event, ${idx})" class="wp-drag-item v28-item-row ${isOpen ? 'v28-is-open border-emerald-500/60' : 'v28-is-closed border-[#27272a]'} p-4 rounded-3xl bg-[#111114] border-2 mb-3 transition">
+          <!-- Visual Summary Header (Closed Default) -->
+          <div class="flex flex-wrap items-center justify-between gap-3 cursor-pointer" onclick="window.toggleDynamicListItemV28('${iKey}', 'renderWordPressBlocks')">
+            <div class="flex items-center gap-3.5 min-w-0 flex-1">
+              <div class="w-14 h-12 rounded-xl overflow-hidden bg-black border border-white/15 flex items-center justify-center shrink-0">
+                ${blk.mediaUrl ? (isVid ? `<video src="${blk.mediaUrl}" muted class="w-full h-full object-cover"></video>` : `<img src="${blk.mediaUrl}" class="w-full h-full object-cover" />`) : `<span class="text-base">🧩</span>`}
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-black">${pageLbl}</span>
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">📐 ${layout.toUpperCase()} (${widthPct}%)</span>
+                  <strong class="text-sm font-extrabold text-white truncate">${blk.title || 'Media Block #' + (idx + 1)}</strong>
+                </div>
+                <p class="text-[11px] text-zinc-400 truncate mt-0.5">✋ Drag to reorder • ${blk.content || 'Click ✏️ Edit to customize media & placement'}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
+              <button type="button" onclick="window.toggleDynamicListItemV28('${iKey}', 'renderWordPressBlocks')" class="lg-btn ${isOpen ? 'lg-btn-done' : 'lg-btn-edit'}">${isOpen ? '✓ Close' : '✏️ Edit'}</button>
+              <button type="button" onclick="moveWPBlock(${idx}, -1)" class="lg-btn" title="Move Up">↑</button>
+              <button type="button" onclick="moveWPBlock(${idx}, 1)" class="lg-btn" title="Move Down">↓</button>
+              <button type="button" onclick="if(canUserDelete()){window.pushHistorySnapshot('Delete Block');db.customMediaBlocks.splice(${idx},1);renderWordPressBlocks();pushToFirebase('Deleted Block');}" class="lg-btn lg-btn-del">🗑️</button>
+            </div>
+          </div>
+
+          <!-- Expanded WordPress Block Editor (Only When Clicked `✏️ Edit`) -->
+          <div class="v28-item-form-drawer space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 rounded-2xl bg-[#09090b] border border-emerald-500/30">
+              <div>
+                <label class="text-[10px] font-extrabold uppercase text-emerald-400 block mb-1">1. Target Page & Vertical Position</label>
+                <select onchange="db.customMediaBlocks[${idx}].page=this.value; pushToFirebase('Moved Block Page');" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold text-emerald-300">
+                  ${pageOptions.map(p => `<option value="${p.id}" ${blk.page===p.id?'selected':''}>${p.lbl}</option>`).join('')}
+                </select>
+              </div>
+              <div>
+                <label class="text-[10px] font-extrabold uppercase text-amber-300 block mb-1">2. Horizontal Alignment / Placement</label>
+                <select onchange="db.customMediaBlocks[${idx}].layout=this.value; pushToFirebase('Changed Block Alignment');" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold text-amber-300">
+                  <option value="center" ${layout==='center'?'selected':''}>🎯 Center Spotlight (Media Top + Text Below)</option>
+                  <option value="left" ${layout==='left'?'selected':''}>⬅️ Left Video/Photo + Right Text</option>
+                  <option value="right" ${layout==='right'?'selected':''}>➡️ Right Video/Photo + Left Text</option>
+                  <option value="full_banner" ${layout==='full_banner'?'selected':''}>🖼️ Full-Width Cinema Banner (Edge-to-Edge)</option>
+                  <option value="background" ${layout==='background'?'selected':''}>🌌 Behind Text Background Video/Photo</option>
+                </select>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="text-[10px] font-bold text-zinc-300 block mb-1">Width (${widthPct}%)</label>
+                  <input type="range" min="40" max="100" step="5" value="${widthPct}" oninput="db.customMediaBlocks[${idx}].widthPct=Number(this.value)" onchange="renderWordPressBlocks(); pushToFirebase('Resized Block Width');" class="w-full accent-emerald-400" />
+                </div>
+                <div>
+                  <label class="text-[10px] font-bold text-zinc-300 block mb-1">Height (${heightPx}px)</label>
+                  <input type="range" min="180" max="680" step="20" value="${heightPx}" oninput="db.customMediaBlocks[${idx}].heightPx=Number(this.value)" onchange="renderWordPressBlocks(); pushToFirebase('Resized Block Height');" class="w-full accent-indigo-400" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Upload Video / Image Row -->
+            <div class="p-3.5 rounded-2xl bg-[#09090b] border border-white/10 space-y-2.5">
+              <label class="text-[11px] font-extrabold text-indigo-300 block">🎬 Video (.mp4) or Photo URL / Direct Upload</label>
+              <div class="flex flex-wrap items-center gap-2">
+                <input type="text" value="${blk.mediaUrl || ''}" oninput="db.customMediaBlocks[${idx}].mediaUrl=this.value" placeholder="Paste Video (.mp4) or Image URL..." class="flex-1 px-3 py-2 rounded-xl adm-input text-xs" />
+                <label class="lg-btn lg-btn-edit cursor-pointer">
+                  🖼️ Upload Photo
+                  <input type="file" accept="image/*" onchange="uploadDirectCallback(this, false, (u)=>{db.customMediaBlocks[${idx}].mediaUrl=u; window.activeOpenListItemKeyV28='${iKey}'; renderWordPressBlocks(); pushToFirebase('Uploaded Block Image');})" class="hidden" />
+                </label>
+                <label class="lg-btn lg-btn-done cursor-pointer">
+                  📹 Upload Video
+                  <input type="file" accept="video/*" onchange="uploadDirectCallback(this, true, (u)=>{db.customMediaBlocks[${idx}].mediaUrl=u; window.activeOpenListItemKeyV28='${iKey}'; renderWordPressBlocks(); pushToFirebase('Uploaded Block Video');})" class="hidden" />
+                </label>
+                ${blk.mediaUrl ? `<button type="button" onclick="db.customMediaBlocks[${idx}].mediaUrl=''; window.activeOpenListItemKeyV28='${iKey}'; renderWordPressBlocks(); pushToFirebase('Cleared Block Media');" class="lg-btn lg-btn-del">✕ Clear</button>` : ''}
+              </div>
+            </div>
+
+            <!-- Text & Action Button Link -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div><label class="text-[10px] text-zinc-400 block mb-1">Small Top Badge</label><input type="text" value="${blk.badge || ''}" oninput="db.customMediaBlocks[${idx}].badge=this.value" placeholder="e.g. Featured Showreel" class="w-full px-3 py-2 rounded-xl adm-input text-xs" /></div>
+              <div><label class="text-[10px] text-white font-bold block mb-1">Block Heading</label><input type="text" value="${blk.title || ''}" oninput="db.customMediaBlocks[${idx}].title=this.value" placeholder="Block Title" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" /></div>
+            </div>
+            <div><label class="text-[10px] text-zinc-400 block mb-1">Paragraph / Description</label><textarea rows="2" oninput="db.customMediaBlocks[${idx}].content=this.value" class="w-full px-3 py-2 rounded-xl adm-input text-xs">${blk.content || ''}</textarea></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div><label class="text-[10px] text-emerald-400 block mb-1">Button Text (Optional)</label><input type="text" value="${blk.btnText || ''}" oninput="db.customMediaBlocks[${idx}].btnText=this.value" placeholder="e.g. Explore Now ↗" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold" /></div>
+              <div><label class="text-[10px] text-emerald-400 block mb-1">Button Link / Page ID</label><input type="text" value="${blk.btnUrl || ''}" oninput="db.customMediaBlocks[${idx}].btnUrl=this.value" placeholder="https://... or quotation" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-mono" /></div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    box.innerHTML = topToolbarHTML + blocksHTML;
+  };
+
+  /* HTML5 Drag-and-Drop Reordering for WordPress Blocks */
+  let draggedWpIdx = null;
+  window.onWpDragStartV28 = function (e, idx) {
+    draggedWpIdx = idx;
+    if (e.currentTarget) e.currentTarget.classList.add('dragging-now');
+  };
+  window.onWpDropV28 = function (e, targetIdx) {
+    e.preventDefault();
+    if (draggedWpIdx === null || draggedWpIdx === targetIdx) return;
+    window.pushHistorySnapshot('Reordered Page Blocks');
+    const arr = db.customMediaBlocks;
+    const moved = arr.splice(draggedWpIdx, 1)[0];
+    arr.splice(targetIdx, 0, moved);
+    draggedWpIdx = null;
+    window.renderWordPressBlocks();
+    pushToFirebase('Dragged & Reordered Media Block');
+  };
+
+  window.addQuickMediaBlockV28 = function (mediaType) {
+    window.pushHistorySnapshot('Added Media Block');
+    db.customMediaBlocks = db.customMediaBlocks || [];
+    const targetPage = window.activeWpFilterPageV28 === 'ALL' ? 'home_hero' : window.activeWpFilterPageV28;
+    const newIdx = db.customMediaBlocks.length;
+    db.customMediaBlocks.push({
+      id: 'WP-' + Date.now(),
+      page: targetPage,
+      layout: mediaType === 'video' ? 'full_banner' : 'left',
+      widthPct: 100,
+      heightPx: 420,
+      badge: mediaType === 'video' ? '🎬 Studio Showreel' : '✨ Featured Highlight',
+      title: mediaType === 'video' ? 'New Video Showcase Block' : 'New Visual Story Block',
+      content: 'Customize this block or upload your video/photo below.',
+      mediaUrl: '',
+      btnText: '',
+      btnUrl: '',
+      autoplay: true
+    });
+    /* Open the WordPress Builder Section & ONLY this new block */
+    window.activeOpenListItemKeyV28 = 'wp_blk_' + newIdx;
+    window.renderWordPressBlocks();
+    pushToFirebase('Added New ' + mediaType.toUpperCase() + ' Block');
+  };
+
+  /* ============================================================================
+     5. HOOK INTO ALL TAB SWITCHES & RENDERS SO NO FORM EVER STAYS ACCIDENTALLY OPEN
+     ============================================================================ */
+  const origSwitch = window.switchAdminTab;
+  window.switchAdminTab = function (tabName) {
+    /* Close any previously open form when switching tabs so every tab starts 100% clean! */
+    window.activeOpenSectionKeyV28 = null;
+    window.activeOpenListItemKeyV28 = null;
+    if (window.openTeamMemberIdsV25) window.openTeamMemberIdsV25.clear();
+    if (window.openServiceIdsV25) window.openServiceIdsV25.clear();
+
+    if (typeof origSwitch === 'function') origSwitch(tabName);
+    setTimeout(function () {
+      window.enforceAllCardsClosedVisualModeV28();
+    }, 30);
+  };
+
+  window.collapseAllOpenSectionsV25 = function () {
+    window.activeOpenSectionKeyV28 = null;
+    window.activeOpenListItemKeyV28 = null;
+    if (window.openTeamMemberIdsV25) window.openTeamMemberIdsV25.clear();
+    if (window.openServiceIdsV25) window.openServiceIdsV25.clear();
+    if (typeof window.renderGranularAboutStudio === 'function') window.renderGranularAboutStudio();
+    if (typeof window.renderAdminServices === 'function') window.renderAdminServices();
+    if (typeof window.renderAdminPortfolio === 'function') window.renderAdminPortfolio();
+    if (typeof window.renderAdminProjects === 'function') window.renderAdminProjects();
+    if (typeof window.renderWordPressBlocks === 'function') window.renderWordPressBlocks();
+    window.enforceAllCardsClosedVisualModeV28();
+    if (typeof window.showLiquidSavePopup === 'function') {
+      window.showLiquidSavePopup('🔒 All Forms Closed — Clean Visual Mode Active!');
+    }
+  };
+
+  /* Run Initial Clean Visual Mode Lock */
+  setTimeout(function () {
+    window.renderWordPressBlocks();
+    window.renderAdminPortfolio();
+    window.renderAdminProjects();
+    window.renderAdminCustomPages();
+    window.enforceAllCardsClosedVisualModeV28();
+  }, 450);
+
+  setTimeout(function () {
+    window.enforceAllCardsClosedVisualModeV28();
+  }, 1100);
+})();
+</script>
+<!-- ==================== ADMIN.HTML : 100% CLOSED-FORM VISUAL STUDIO & WP DRAG-AND-DROP BUILDER COMPLETE ==================== -->
