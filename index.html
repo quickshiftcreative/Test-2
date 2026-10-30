@@ -15239,3 +15239,473 @@
 })();
 </script>
 <!-- ==================== ADMIN.HTML : V33 UNLIMITED CHARACTERS PATCH COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : V34 ALL-IN-ONE MASTER FIX (100% INPUT COLLECTOR, BRAND NAME SYNC, UNLIMITED CHARACTERS & FIXED MICRO-TEXT STUDIO) ==================== -->
+<style id="admin-v34-unlimited-and-clean-styles">
+  /* 1. Never Cut Off or Truncate Any Title, Brand Name, Chip or Logo Preview in Admin */
+  .adm-panel h2.truncate,
+  .adm-panel h3.truncate,
+  .adm-panel h4.truncate,
+  .adm-panel h5.truncate,
+  .adm-panel strong.truncate,
+  .adm-panel p.truncate {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
+    word-break: break-word !important;
+  }
+  .v32-pill-item {
+    max-width: 100% !important;
+  }
+  .v32-pill-item span {
+    white-space: normal !important;
+    word-break: break-word !important;
+  }
+  #quick-logo-preview,
+  #gl-logo-preview {
+    width: auto !important;
+    min-width: 4rem !important;
+    max-width: 100% !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    text-align: center !important;
+  }
+</style>
+
+<script id="admin-v34-master-collector-and-unlimited-engine">
+(function () {
+  /* 1. Bridge `let db` and `window.db` Safely */
+  try {
+    Object.defineProperty(window, 'db', {
+      get: function () { return typeof db !== 'undefined' ? db : null; },
+      set: function (val) { if (typeof db !== 'undefined') db = val; },
+      configurable: true
+    });
+  } catch (e) {}
+
+  /* ============================================================================
+     2. REMOVE ALL CHARACTER LIMITS (`maxlength`) ACROSS ENTIRE BACKEND
+     ============================================================================ */
+  function stripAllMaxLengthsV34() {
+    document.querySelectorAll('input[maxlength], textarea[maxlength]').forEach(function (el) {
+      el.removeAttribute('maxlength');
+    });
+  }
+  document.addEventListener('focusin', function (e) {
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+      e.target.removeAttribute('maxlength');
+    }
+  }, true);
+  document.addEventListener('input', function (e) {
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+      e.target.removeAttribute('maxlength');
+    }
+  }, true);
+
+  /* ============================================================================
+     3. TWO-WAY REALTIME SYNC BETWEEN QUICK BRAND BAR (`#qk-*`) & GLOBAL (`#gl-*`)
+        Fixes the bug where `#gl-name` overwrote `#qk-name` with old Brand Name!
+     ============================================================================ */
+  const BRAND_PAIR_MAP = [
+    ['qk-name', 'gl-name', 'name'],
+    ['qk-tagline', 'gl-tagline', 'tagline'],
+    ['qk-phone', 'gl-phone', 'phone'],
+    ['qk-whatsapp', 'gl-whatsapp', 'whatsapp'],
+    ['qk-email', 'gl-email', 'email'],
+    ['qk-domain', 'gl-domain', 'domain']
+  ];
+
+  document.addEventListener('input', function (e) {
+    const t = e.target;
+    if (!t || !t.id || !window.db) return;
+    db.brand = db.brand || {};
+
+    BRAND_PAIR_MAP.forEach(function (pair) {
+      const qkId = pair[0];
+      const glId = pair[1];
+      const prop = pair[2];
+      if (t.id === qkId) {
+        const glEl = document.getElementById(glId);
+        if (glEl) glEl.value = t.value;
+        db.brand[prop] = t.value;
+      } else if (t.id === glId) {
+        const qkEl = document.getElementById(qkId);
+        if (qkEl) qkEl.value = t.value;
+        db.brand[prop] = t.value;
+      }
+    });
+
+    if (t.id === 'qk-logo-text') {
+      db.brand.logoText = t.value.trim();
+    }
+    if (t.id === 'qk-logo-size') {
+      db.brand.logoSize = Number(t.value || 40);
+    }
+    if (t.id === 'gl-logo') {
+      db.brand.logo = t.value.trim();
+    }
+
+    if (t.id.startsWith('qk-') || t.id.startsWith('gl-')) {
+      window.updateAllLogoPreviewsV34();
+    }
+  }, true);
+
+  window.updateAllLogoPreviewsV34 = function () {
+    if (!window.db) return;
+    const logoUrl = (document.getElementById('gl-logo')?.value || db.brand?.logo || '').trim();
+    const customLogoTxt = (document.getElementById('qk-logo-text')?.value || db.brand?.logoText || '').trim();
+    const fullName = (document.getElementById('qk-name')?.value || document.getElementById('gl-name')?.value || db.brand?.name || 'BP').trim();
+    const displayTxt = customLogoTxt || fullName;
+
+    const qkPrev = document.getElementById('quick-logo-preview');
+    if (qkPrev) {
+      qkPrev.innerHTML = logoUrl
+        ? `<img src="${logoUrl}" class="w-16 h-16 object-contain rounded-xl" />`
+        : `<span class="text-xs sm:text-sm font-black leading-tight">${displayTxt}</span>`;
+    }
+
+    const glPrev = document.getElementById('gl-logo-preview');
+    if (glPrev) {
+      glPrev.innerHTML = logoUrl
+        ? `<img src="${logoUrl}" class="w-16 h-16 object-contain rounded-xl" />`
+        : `<span class="text-xs sm:text-sm font-black leading-tight">${displayTxt}</span>`;
+    }
+  };
+
+  window.updateLogoLivePreview = window.updateAllLogoPreviewsV34;
+  window.syncGlobalLogoToQuick = window.updateAllLogoPreviewsV34;
+  window.syncQuickBrandToGlobal = window.updateAllLogoPreviewsV34;
+
+  /* ============================================================================
+     4. RE-INJECT FIXED "🔤 A-TO-Z MICRO-TEXT, NUMBERS & LABELS EDITOR"
+        (Fixes the v27 backtick SyntaxError so Micro-Text Studio works 100%!)
+     ============================================================================ */
+  const MICRO_TEXT_FIELDS_V34 = [
+    { key: 'slotPrefix',       label: 'Top Bar Scarcity Prefix',          def: '🔥 Only' },
+    { key: 'slotSuffix',       label: 'Top Bar Scarcity Suffix',          def: 'Client Onboarding Slots Left' },
+    { key: 'navQuoteLabel',    label: 'Navbar Cart Button Word',          def: 'Quote' },
+    { key: 'stat1NumBadge',    label: 'Metric Card 1 Top Number',         def: '(01)' },
+    { key: 'stat2NumBadge',    label: 'Metric Card 2 Top Number',         def: '(02)' },
+    { key: 'stat3NumBadge',    label: 'Metric Card 3 Top Number',         def: '(03)' },
+    { key: 'stat4NumBadge',    label: 'Metric Card 4 Top Number',         def: '(04)' },
+    { key: 'srvCardDelivWord', label: 'Service Card Deliverables Word',   def: 'Deliverables' },
+    { key: 'srvCardBtnText',   label: 'Service Card Action Button',       def: 'Inspect & Add ↗' },
+    { key: 'scannerBadge',     label: 'AI Scanner Top Badge',             def: '⚡ VIRAL AI DIAGNOSTIC' },
+    { key: 'scannerHeading',   label: 'AI Scanner Main Title',            def: '10-Second Brand Revenue Leak Scanner' },
+    { key: 'scannerBtn',       label: 'AI Scanner Button Text',           def: '🔍 Run 10-Second AI Brand Scan Now' },
+    { key: 'roiBadge',         label: 'ROI Simulator Top Badge',          def: 'Interactive Calculator' },
+    { key: 'roiHeading',       label: 'ROI Simulator Main Title',         def: '6-Month Brand ROI Simulator' },
+    { key: 'box3dHeading',     label: '3D Packaging Box Title',           def: '🎨 Live 3D Packaging Box Previewer' },
+    { key: 'scratchBadge',     label: 'Quotation Scratch Card Title',     def: '🎁 Interactive VIP Founder Grant' },
+    { key: 'scratchBtnText',   label: 'Quotation Scratch Bar Text',       def: '✨ TAP OR SCRATCH HERE TO UNLOCK VIP GRANT ✨' },
+    { key: 'reviewsEyebrow',   label: 'Reviews Page Top Badge',           def: 'Client Testimonials' },
+    { key: 'reviewsHeading',   label: 'Reviews Page Main Heading',        def: 'Verified 5-Star Reviews' },
+    { key: 'reviewsBtnText',   label: 'Write Review Button Text',         def: '★ Write a Client Review' },
+    { key: 'dockCallText',     label: 'Floating Call Button Text',        def: '📅 Book 15m Audit Call' },
+    { key: 'dockVipText',      label: 'Floating VIP Pass Button Text',    def: '💳 VIP Pass' },
+    { key: 'dockWaText',       label: 'Floating WhatsApp Button Text',    def: '💬 WhatsApp Desk' }
+  ];
+
+  function mountMicroTextStudioV34() {
+    const panelHome = document.getElementById('panel-home');
+    if (!panelHome || !window.db) return;
+    const oldBroken = document.getElementById('micro-text-editor-card-v27');
+    if (oldBroken) oldBroken.remove();
+    if (document.getElementById('micro-text-editor-card-v34')) return;
+
+    db.microTexts = db.microTexts || {};
+    const mCard = document.createElement('div');
+    mCard.id = 'micro-text-editor-card-v34';
+    mCard.className = 'admin-card rounded-3xl p-6 space-y-4 border border-amber-500/40';
+    mCard.innerHTML = `
+      <div>
+        <span class="text-[10px] font-extrabold uppercase text-amber-400">Single Alphabet, Word & Number Control</span>
+        <h3 class="text-base font-bold text-white">🔤 6. A-to-Z Website Micro-Text, Numbers & Button Labels Editor</h3>
+        <p class="text-xs text-zinc-400">Website ke har chhote-se-chhote word, number badge (01), button text aur tool title ko yahan se ek-ek alphabet tak edit karein.</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        ${MICRO_TEXT_FIELDS_V34.map(function (f) {
+          const val = db.microTexts[f.key] !== undefined ? db.microTexts[f.key] : f.def;
+          return `
+            <div>
+              <label class="text-[10px] font-bold text-zinc-400 block mb-1">${f.label}</label>
+              <input type="text" data-micro-key="${f.key}" value="${String(val).replace(/"/g, '&quot;')}" oninput="db.microTexts=db.microTexts||{}; db.microTexts['${f.key}']=this.value;" class="w-full px-3 py-2 rounded-xl adm-input text-xs font-bold text-white" />
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+    panelHome.appendChild(mCard);
+    if (typeof window.lockAllCardsClosedV32 === 'function') {
+      window.lockAllCardsClosedV32();
+    }
+  }
+
+  /* ============================================================================
+     5. MASTER INPUT COLLECTOR (`collectAllAdminInputsIntoDBV34`)
+        Re-connects ALL 75+ Input Fields that were disconnected by v16/v19!
+     ============================================================================ */
+  window.collectAllAdminInputsIntoDBV34 = function () {
+    if (!window.db) return;
+
+    const has = function (id) { return Boolean(document.getElementById(id)); };
+    const val = function (id, fb) {
+      const el = document.getElementById(id);
+      return el ? el.value : fb;
+    };
+    const chk = function (id, fb) {
+      const el = document.getElementById(id);
+      return el ? Boolean(el.checked) : fb;
+    };
+
+    db.brand = db.brand || {};
+    db.visibility = db.visibility || {};
+    db.hero3D = db.hero3D || {};
+    db.headings = db.headings || {};
+    db.about = db.about || {};
+    db.aboutConfig = db.aboutConfig || {};
+    db.theme = db.theme || {};
+    db.seo = db.seo || {};
+    db.policies = db.policies || {};
+
+    /* A. Brand Identity (Synced from Quick Bar & Global Tab) */
+    if (has('qk-name') || has('gl-name')) {
+      db.brand.name = val('qk-name', val('gl-name', db.brand.name));
+      db.brand.tagline = val('qk-tagline', val('gl-tagline', db.brand.tagline));
+      db.brand.phone = val('qk-phone', val('gl-phone', db.brand.phone));
+      db.brand.whatsapp = val('qk-whatsapp', val('gl-whatsapp', db.brand.whatsapp));
+      db.brand.email = val('qk-email', val('gl-email', db.brand.email));
+      db.brand.domain = val('qk-domain', val('gl-domain', db.brand.domain));
+    }
+    if (has('qk-logo-text')) db.brand.logoText = val('qk-logo-text', db.brand.logoText || '').trim();
+    if (has('qk-logo-size')) db.brand.logoSize = Number(val('qk-logo-size', db.brand.logoSize || 40));
+    if (has('gl-logo')) db.brand.logo = val('gl-logo', db.brand.logo);
+    if (has('gl-kinetic')) db.brand.kineticFooterText = val('gl-kinetic', db.brand.kineticFooterText);
+    if (has('gl-copy')) db.brand.copyright = val('gl-copy', db.brand.copyright);
+    if (has('gl-stealth-copy')) db.visibility.stealthAntiCopy = chk('gl-stealth-copy', db.visibility.stealthAntiCopy);
+
+    /* Also keep Primary Studio #1 Phone & Email in sync */
+    if (Array.isArray(db.studios) && db.studios[0]) {
+      if (db.brand.phone) db.studios[0].phone = db.brand.phone;
+      if (db.brand.email) db.studios[0].email = db.brand.email;
+    }
+
+    /* B. Home Hero, Scarcity, Buttons, Pills & Marquee */
+    if (has('hm-announcement')) db.brand.announcement = val('hm-announcement', db.brand.announcement);
+    if (has('hm-scarcity-slots')) db.visibility.scarcitySlots = Number(val('hm-scarcity-slots', db.visibility.scarcitySlots ?? 2));
+    if (has('hm-hero-badge')) db.brand.heroBadge = val('hm-hero-badge', db.brand.heroBadge);
+    if (has('hm-hero-title')) db.brand.heroTitle = val('hm-hero-title', db.brand.heroTitle);
+    if (has('hm-hero-sub')) db.brand.heroSub = val('hm-hero-sub', db.brand.heroSub);
+    if (has('hm-btn1')) db.brand.heroBtn1 = val('hm-btn1', db.brand.heroBtn1);
+    if (has('hm-btn2')) db.brand.heroBtn2 = val('hm-btn2', db.brand.heroBtn2);
+    if (has('hm-pills')) {
+      db.brand.pills = val('hm-pills', '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+    }
+    if (has('hm-marquee')) {
+      db.brand.marqueeItems = val('hm-marquee', '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+    }
+
+    /* C. Hero 3D / Video Stage */
+    if (has('hm-show-3d')) db.visibility.show3DStage = chk('hm-show-3d', true);
+    if (has('h3d-mode')) {
+      db.hero3D = {
+        mode: val('h3d-mode', db.hero3D.mode || 'character_image'),
+        position: val('h3d-position', db.hero3D.position || 'right'),
+        scale: Number(val('h3d-scale', db.hero3D.scale || 100)),
+        offsetX: Number(val('h3d-offx', db.hero3D.offsetX || 0)),
+        offsetY: Number(val('h3d-offy', db.hero3D.offsetY || 0)),
+        badgeText: val('h3d-badge', db.hero3D.badgeText || ''),
+        title: val('h3d-title', db.hero3D.title || ''),
+        subtitle: val('h3d-sub', db.hero3D.subtitle || ''),
+        imageUrl: val('h3d-img-url', db.hero3D.imageUrl || ''),
+        videoUrl: val('h3d-vid-url', db.hero3D.videoUrl || ''),
+        glbUrl: val('h3d-glb-url', db.hero3D.glbUrl || ''),
+        splineUrl: val('h3d-spline-url', db.hero3D.splineUrl || '')
+      };
+    }
+
+    /* D. 4 Key Metrics & Floating PiP Video */
+    if (has('hm-st1-v')) db.brand.stat1Val = val('hm-st1-v', db.brand.stat1Val);
+    if (has('hm-st1-l')) db.brand.stat1Lbl = val('hm-st1-l', db.brand.stat1Lbl);
+    if (has('hm-st2-v')) db.brand.stat2Val = val('hm-st2-v', db.brand.stat2Val);
+    if (has('hm-st2-l')) db.brand.stat2Lbl = val('hm-st2-l', db.brand.stat2Lbl);
+    if (has('hm-st3-l')) db.brand.stat3Lbl = val('hm-st3-l', db.brand.stat3Lbl);
+    if (has('hm-st4-v')) db.brand.stat4Val = val('hm-st4-v', db.brand.stat4Val);
+    if (has('hm-st4-l')) db.brand.stat4Lbl = val('hm-st4-l', db.brand.stat4Lbl);
+    if (has('hm-pip-video')) db.visibility.pipVideoUrl = val('hm-pip-video', db.visibility.pipVideoUrl);
+
+    /* E. Home Visibility Toggles */
+    if (has('vis-ann')) db.visibility.showAnnouncement = chk('vis-ann', true);
+    if (has('vis-clocks')) db.visibility.showWorldClocks = chk('vis-clocks', true);
+    if (has('vis-scarcity')) db.visibility.showScarcityBadge = chk('vis-scarcity', true);
+    if (has('vis-marquee')) db.visibility.showMarquee = chk('vis-marquee', true);
+    if (has('vis-stats')) db.visibility.showStats = chk('vis-stats', true);
+    if (has('vis-viral')) db.visibility.showViralSuite = chk('vis-viral', true);
+    if (has('vis-work')) db.visibility.showWork = chk('vis-work', true);
+    if (has('vis-process')) db.visibility.showProcess = chk('vis-process', true);
+    if (has('vis-awards')) db.visibility.showAwards = chk('vis-awards', true);
+
+    /* F. All Page Headings */
+    if (has('hd-srv-eyebrow')) db.headings.srvPageEyebrow = val('hd-srv-eyebrow', db.headings.srvPageEyebrow);
+    if (has('hd-srv-heading')) db.headings.srvPageHeading = val('hd-srv-heading', db.headings.srvPageHeading);
+    if (has('hd-srv-sub')) db.headings.srvPageSub = val('hd-srv-sub', db.headings.srvPageSub);
+    if (has('hd-hm-srv')) db.headings.homeSrvHeading = val('hd-hm-srv', db.headings.homeSrvHeading);
+    if (has('hd-hm-wrk')) db.headings.homeWorkHeading = val('hd-hm-wrk', db.headings.homeWorkHeading);
+    if (has('hd-proc')) db.headings.processHeading = val('hd-proc', db.headings.processHeading);
+    if (has('hd-awd')) db.headings.awardsHeading = val('hd-awd', db.headings.awardsHeading);
+    if (has('hd-qt')) db.headings.quotePageHeading = val('hd-qt', db.headings.quotePageHeading);
+    if (has('hd-pf')) db.headings.pfPageHeading = val('hd-pf', db.headings.pfPageHeading);
+    if (has('hd-tr')) db.headings.trPageHeading = val('hd-tr', db.headings.trPageHeading);
+    if (has('hd-faq')) db.headings.faqHeading = val('hd-faq', db.headings.faqHeading);
+    if (has('hd-cnt')) db.headings.contactHeading = val('hd-cnt', db.headings.contactHeading);
+
+    /* G. Quotation, Pricing, Currency & Scratch Card */
+    if (has('qt-pricing-mode')) db.visibility.pricingMode = val('qt-pricing-mode', 'show');
+    if (has('qt-usd-rate')) db.brand.usdRate = Number(val('qt-usd-rate', 84));
+    if (has('qt-aed-rate')) db.brand.aedRate = Number(val('qt-aed-rate', 23));
+    if (has('qt-gst-pct')) db.brand.gstPercent = Number(val('qt-gst-pct', 0));
+    if (has('qt-enable-scratch')) db.visibility.enableScratchCard = chk('qt-enable-scratch', true);
+    if (has('qt-scratch-pct')) db.visibility.scratchDiscountPercent = Number(val('qt-scratch-pct', 10));
+    if (has('qt-terms')) db.brand.quoteTerms = val('qt-terms', db.brand.quoteTerms);
+
+    /* H. Client Tracker Visual Gauge Config */
+    if (has('tr-vis-style')) {
+      db.trackerConfig = {
+        visualStyle: val('tr-vis-style', 'circle_ring'),
+        completedColor: val('tr-col-done', '#10b981'),
+        remainingColor: val('tr-col-rem', '#27272a'),
+        gaugeSize: Number(val('tr-gauge-size', 130))
+      };
+    }
+
+    /* I. About Page Story, Mission & Vision */
+    if (has('ab-heading')) {
+      db.about.heading = val('ab-heading', db.about.heading);
+      db.about.story = val('ab-story', db.about.story);
+      db.about.mission = val('ab-mission', db.about.mission);
+      db.about.vision = val('ab-vision', db.about.vision);
+      db.aboutConfig.heading = db.about.heading;
+      db.aboutConfig.story = db.about.story;
+      db.aboutConfig.mission = db.about.mission;
+      db.aboutConfig.vision = db.about.vision;
+    }
+
+    /* J. Theme Colors, 26 Luxury Fonts & Luxury Glass UI */
+    if (has('th-bg')) {
+      db.theme = {
+        bgSolid: val('th-bg', '#09090b'),
+        cardCharcoal: val('th-card', '#111114'),
+        accentPrimary: val('th-pri', '#6366f1'),
+        accentSecondary: val('th-sec', '#10b981'),
+        textMain: '#f4f4f5',
+        fontHeading: val('th-font-head', 'Space Grotesk'),
+        fontBody: val('th-font-body', 'Plus Jakarta Sans'),
+        fontScale: Number(val('th-font-scale', 100))
+      };
+    }
+    if (has('lux-blur-inp')) {
+      db.luxuryUI = {
+        blurPx: Number(val('lux-blur-inp', 24)),
+        radiusPx: Number(val('lux-rad-inp', 24)),
+        spotlight: val('lux-spot-inp', 'gold'),
+        goldShimmer: chk('lux-gold-shimmer', true),
+        showGrader: chk('lux-show-grader', true),
+        showCallBtn: chk('lux-show-callbtn', true)
+      };
+    }
+
+    /* K. Google SEO, Favicon & Legal Policies */
+    if (has('seo-inp-title')) {
+      db.seo = {
+        title: val('seo-inp-title', db.seo.title),
+        desc: val('seo-inp-desc', db.seo.desc),
+        keywords: val('seo-inp-keys', db.seo.keywords),
+        favicon: val('seo-inp-fav', db.seo.favicon),
+        ogImage: val('seo-inp-og', db.seo.ogImage)
+      };
+    }
+    if (has('pol-inp-privacy')) {
+      db.policies = {
+        privacy: val('pol-inp-privacy', db.policies.privacy),
+        terms: val('pol-inp-terms', db.policies.terms),
+        refund: val('pol-inp-refund', db.policies.refund)
+      };
+    }
+
+    /* L. Smooth Motion Config */
+    if (has('sm-anim-preset')) {
+      db.smoothMotionConfig = {
+        preset: val('sm-anim-preset', 'apple_spring'),
+        durationMs: Number(val('sm-anim-dur', 650)),
+        staggerMs: Number(val('sm-anim-stagger', 45)),
+        gpuBoost: chk('sm-gpu-boost', true)
+      };
+    }
+
+    /* M. Sub-Studio Collectors (Menu Studio, Loader Studio, Contact Studio, Switchboard) */
+    if (typeof window.collectMenuStudioDataIntoDB === 'function') {
+      try { window.collectMenuStudioDataIntoDB(); } catch (e) {}
+    }
+    if (typeof window.collectLoaderStudioDataIntoDB === 'function') {
+      try { window.collectLoaderStudioDataIntoDB(); } catch (e) {}
+    }
+    if (typeof window.syncSwitchboardWithLegacyDB === 'function') {
+      try { window.syncSwitchboardWithLegacyDB(); } catch (e) {}
+    }
+  };
+
+  /* ============================================================================
+     6. UNIFIED MASTER SAVE & INSTANT BROADCAST ENGINE (`masterSaveAllV34`)
+     ============================================================================ */
+  window.masterSaveAllV34 = async function (actionNote, showGlassPopup) {
+    if (!window.db) return;
+
+    /* Step 1: Collect every single input box across the entire backend into `db` */
+    window.collectAllAdminInputsIntoDBV34();
+    window.updateAllLogoPreviewsV34();
+
+    /* Step 2: Save immediately to LocalStorage */
+    localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(window.db));
+
+    /* Step 3: Broadcast immediately to all open `index.html` tabs & Split Preview */
+    try {
+      const ch = new BroadcastChannel('OG_AGENCY_LIVE_SYNC_V13');
+      ch.postMessage({ type: 'DB_UPDATED', db: window.db });
+    } catch (e) {}
+
+    /* Step 4: Refresh Preview Chips on Closed Cards so Admin UI Shows Latest Values */
+    if (typeof window.lockAllCardsClosedV32 === 'function') {
+      window.lockAllCardsClosedV32();
+    }
+
+    /* Step 5: Push to Firebase Realtime Database */
+    if (typeof pushToFirebase === 'function') {
+      await pushToFirebase(actionNote || 'Saved All Studio Changes');
+    }
+
+    if (showGlassPopup && typeof window.showLiquidSavePopup === 'function') {
+      window.showLiquidSavePopup(actionNote || 'All Changes Live on Frontend!');
+    }
+  };
+
+  /* Route ALL Save Functions from Every Patch into `masterSaveAllV34`! */
+  window.saveAndPushAll         = function (note) { return window.masterSaveAllV34(note, true); };
+  window.quietCollectAndSyncAll = function (note, showPop) { return window.masterSaveAllV34(note, showPop !== false); };
+  window.easyAutoSave           = function () { return window.masterSaveAllV34('Auto-Saved Changes', true); };
+  window.syncEverythingV31      = function (note, imm) { return window.masterSaveAllV34(note, Boolean(imm)); };
+  window.syncEverythingV32      = function (note, imm) { return window.masterSaveAllV34(note, Boolean(imm)); };
+
+  /* Boot V34 Cleanup & Setup */
+  stripAllMaxLengthsV34();
+  mountMicroTextStudioV34();
+  window.updateAllLogoPreviewsV34();
+
+  setTimeout(function () {
+    stripAllMaxLengthsV34();
+    mountMicroTextStudioV34();
+    window.updateAllLogoPreviewsV34();
+  }, 500);
+})();
+</script>
+<!-- ==================== ADMIN.HTML : V34 ALL-IN-ONE MASTER FIX COMPLETE ==================== -->
