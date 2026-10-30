@@ -15083,3 +15083,159 @@
 })();
 </script>
 <!-- ==================== ADMIN.HTML : V32 ULTIMATE FIX COMPLETE ==================== -->
+<!-- ==================== ADMIN.HTML : V33 UNLIMITED CHARACTERS & ZERO-TRUNCATION PATCH (PASTE BELOW V32 AT VERY BOTTOM OF admin.html) ==================== -->
+<style id="admin-v33-unlimited-text-styles">
+  /* 1. Allow All Titles, Brand Names & Preview Chips in Admin to Show Full Text Without Cutting Off */
+  .adm-panel h2.truncate,
+  .adm-panel h3.truncate,
+  .adm-panel h4.truncate,
+  .adm-panel h5.truncate,
+  .adm-panel strong.truncate,
+  .adm-panel p.truncate {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
+    word-break: break-word !important;
+  }
+
+  .v32-pill-item {
+    max-width: 100% !important;
+  }
+  .v32-pill-item span {
+    white-space: normal !important;
+    word-break: break-word !important;
+  }
+
+  /* Expand Logo Preview Box Automatically if Long Text Logo is Typed */
+  #quick-logo-preview,
+  #gl-logo-preview {
+    width: auto !important;
+    min-width: 4rem !important;
+    max-width: 100% !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    text-align: center !important;
+  }
+</style>
+
+<script id="admin-v33-unlimited-typing-engine">
+(function () {
+  /* 1. Strip `maxlength` from Every Existing Input & Textarea Immediately */
+  function removeAllMaxLengthLimitsV33() {
+    document.querySelectorAll('input[maxlength], textarea[maxlength]').forEach(function (el) {
+      el.removeAttribute('maxlength');
+    });
+  }
+
+  /* 2. Instant Focus Guard: Whenever User Clicks or Types in ANY Box (Even Dynamically Created Ones), Remove `maxlength` in 0ms! */
+  document.addEventListener('focusin', function (e) {
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+      e.target.removeAttribute('maxlength');
+    }
+  }, true);
+
+  document.addEventListener('input', function (e) {
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+      e.target.removeAttribute('maxlength');
+    }
+  }, true);
+
+  /* 3. Remove `.substring(0, 2)` / `.substring(0, 3)` Slicing on Brand Logo Text & Previews */
+  window.updateLogoLivePreview = function () {
+    const box = document.getElementById('gl-logo-preview');
+    if (!box) return;
+    const url = (document.getElementById('gl-logo')?.value || '').trim();
+    const customLogoTxt = (document.getElementById('qk-logo-text')?.value || db?.brand?.logoText || '').trim();
+    const fullName = (document.getElementById('gl-name')?.value || db?.brand?.name || 'BP').trim();
+    if (url) {
+      box.innerHTML = `<img src="${url}" class="w-16 h-16 object-contain rounded-xl" />`;
+    } else {
+      box.innerText = customLogoTxt || fullName;
+    }
+  };
+
+  window.syncGlobalLogoToQuick = function () {
+    const logoUrl = (document.getElementById('gl-logo')?.value || '').trim();
+    const customLogoTxt = (document.getElementById('qk-logo-text')?.value || db?.brand?.logoText || '').trim();
+    const fullName = (document.getElementById('qk-name')?.value || document.getElementById('gl-name')?.value || db?.brand?.name || 'BP').trim();
+    const displayTxt = customLogoTxt || fullName;
+
+    const qkPrev = document.getElementById('quick-logo-preview');
+    if (qkPrev) {
+      if (logoUrl) {
+        qkPrev.innerHTML = `<img src="${logoUrl}" class="w-16 h-16 object-contain rounded-xl" />`;
+      } else {
+        qkPrev.innerHTML = `<span class="text-xs sm:text-sm font-black leading-tight">${displayTxt}</span>`;
+      }
+    }
+    window.updateLogoLivePreview();
+  };
+
+  window.syncQuickBrandToGlobal = function () {
+    const setVal = function (id, v) { const el = document.getElementById(id); if (el) el.value = v ?? ''; };
+    const qkName = document.getElementById('qk-name')?.value ?? '';
+    const qkTag  = document.getElementById('qk-tagline')?.value ?? '';
+    const qkPh   = document.getElementById('qk-phone')?.value ?? '';
+    const qkWa   = document.getElementById('qk-whatsapp')?.value ?? '';
+    const qkEm   = document.getElementById('qk-email')?.value ?? '';
+    const qkDom  = document.getElementById('qk-domain')?.value ?? '';
+    const qkLtxt = document.getElementById('qk-logo-text')?.value ?? '';
+    const qkLsz  = Number(document.getElementById('qk-logo-size')?.value || 40);
+
+    setVal('gl-name', qkName);
+    setVal('gl-tagline', qkTag);
+    setVal('gl-phone', qkPh);
+    setVal('gl-whatsapp', qkWa);
+    setVal('gl-email', qkEm);
+    setVal('gl-domain', qkDom);
+
+    if (window.db && db.brand) {
+      db.brand.name = qkName;
+      db.brand.tagline = qkTag;
+      db.brand.phone = qkPh;
+      db.brand.whatsapp = qkWa;
+      db.brand.email = qkEm;
+      db.brand.domain = qkDom;
+      db.brand.logoText = qkLtxt.trim(); // Save 100% FULL logo text without cutting!
+      db.brand.logoSize = qkLsz;
+    }
+    window.syncGlobalLogoToQuick();
+  };
+
+  /* 4. Ensure Loader Simulator Also Shows Full Brand Name & Logo Text Without Cutting */
+  const origUpdateLoaderSim = window.updateLoaderStudioCardsAndPreview;
+  window.updateLoaderStudioCardsAndPreview = function (playSim) {
+    if (typeof origUpdateLoaderSim === 'function') origUpdateLoaderSim(playSim);
+    if (!window.db) return;
+    const simEmblem = document.getElementById('sim-logo-emblem');
+    const simTitle = document.getElementById('sim-brand-title');
+    const activeLogoUrl = (db.loaderConfig?.customLoaderLogo || db.brand?.logo || '').trim();
+    if (simEmblem && !activeLogoUrl) {
+      simEmblem.style.width = 'auto';
+      simEmblem.style.minWidth = '5rem';
+      simEmblem.style.padding = '0 14px';
+      simEmblem.innerHTML = `<span class="text-sm font-black">${db.brand?.logoText || db.brand?.name || 'BP'}</span>`;
+    }
+    if (simTitle) {
+      simTitle.innerText = db.brand?.name || 'THE BLANK PAGE';
+    }
+  };
+
+  /* 5. Run Cleanup on Boot & After Any Tab Switch (Without Disturbing V32 Closed Forms) */
+  const origSwitchV32 = window.switchAdminTab;
+  window.switchAdminTab = function (tabName) {
+    if (typeof origSwitchV32 === 'function') origSwitchV32(tabName);
+    removeAllMaxLengthLimitsV33();
+  };
+
+  removeAllMaxLengthLimitsV33();
+  window.syncGlobalLogoToQuick();
+  setTimeout(function () {
+    removeAllMaxLengthLimitsV33();
+    window.syncGlobalLogoToQuick();
+  }, 500);
+})();
+</script>
+<!-- ==================== ADMIN.HTML : V33 UNLIMITED CHARACTERS PATCH COMPLETE ==================== -->
